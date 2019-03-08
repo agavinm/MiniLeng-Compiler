@@ -1,0 +1,201 @@
+/**
+ * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
+ */options{  static = true;
+  ignore_case = true;}PARSER_BEGIN(MiniLeng)
+
+import TablaVeces.TablaVeces;
+public class MiniLeng
+{
+  public static void main(String args []) throws ParseException
+  {
+    System.out.println("Compilador de Minileng V1. Autor: Andrés Gavín Murillo 716358. Ayuda: ./compilador -h");
+    
+    Boolean verbose = false;
+    MiniLeng parser;
+    TablaVeces tabla;
+
+    if (args.length == 0) {
+      System.out.println("Uso: ./compilador [argumentos] [archivo]");
+      return ;
+    }
+    else {
+      if (args[0].equals("-h")) {
+        System.out.println("Uso: ./compilador [argumentos] [archivo]");
+	    System.out.println("     [] -> opcional");
+        System.out.println("Argumentos:");
+	    System.out.println("    -h  -> Muestra la ayuda");
+	    System.out.println("    -v  -> Muestra información adicional");
+	    return ;
+	  }
+	  else if (args[0].equals("-v")) {
+	    if (args.length > 1) {
+	      verbose = true;
+	      try {
+            parser = new MiniLeng(new java.io.FileInputStream(args[1]));
+        }
+        catch (java.io.FileNotFoundException e) {
+            System.out.println("Fichero " + args[1] + " no encontrado.");
+            return ;
+        }
+	    }
+	  }
+	  else {
+	    try {
+            parser = new MiniLeng(new java.io.FileInputStream(args[0]));
+        }
+        catch (java.io.FileNotFoundException e) {
+            System.out.println("Fichero " + args[0] + " no encontrado.");
+            return ;
+        }
+	  }
+
+	  try { 
+    	MiniLeng.programa(verbose);
+	  }
+	  catch (Exception e) {
+		System.out.println("NOK.");
+        System.out.println(e.getMessage());
+        MiniLeng.ReInit(System.in);
+	  }
+	  catch (Error e) { 
+        return ;
+	  }
+	}
+  }
+}
+PARSER_END(MiniLeng)SKIP :{  " "| "\r"| "\t"| "\n"
+| "%" : COMENTARIO}
+
+< COMENTARIO > SKIP : // Comentarios de varias lineas %% opcional
+{
+  "\n" : DEFAULT
+}
+
+< COMENTARIO > MORE :
+{
+  < ~[] >
+}
+
+TOKEN : /* Estructuras */
+{  < tPROGRAMA : "programa" >
+| < tPRINCIPIO : "principio" >
+| < tFIN : "fin" >
+| < tSI : "si" >
+| < tENT : "ent" >
+| < tSI_NO : "si_no" >
+| < tFSI : "fsi" >
+| < tMQ : "mq" >
+| < tFMQ : "fmq" >
+| < tACCION : "accion" >
+}
+
+TOKEN : /* Tipos de datos */
+{
+  < tVAR : "var" >
+| < tENTERO : "entero" >
+| < tBOOLEANO : "booleano" >
+| < tCARACTER : "caracter" >
+| < tVAL : "val" >
+| < tREF : "ref" >
+}
+
+TOKEN : /* Valores lógicos */
+{
+  < tAND : "and" >
+| < tOR : "or" >
+| < tNOT : "not" >
+| < tTRUE : "true" >
+| < tFALSE : "false" >
+}
+
+TOKEN : /* Operaciones */
+{
+  < tESCRIBIR : "escribir" >
+| < tLEER : "leer" >
+| < tENTACAR : "entacar" >
+| < tCARAENT : "caraent" >
+}
+TOKEN : /* Operadores */{
+  < tMOD : "mod" >
+| < tDIV : "div" | "/" >
+| < tMAYOR : ">" >
+| < tMENOR : "<" >
+| < tIGUAL : "=" >
+| < tMAI : ">=" >
+| < tMEI : "<=" >
+| < tNI : "<>" >
+| < tOPAS : ":=" >
+| < tPC : ";" >
+| < tC : "," >
+| < tSUMA : "+" >
+| < tRESTA : "-" >
+| < tMULTIPLICA : "*" >
+| < tAP : "(" >
+| < tCP : ")" >}TOKEN :{  < tNUMERO : (< DIGITO >)+ >| < #DIGITO : [ "0"-"9" ] >
+| < tLETRA : ["\""] (< LETRA >) ["\""] >
+| < tCADENA : ["\""] (~["\""])+ ["\""] >
+| < #LETRA : [ "A"-"Z" ] >
+| < tIDENTIFICADOR : (< LETRA > | (< LETRA > | "_") (< LETRA > | < DIGITO > | "_")*
+	(< LETRA > | < DIGITO >)) >
+| < tERROR : ~[] >
+	{
+		System.out.println("ERROR LÉXICO (<" + matchedToken.beginLine + ", " +
+		 matchedToken.beginColumn + ">) : símbolo no reconocido: <" + matchedToken + ">");
+	}}
+
+int programa(Boolean verbose) :
+{}
+{
+(
+      < tPROGRAMA >
+	| < tPRINCIPIO >
+	| < tFIN >
+	| < tSI >
+	| < tENT >
+	| < tSI_NO >
+	| < tFSI >
+	| < tMQ >
+	| < tFMQ >
+	| < tACCION >
+	| < tVAR >
+	| < tENTERO >
+	| < tBOOLEANO >
+	| < tCARACTER >
+	| < tVAL >
+	| < tREF >
+	| < tAND >
+	| < tOR >
+	| < tNOT >
+	| < tTRUE >
+	| < tFALSE >
+	| < tESCRIBIR >
+	| < tLEER >
+	| < tENTACAR >
+	| < tCARAENT >
+	| < tMOD >
+	| < tDIV >
+	| < tMAYOR >
+	| < tMENOR >
+	| < tIGUAL >
+	| < tMAI >
+	| < tMEI >
+	| < tNI >
+	| < tOPAS >
+	| < tPC >
+	| < tC >
+	| < tSUMA >
+	| < tRESTA >
+	| < tMULTIPLICA >
+	| < tAP >
+	| < tCP >
+	| < tNUMERO >
+	| < tLETRA >
+	| < tCADENA >
+	| < tIDENTIFICADOR >
+	| < EOF > { return 0; }
+	| < tERROR > { return 1; }
+)+
+  {
+    return 1;
+  }
+}
