@@ -1,17 +1,22 @@
-/**
- * JavaCC template file created by SF JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
- */options{  static = true;
-  ignore_case = true;}PARSER_BEGIN(MiniLeng)
+//*****************************************************************
+// File:   MiniLengCompiler.jj
+// Author: Andrés Gavín Murillo 716358
+// Date:   Marzo 2019
+// Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V1
+//         JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
+//*****************************************************************
+options{  static = true;
+  ignore_case = true;}PARSER_BEGIN(MiniLengCompiler)
 
 import TablaVeces.TablaVeces;
-public class MiniLeng
+public class MiniLengCompiler
 {
   public static void main(String args []) throws ParseException
   {
-    System.out.println("Compilador de Minileng V1. Autor: Andrés Gavín Murillo 716358. Ayuda: ./compilador -h\n");
+    System.out.println("Compilador de MiniLengCompiler V1. Autor: Andrés Gavín Murillo 716358. Ayuda: ./compilador -h\n");
     
     Boolean verbose = false;
-    MiniLeng parser;
+    MiniLengCompiler parser;
     TablaVeces tabla = new TablaVeces();
 
     if (args.length == 0) {
@@ -31,7 +36,7 @@ public class MiniLeng
 	    if (args.length > 1) {
 	      verbose = true;
 	      try {
-            parser = new MiniLeng(new java.io.FileInputStream(args[1]));
+            parser = new MiniLengCompiler(new java.io.FileInputStream(args[1]));
         }
         catch (java.io.FileNotFoundException e) {
             System.out.println("Fichero " + args[1] + " no encontrado.");
@@ -41,7 +46,7 @@ public class MiniLeng
 	  }
 	  else {
 	    try {
-            parser = new MiniLeng(new java.io.FileInputStream(args[0]));
+            parser = new MiniLengCompiler(new java.io.FileInputStream(args[0]));
         }
         catch (java.io.FileNotFoundException e) {
             System.out.println("Fichero " + args[0] + " no encontrado.");
@@ -50,12 +55,15 @@ public class MiniLeng
 	  }
 
 	  try { 
-    	MiniLeng.programa(verbose);
+    	if (MiniLengCompiler.programa(verbose) == 0)
+    		System.out.println("OK.");
+    	else
+    		System.out.println("NOK.");
 	  }
 	  catch (Exception e) {
 		System.out.println("NOK.");
         System.out.println(e.getMessage());
-        MiniLeng.ReInit(System.in);
+        MiniLengCompiler.ReInit(System.in);
 	  }
 	  catch (Error e) { 
         return ;
@@ -63,7 +71,7 @@ public class MiniLeng
 	}
   }
 }
-PARSER_END(MiniLeng)SKIP :{  " "| "\r"| "\t"| "\n"
+PARSER_END(MiniLengCompiler)SKIP :{  " "| "\r"| "\t"| "\n"
 | "%" : COMENTARIO}
 
 < COMENTARIO > SKIP : // Comentarios de varias lineas %% opcional
@@ -258,7 +266,7 @@ TOKEN : /* Operaciones */
   	{
   	  TablaVeces.incrementarValor(41);
  	}| < #DIGITO : [ "0"-"9" ] >
-| < tLETRA : ["\""] (< LETRA >) ["\""] >
+| < tLETRA : ["\""] ~["\""] ["\""] >
   	{
   	  TablaVeces.incrementarValor(42);
  	}

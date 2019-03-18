@@ -1,3 +1,11 @@
+//*****************************************************************
+// File:   TablaVeces.java
+// Author: Andrés Gavín Murillo 716358
+// Date:   Marzo 2019
+// Coms:   Procesadores de lenguajes - Compilador de Minileng V1
+//         JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
+//*****************************************************************
+
 package TablaVeces;
 
 public class TablaVeces {
