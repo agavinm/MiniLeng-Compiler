@@ -2,7 +2,7 @@
 // File:   MiniLengCompiler.jj
 // Author: Andrés Gavín Murillo 716358
 // Date:   Marzo 2019
-// Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V1 
+// Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V1
 //         JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
 //*****************************************************************
 options{  static = true;
