@@ -2,7 +2,7 @@
 // File:   MiniLengCompiler.jj
 // Author: Andrés Gavín Murillo 716358
 // Date:   Marzo 2019
-// Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V1
+// Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V1.1
 //         JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
 //*****************************************************************
 options{  static = true;
@@ -13,17 +13,18 @@ public class MiniLengCompiler
 {
   public static void main(String args []) throws ParseException
   {
-    System.out.println("Compilador de MiniLengCompiler V1. Autor: Andrés Gavín Murillo 716358. Ayuda: ./compilador -h\n");
+    System.out.println("Compilador de MiniLengCompiler V1.1 Autor: Andrés Gavín Murillo 716358. Ayuda: ./compilador -h\n");
     
     Boolean verbose = false;
-    MiniLengCompiler parser;
+    MiniLengCompiler compiler;
     TablaVeces tabla = new TablaVeces();
 
-    if (args.length == 0) {
+    // Lanzar compilador
+    if (args.length == 0) { // Sin argumentos
       System.out.println("Uso: ./compilador [argumentos] [archivo]");
       return ;
     }
-    else {
+    else { // Opción ayuda
       if (args[0].equals("-h")) {
         System.out.println("Uso: ./compilador [argumentos] [archivo]");
 	    System.out.println("     [] -> opcional");
@@ -32,40 +33,44 @@ public class MiniLengCompiler
 	    System.out.println("    -v  -> Muestra información adicional");
 	    return ;
 	  }
-	  else if (args[0].equals("-v")) {
-	    if (args.length > 1) {
-	      verbose = true;
-	      try {
-            parser = new MiniLengCompiler(new java.io.FileInputStream(args[1]));
-        }
-        catch (java.io.FileNotFoundException e) {
-            System.out.println("Fichero " + args[1] + " no encontrado.");
-            return ;
-        }
-	    }
-	  }
 	  else {
+	    int n_arg = 0;
+	    if (args[0].equals("-v") && (args.length > 1)) { // Opción verbose
+	      verbose = true;
+	      n_arg++;
+	    }
+
 	    try {
-            parser = new MiniLengCompiler(new java.io.FileInputStream(args[0]));
+            compiler = new MiniLengCompiler(new java.io.FileInputStream(args[n_arg]));
         }
         catch (java.io.FileNotFoundException e) {
-            System.out.println("Fichero " + args[0] + " no encontrado.");
+            System.out.println("Fichero " + args[n_arg] + " no encontrado.");
             return ;
         }
 	  }
 
 	  try { 
-    	if (MiniLengCompiler.programa(verbose) == 0)
-    		System.out.println("OK.");
-    	else
-    		System.out.println("NOK.");
+    	MiniLengCompiler.programa(verbose);
+    	System.out.println("Compilación correcta.");
 	  }
-	  catch (Exception e) {
-		System.out.println("NOK.");
+	  catch (Exception e) { // Error sintáctico
+		System.out.println("Compilación fallida.");
         System.out.println(e.getMessage());
         MiniLengCompiler.ReInit(System.in);
 	  }
-	  catch (Error e) { 
+	  catch (Error e) { // Error léxico
+	    int error_line = token.beginLine, error_column = token.beginColumn; // TODO: Corregir problema de posicion del error, posibilidad crear nueva clase gestion de errores
+	    char curChar = MiniLengCompilerTokenManager.curChar;
+
+	    if (curChar == '\n' || curChar == '\r') {
+           error_line++;
+           error_column = 0;
+        }
+        else
+           error_column++;
+	    
+	    System.out.println("ERROR LÉXICO (<" + error_line + ", " + error_column +
+	       ">) : símbolo no reconocido: <" + curChar + ">");
         return ;
 	  }
 	}
@@ -262,15 +267,15 @@ TOKEN : /* Operaciones */
 | < tCP : ")" >
   	{
   	  TablaVeces.incrementarValor(40);
- 	}}TOKEN :{  < tNUMERO : (< DIGITO >)+ >
+ 	}}TOKEN :{  < tCONSTENTERA : (< DIGITO >)+ >
   	{
   	  TablaVeces.incrementarValor(41);
  	}| < #DIGITO : [ "0"-"9" ] >
-| < tLETRA : ["\""] ~["\""] ["\""] >
+| < tCONSTCHAR : ["\""] ~["\""] ["\""] >
   	{
   	  TablaVeces.incrementarValor(42);
  	}
-| < tCADENA : ["\""] (~["\""])+ ["\""] >
+| < tCONSTCAD : ["\""] (~["\""])+ ["\""] >
   	{
   	  TablaVeces.incrementarValor(43);
  	}
@@ -279,14 +284,9 @@ TOKEN : /* Operaciones */
   	{
   	  TablaVeces.incrementarValor(44);
  	}
-| < #LETRA : [ "A"-"Z" ] >
-| < tERROR : ~[] >
-	{
-		System.out.println("ERROR LÉXICO (<" + matchedToken.beginLine + ", " +
-		 matchedToken.beginColumn + ">) : símbolo no reconocido: <" + matchedToken + ">");
-	}}
+| < #LETRA : [ "A"-"Z" ] >}
 
-int programa(Boolean verbose) :
+void programa(Boolean verbose) :
 {}
 {
 (
@@ -331,19 +331,15 @@ TOKEN : /* Operaciones */
 	| < tMULTIPLICA >
 	| < tAP >
 	| < tCP >
-	| < tNUMERO >
-	| < tLETRA >
-	| < tCADENA >
+	| < tCONSTENTERA >
+	| < tCONSTCHAR >
+	| < tCONSTCAD >
 	| < tIDENTIFICADOR >
 	| < EOF >
 		{
 		  if (verbose)
 		  	TablaVeces.print();
-		  return 0;
 		}
-	| < tERROR > { return 1; }
 )+
-  {
-    return 1;
-  }
+  { }
 }
