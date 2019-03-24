@@ -1,0 +1,341 @@
+//*****************************************************************
+// File:   MiniLengCompiler.jj
+// Author: Andrés Gavín Murillo 716358
+// Date:   24/3/2019
+// Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V1.1
+//         JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
+//*****************************************************************
+options{    static = true;
+    ignore_case = true;
+    //error_reporting = true;}PARSER_BEGIN(MiniLengCompiler)
+
+package javacc;
+
+import lib.TablaVeces;
+import lib.ErrorLexico;
+import java.io.FileInputStream;
+
+public class MiniLengCompiler {
+    public static void main(String args []) throws ParseException {
+        System.out.println("Compilador de MiniLengCompiler V1.1 Autor: Andrés Gavín Murillo 716358. Ayuda: ./compilador -h\n");
+        
+        Boolean verbose = false;
+        MiniLengCompiler compiler;
+        FileInputStream f = null;
+        TablaVeces tabla = new TablaVeces();
+
+        // Lanzar compilador
+        if (args.length == 0) { // Sin argumentos
+            System.out.println("Uso: ./compilador [argumentos] [archivo]");
+            return ;
+        }
+        else { // Opción ayuda
+            if (args[0].equals("-h")) {
+                System.out.println("Uso: ./compilador [argumentos] [archivo]");
+                System.out.println("     [] -> opcional");
+                System.out.println("Argumentos:");
+                System.out.println("    -h  -> Muestra la ayuda");
+                System.out.println("    -v  -> Muestra información adicional");
+                return ;
+            }
+            else {
+                int n_arg = 0;
+                if (args[0].equals("-v") && (args.length > 1)) { // Opción verbose
+                    verbose = true;
+                    n_arg++;
+                }
+
+                try {
+                    f = new FileInputStream(args[n_arg]);
+                    compiler = new MiniLengCompiler(new FileInputStream(args[n_arg]));
+                }
+                catch (java.io.FileNotFoundException e) {
+                    System.out.println("Fichero " + args[n_arg] + " no encontrado.");
+                    return ;
+                }
+            }
+
+            try { 
+                MiniLengCompiler.programa(verbose);
+                System.out.println("Compilación correcta.");
+            }
+            catch (Exception e) { // Error sintáctico
+                System.out.println("Compilación fallida.");
+                System.out.println(e.getMessage());
+                MiniLengCompiler.ReInit(System.in);
+            }
+            catch (Error e) { // Error léxico
+                ErrorLexico.generar(token, MiniLengCompilerTokenManager.curChar, f);
+                return ;
+            }
+        }
+    }
+}
+PARSER_END(MiniLengCompiler)SKIP :{  " "| "\r"| "\t"| "\n"
+| "%" : COMENTARIO}
+
+< COMENTARIO > SKIP : // Comentarios de varias lineas %% opcional
+{
+  "\n" : DEFAULT
+}
+
+< COMENTARIO > MORE :
+{
+  < ~[] >
+}
+
+TOKEN : /* Estructuras */
+{  < tPROGRAMA : "programa" >
+    {
+        TablaVeces.incrementarValor(0);
+    }
+| < tPRINCIPIO : "principio" >
+    {
+        TablaVeces.incrementarValor(1);
+    }
+| < tFIN : "fin" >
+    {
+        TablaVeces.incrementarValor(2);
+    }
+| < tSI : "si" >
+    {
+        TablaVeces.incrementarValor(3);
+    }
+| < tENT : "ent" >
+    {
+        TablaVeces.incrementarValor(4);
+    }
+| < tSI_NO : "si_no" >
+    {
+        TablaVeces.incrementarValor(5);
+    }
+| < tFSI : "fsi" >
+    {
+        TablaVeces.incrementarValor(6);
+    }
+| < tMQ : "mq" >
+    {
+        TablaVeces.incrementarValor(7);
+    }
+| < tFMQ : "fmq" >
+    {
+        TablaVeces.incrementarValor(8);
+    }
+| < tACCION : "accion" >
+    {
+        TablaVeces.incrementarValor(9);
+    }
+| < tPC : ";" >
+    {
+        TablaVeces.incrementarValor(10);
+    }
+| < tC : "," >
+    {
+        TablaVeces.incrementarValor(11);
+    }
+}
+
+TOKEN : /* Tipos de datos */
+{
+  < tVAR : "var" >
+    {
+        TablaVeces.incrementarValor(12);
+    }
+| < tENTERO : "entero" >
+    {
+        TablaVeces.incrementarValor(13);
+    }
+| < tBOOLEANO : "booleano" >
+    {
+        TablaVeces.incrementarValor(14);
+    }
+| < tCARACTER : "caracter" >
+    {
+        TablaVeces.incrementarValor(15);
+    }
+| < tVAL : "val" >
+    {
+        TablaVeces.incrementarValor(16);
+    }
+| < tREF : "ref" >
+    {
+        TablaVeces.incrementarValor(17);
+    }
+}
+
+TOKEN : /* Operadores lógicos */
+{
+  < tAND : "and" >
+    {
+        TablaVeces.incrementarValor(18);
+    }
+| < tOR : "or" >
+    {
+        TablaVeces.incrementarValor(19);
+    }
+| < tNOT : "not" >
+    {
+        TablaVeces.incrementarValor(20);
+    }
+| < tMAYOR : ">" >
+    {
+        TablaVeces.incrementarValor(21);
+    }
+| < tMENOR : "<" >
+    {
+        TablaVeces.incrementarValor(22);
+    }
+| < tIGUAL : "=" >
+    {
+      TablaVeces.incrementarValor(23);
+    }
+| < tMAI : ">=" >
+    {
+        TablaVeces.incrementarValor(24);
+    }
+| < tMEI : "<=" >
+    {
+        TablaVeces.incrementarValor(25);
+    }
+| < tNI : "<>" >
+    {
+        TablaVeces.incrementarValor(26);
+    }
+| < tTRUE : "true" >
+    {
+        TablaVeces.incrementarValor(27);
+    }
+| < tFALSE : "false" >
+    {
+        TablaVeces.incrementarValor(28);
+    }
+}
+
+TOKEN : /* Operaciones */
+{
+  < tESCRIBIR : "escribir" >
+    {
+        TablaVeces.incrementarValor(29);
+    }
+| < tLEER : "leer" >
+    {
+        TablaVeces.incrementarValor(30);
+    }
+| < tENTACAR : "entacar" >
+    {
+        TablaVeces.incrementarValor(31);
+    }
+| < tCARAENT : "caraent" >
+    {
+        TablaVeces.incrementarValor(32);
+    }
+}
+TOKEN : /* Operadores aritméticos */{
+  < tMOD : "mod" >
+    {
+        TablaVeces.incrementarValor(33);
+    }
+| < tDIV : "div" | "/" >
+    {
+        TablaVeces.incrementarValor(34);
+    }
+| < tOPAS : ":=" >
+    {
+        TablaVeces.incrementarValor(35);
+    }
+| < tSUMA : "+" >
+    {
+        TablaVeces.incrementarValor(36);
+    }
+| < tRESTA : "-" >
+    {
+        TablaVeces.incrementarValor(37);
+    }
+| < tMULTIPLICA : "*" >
+    {
+        TablaVeces.incrementarValor(38);
+    }
+| < tAP : "(" >
+    {
+        TablaVeces.incrementarValor(39);
+    }
+| < tCP : ")" >
+    {
+        TablaVeces.incrementarValor(40);
+    }}TOKEN :{  < tCONSTENTERA : (< DIGITO >)+ >
+    {
+        TablaVeces.incrementarValor(41);
+    }| < #DIGITO : [ "0"-"9" ] >
+| < tCONSTCHAR : ["\""] ~["\""] ["\""] >
+    {
+        TablaVeces.incrementarValor(42);
+    }
+| < tCONSTCAD : ["\""] (~["\""])+ ["\""] >
+    {
+        TablaVeces.incrementarValor(43);
+    }
+| < tIDENTIFICADOR : (< LETRA > | (< LETRA > | "_") (< LETRA > | < DIGITO > | "_")*
+    (< LETRA > | < DIGITO >)) >
+    {
+        TablaVeces.incrementarValor(44);
+    }
+| < #LETRA : [ "A"-"Z" ] >}
+
+void programa(Boolean verbose) :
+{}
+{
+(
+      < tPROGRAMA >
+    | < tPRINCIPIO >
+    | < tFIN >
+    | < tSI >
+    | < tENT >
+    | < tSI_NO >
+    | < tFSI >
+    | < tMQ >
+    | < tFMQ >
+    | < tACCION >
+    | < tPC >
+    | < tC >
+    | < tVAR >
+    | < tENTERO >
+    | < tBOOLEANO >
+    | < tCARACTER >
+    | < tVAL >
+    | < tREF >
+    | < tAND >
+    | < tOR >
+    | < tNOT >
+    | < tMAYOR >
+    | < tMENOR >
+    | < tIGUAL >
+    | < tMAI >
+    | < tMEI >
+    | < tNI >
+    | < tTRUE >
+    | < tFALSE >
+    | < tESCRIBIR >
+    | < tLEER >
+    | < tENTACAR >
+    | < tCARAENT >
+    | < tMOD >
+    | < tDIV >
+    | < tOPAS >
+    | < tSUMA >
+    | < tRESTA >
+    | < tMULTIPLICA >
+    | < tAP >
+    | < tCP >
+    | < tCONSTENTERA >
+    | < tCONSTCHAR >
+    | < tCONSTCAD >
+    | < tIDENTIFICADOR >
+    | < EOF >
+        {
+            if (verbose)
+                TablaVeces.print();
+            return;
+        }
+)+
+  { return; }
+}
