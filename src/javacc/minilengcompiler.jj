@@ -2,7 +2,7 @@
 // File:   MiniLengCompiler.jj
 // Author: Andrés Gavín Murillo 716358
 // Date:   24/3/2019
-// Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V1.1
+// Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V2.0
 //         JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
 //*****************************************************************
 options{    static = true;
@@ -74,7 +74,7 @@ public class MiniLengCompiler {
 PARSER_END(MiniLengCompiler)SKIP :{  " "| "\r"| "\t"| "\n"
 | "%" : COMENTARIO}
 
-< COMENTARIO > SKIP : // Comentarios de varias lineas %% opcional
+< COMENTARIO > SKIP :
 {
   "\n" : DEFAULT
 }
