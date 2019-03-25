@@ -17,7 +17,7 @@ import java.io.FileInputStream;
 
 public class MiniLengCompiler {
     public static void main(String args []) throws ParseException {
-        System.out.println("Compilador de MiniLengCompiler V1.1 Autor: Andrés Gavín Murillo 716358. Ayuda: ./compilador -h\n");
+        System.out.println("Compilador de MiniLengCompiler V2.0 Autor: Andrés Gavín Murillo 716358. Ayuda: ./compilador -h\n");
         
         Boolean verbose = false;
         MiniLengCompiler compiler;
@@ -527,7 +527,7 @@ void lista_escribibles() :
 {}
 {
     try { 
-        lista_expresiones()
+        ( <tCONSTCAD> | expresion() ) ( <tC> ( <tCONSTCAD> | expresion() ) )*
     }
     catch (Exception e) { // Error sintáctico
         System.out.println("Compilación fallida.");
@@ -717,7 +717,6 @@ void factor() :
 	    | <tIDENTIFICADOR>
 	    | <tCONSTENTERA>
 	    | <tCONSTCHAR>
-	    | <tCONSTCAD>
 	    | <tTRUE>
 	    | <tFALSE>
     }
