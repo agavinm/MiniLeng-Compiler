@@ -59,11 +59,6 @@ public class MiniLengCompiler {
                 MiniLengCompiler.programa(verbose);
                 System.out.println("Compilación correcta.");
             }
-            catch (Exception e) { // Error sintáctico
-                System.out.println("Compilación fallida.");
-                System.out.println(e.getMessage());
-                MiniLengCompiler.ReInit(System.in);
-            }
             catch (Error e) { // Error léxico
                 ErrorLexico.generar(token, MiniLengCompilerTokenManager.curChar, f);
                 return ;
@@ -71,7 +66,8 @@ public class MiniLengCompiler {
         }
     }
 }
-PARSER_END(MiniLengCompiler)SKIP :{  " "| "\r"| "\t"| "\n"
+// Análisis léxico
+PARSER_END(MiniLengCompiler)SKIP :{  " "| "\r"| "\t"| "\n"
 | "%" : COMENTARIO}
 
 < COMENTARIO > SKIP :
@@ -281,61 +277,453 @@ TOKEN : /* Operaciones */
     }
 | < #LETRA : [ "A"-"Z" ] >}
 
+// Análisis sintáctico
 void programa(Boolean verbose) :
 {}
 {
-(
-      < tPROGRAMA >
-    | < tPRINCIPIO >
-    | < tFIN >
-    | < tSI >
-    | < tENT >
-    | < tSI_NO >
-    | < tFSI >
-    | < tMQ >
-    | < tFMQ >
-    | < tACCION >
-    | < tPC >
-    | < tC >
-    | < tVAR >
-    | < tENTERO >
-    | < tBOOLEANO >
-    | < tCARACTER >
-    | < tVAL >
-    | < tREF >
-    | < tAND >
-    | < tOR >
-    | < tNOT >
-    | < tMAYOR >
-    | < tMENOR >
-    | < tIGUAL >
-    | < tMAI >
-    | < tMEI >
-    | < tNI >
-    | < tTRUE >
-    | < tFALSE >
-    | < tESCRIBIR >
-    | < tLEER >
-    | < tENTACAR >
-    | < tCARAENT >
-    | < tMOD >
-    | < tDIV >
-    | < tOPAS >
-    | < tSUMA >
-    | < tRESTA >
-    | < tMULTIPLICA >
-    | < tAP >
-    | < tCP >
-    | < tCONSTENTERA >
-    | < tCONSTCHAR >
-    | < tCONSTCAD >
-    | < tIDENTIFICADOR >
-    | < EOF >
-        {
-            if (verbose)
-                TablaVeces.print();
-            return;
-        }
-)+
-  { return; }
+    try { 
+	    <tPROGRAMA> <tIDENTIFICADOR> <tPC> declaracion_variables() declaracion_acciones()
+	     bloque_sentencias() < EOF >
+	        {
+	            if (verbose)
+	                TablaVeces.print();
+	            return;
+	        }
+    }
+    catch (Exception e) { // Error sintáctico
+        System.out.println("Compilación fallida.");
+        System.out.println(e.getMessage());
+        MiniLengCompiler.ReInit(System.in);
+    }
+}
+
+void declaracion_variables() :
+{}
+{
+    try { 
+        ( declaracion() <tPC> )*
+    }
+    catch (Exception e) { // Error sintáctico
+        System.out.println("Compilación fallida.");
+        System.out.println(e.getMessage());
+        MiniLengCompiler.ReInit(System.in);
+    }
+}
+
+void declaracion() :
+{}
+{
+    try { 
+        tipo_variables() identificadores()
+    }
+    catch (Exception e) { // Error sintáctico
+        System.out.println("Compilación fallida.");
+        System.out.println(e.getMessage());
+        MiniLengCompiler.ReInit(System.in);
+    }
+}
+
+void tipo_variables() :
+{}
+{
+    try { 
+        <tENTERO> | <tCARACTER> | <tBOOLEANO>
+    }
+    catch (Exception e) { // Error sintáctico
+        System.out.println("Compilación fallida.");
+        System.out.println(e.getMessage());
+        MiniLengCompiler.ReInit(System.in);
+    }
+}
+
+void identificadores() :
+{}
+{
+    try { 
+        <tIDENTIFICADOR> ( <tC> <tIDENTIFICADOR> )*
+    }
+    catch (Exception e) { // Error sintáctico
+        System.out.println("Compilación fallida.");
+        System.out.println(e.getMessage());
+        MiniLengCompiler.ReInit(System.in);
+    }
+}
+
+void declaracion_acciones() :
+{}
+{
+    try { 
+        ( declaracion_accion() )*
+    }
+    catch (Exception e) { // Error sintáctico
+        System.out.println("Compilación fallida.");
+        System.out.println(e.getMessage());
+        MiniLengCompiler.ReInit(System.in);
+    }
+}
+
+void declaracion_accion() :
+{}
+{
+    try { 
+        cabecera_accion() <tPC> declaracion_variables()
+         declaracion_acciones() bloque_sentencias()
+    }
+    catch (Exception e) { // Error sintáctico
+        System.out.println("Compilación fallida.");
+        System.out.println(e.getMessage());
+        MiniLengCompiler.ReInit(System.in);
+    }
+}
+
+void cabecera_accion() :
+{}
+{
+    try { 
+        <tACCION> <tIDENTIFICADOR> parametros_formales()
+    }
+    catch (Exception e) { // Error sintáctico
+        System.out.println("Compilación fallida.");
+        System.out.println(e.getMessage());
+        MiniLengCompiler.ReInit(System.in);
+    }
+}
+
+void parametros_formales() :
+{}
+{
+    try { 
+        ( <tAP> ( parametros() )* <tCP> )?
+    }
+    catch (Exception e) { // Error sintáctico
+        System.out.println("Compilación fallida.");
+        System.out.println(e.getMessage());
+        MiniLengCompiler.ReInit(System.in);
+    }
+}
+
+void lista_parametros() :
+{}
+{
+    try { 
+        identificadores() ( <tPC> parametros() )*
+    }
+    catch (Exception e) { // Error sintáctico
+        System.out.println("Compilación fallida.");
+        System.out.println(e.getMessage());
+        MiniLengCompiler.ReInit(System.in);
+    }
+}
+
+void parametros() :
+{}
+{
+    try { 
+        clase_parametros() tipo_variables() lista_parametros()
+    }
+    catch (Exception e) { // Error sintáctico
+        System.out.println("Compilación fallida.");
+        System.out.println(e.getMessage());
+        MiniLengCompiler.ReInit(System.in);
+    }
+}
+
+void clase_parametros() :
+{}
+{
+    try { 
+        <tVAL> | <tREF>
+    }
+    catch (Exception e) { // Error sintáctico
+        System.out.println("Compilación fallida.");
+        System.out.println(e.getMessage());
+        MiniLengCompiler.ReInit(System.in);
+    }
+}
+
+void bloque_sentencias() :
+{}
+{
+    try { 
+        <tPRINCIPIO> lista_sentencias() <tFIN>
+    }
+    catch (Exception e) { // Error sintáctico
+        System.out.println("Compilación fallida.");
+        System.out.println(e.getMessage());
+        MiniLengCompiler.ReInit(System.in);
+    }
+}
+
+void lista_sentencias() :
+{}
+{
+    try { 
+        ( sentencia() )+
+    }
+    catch (Exception e) { // Error sintáctico
+        System.out.println("Compilación fallida.");
+        System.out.println(e.getMessage());
+        MiniLengCompiler.ReInit(System.in);
+    }
+}
+
+void sentencia() :
+{}
+{
+    try { 
+        leer() <tPC>
+	    | escribir() <tPC>
+	    | identificacion()
+	    | seleccion()
+	    | mientras_que()
+    }
+    catch (Exception e) { // Error sintáctico
+        System.out.println("Compilación fallida.");
+        System.out.println(e.getMessage());
+        MiniLengCompiler.ReInit(System.in);
+    }
+}
+
+void leer() :
+{}
+{
+    try { 
+        <tLEER> <tAP> lista_asignables() <tCP>
+    }
+    catch (Exception e) { // Error sintáctico
+        System.out.println("Compilación fallida.");
+        System.out.println(e.getMessage());
+        MiniLengCompiler.ReInit(System.in);
+    }
+}
+
+void lista_asignables() :
+{}
+{
+    try { 
+        identificadores()
+    }
+    catch (Exception e) { // Error sintáctico
+        System.out.println("Compilación fallida.");
+        System.out.println(e.getMessage());
+        MiniLengCompiler.ReInit(System.in);
+    }
+}
+
+void escribir() :
+{}
+{
+    try { 
+        <tESCRIBIR> <tAP> lista_escribibles() <tCP>
+    }
+    catch (Exception e) { // Error sintáctico
+        System.out.println("Compilación fallida.");
+        System.out.println(e.getMessage());
+        MiniLengCompiler.ReInit(System.in);
+    }
+}
+
+void lista_escribibles() :
+{}
+{
+    try { 
+        lista_expresiones()
+    }
+    catch (Exception e) { // Error sintáctico
+        System.out.println("Compilación fallida.");
+        System.out.println(e.getMessage());
+        MiniLengCompiler.ReInit(System.in);
+    }
+}
+
+void identificacion() :
+{}
+{
+    try { 
+        <tIDENTIFICADOR> ( asignacion() | invocacion_accion() )
+    }
+    catch (Exception e) { // Error sintáctico
+        System.out.println("Compilación fallida.");
+        System.out.println(e.getMessage());
+        MiniLengCompiler.ReInit(System.in);
+    }
+}
+
+void asignacion() :
+{}
+{
+    try { 
+        <tOPAS> expresion() <tPC>
+    }
+    catch (Exception e) { // Error sintáctico
+        System.out.println("Compilación fallida.");
+        System.out.println(e.getMessage());
+        MiniLengCompiler.ReInit(System.in);
+    }
+}
+
+void invocacion_accion() :
+{}
+{
+    try { 
+        ( argumentos() )? <tPC>
+    }
+    catch (Exception e) { // Error sintáctico
+        System.out.println("Compilación fallida.");
+        System.out.println(e.getMessage());
+        MiniLengCompiler.ReInit(System.in);
+    }
+}
+
+void mientras_que() :
+{}
+{
+    try { 
+        <tMQ> expresion() lista_sentencias() <tFMQ>
+    }
+    catch (Exception e) { // Error sintáctico
+        System.out.println("Compilación fallida.");
+        System.out.println(e.getMessage());
+        MiniLengCompiler.ReInit(System.in);
+    }
+}
+
+void seleccion() :
+{}
+{
+    try { 
+        <tSI> expresion() <tENT> lista_sentencias() ( <tSI_NO> lista_sentencias() )? <tFSI>
+    }
+    catch (Exception e) { // Error sintáctico
+        System.out.println("Compilación fallida.");
+        System.out.println(e.getMessage());
+        MiniLengCompiler.ReInit(System.in);
+    }
+}
+
+void argumentos() :
+{}
+{
+    try { 
+        <tAP> ( lista_expresiones() )? <tCP>
+    }
+    catch (Exception e) { // Error sintáctico
+        System.out.println("Compilación fallida.");
+        System.out.println(e.getMessage());
+        MiniLengCompiler.ReInit(System.in);
+    }
+}
+
+void lista_expresiones() :
+{}
+{
+    try { 
+        expresion() ( <tC> expresion() )*
+    }
+    catch (Exception e) { // Error sintáctico
+        System.out.println("Compilación fallida.");
+        System.out.println(e.getMessage());
+        MiniLengCompiler.ReInit(System.in);
+    }
+}
+
+void expresion() :
+{}
+{
+    try { 
+        expresion_simple() ( operador_relacional() expresion_simple() )?
+    }
+    catch (Exception e) { // Error sintáctico
+        System.out.println("Compilación fallida.");
+        System.out.println(e.getMessage());
+        MiniLengCompiler.ReInit(System.in);
+    }
+}
+
+void operador_relacional() :
+{}
+{
+    try { 
+        <tMAYOR> | <tMENOR> | <tIGUAL> | <tMAI> | <tMEI> | <tNI>
+    }
+    catch (Exception e) { // Error sintáctico
+        System.out.println("Compilación fallida.");
+        System.out.println(e.getMessage());
+        MiniLengCompiler.ReInit(System.in);
+    }
+}
+
+void expresion_simple() :
+{}
+{
+    try { 
+        termino() ( operador_aditivo() termino() )*
+    }
+    catch (Exception e) { // Error sintáctico
+        System.out.println("Compilación fallida.");
+        System.out.println(e.getMessage());
+        MiniLengCompiler.ReInit(System.in);
+    }
+}
+
+void operador_aditivo() :
+{}
+{
+    try { 
+        <tSUMA> | <tRESTA> | <tOR>
+    }
+    catch (Exception e) { // Error sintáctico
+        System.out.println("Compilación fallida.");
+        System.out.println(e.getMessage());
+        MiniLengCompiler.ReInit(System.in);
+    }
+}
+
+void termino() :
+{}
+{
+    try { 
+        factor() ( operador_multiplicativo() factor() )*
+    }
+    catch (Exception e) { // Error sintáctico
+        System.out.println("Compilación fallida.");
+        System.out.println(e.getMessage());
+        MiniLengCompiler.ReInit(System.in);
+    }
+}
+
+void operador_multiplicativo() :
+{}
+{
+    try { 
+        <tMOD> | <tDIV> | <tMULTIPLICA> | <tAND>
+    }
+    catch (Exception e) { // Error sintáctico
+        System.out.println("Compilación fallida.");
+        System.out.println(e.getMessage());
+        MiniLengCompiler.ReInit(System.in);
+    }
+}
+
+void factor() :
+{}
+{
+    try { 
+        <tRESTA> factor()
+	    | <tNOT> factor()
+	    | <tAP> expresion() <tCP>
+	    | <tENTACAR> <tAP> expresion() <tCP>
+	    | <tCARAENT> <tAP> expresion() <tCP>
+	    | <tIDENTIFICADOR>
+	    | <tCONSTENTERA>
+	    | <tCONSTCHAR>
+	    | <tCONSTCAD>
+	    | <tTRUE>
+	    | <tFALSE>
+    }
+    catch (Exception e) { // Error sintáctico
+        System.out.println("Compilación fallida.");
+        System.out.println(e.getMessage());
+        MiniLengCompiler.ReInit(System.in);
+    }
 }
