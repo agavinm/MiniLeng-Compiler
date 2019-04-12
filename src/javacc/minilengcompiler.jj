@@ -1,27 +1,24 @@
 //*****************************************************************
 // File:   MiniLengCompiler.jj
 // Author: Andrés Gavín Murillo 716358
-// Date:   24/3/2019
-// Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V1.1
+// Date:   12/4/2019
+// Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V1.2
 //         JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
 //*****************************************************************
 options{    static = true;
-    ignore_case = true;
-    //error_reporting = true;}PARSER_BEGIN(MiniLengCompiler)
+    ignore_case = true;}PARSER_BEGIN(MiniLengCompiler)
 
 package javacc;
 
 import lib.TablaVeces;
-import lib.ErrorLexico;
 import java.io.FileInputStream;
 
 public class MiniLengCompiler {
     public static void main(String args []) throws ParseException {
-        System.out.println("Compilador de MiniLengCompiler V1.1 Autor: Andrés Gavín Murillo 716358. Ayuda: ./compilador -h\n");
+        System.out.println("Compilador de MiniLengCompiler V1.2 Autor: Andrés Gavín Murillo 716358. Ayuda: ./compilador -h\n");
         
         Boolean verbose = false;
         MiniLengCompiler compiler;
-        FileInputStream f = null;
         TablaVeces tabla = new TablaVeces();
 
         // Lanzar compilador
@@ -46,7 +43,6 @@ public class MiniLengCompiler {
                 }
 
                 try {
-                    f = new FileInputStream(args[n_arg]);
                     compiler = new MiniLengCompiler(new FileInputStream(args[n_arg]));
                 }
                 catch (java.io.FileNotFoundException e) {
@@ -65,7 +61,10 @@ public class MiniLengCompiler {
                 MiniLengCompiler.ReInit(System.in);
             }
             catch (Error e) { // Error léxico
-                ErrorLexico.generar(token, MiniLengCompilerTokenManager.curChar, f);
+                System.out.println("ERROR LÉXICO (<" + SimpleCharStream.getBeginLine() + ", " + 
+                    SimpleCharStream.getBeginColumn() + ">) : símbolo no reconocido: <" +
+                    SimpleCharStream.GetImage().charAt(MiniLengCompilerTokenManager.curLexState) + ">");
+                
                 return ;
             }
         }
