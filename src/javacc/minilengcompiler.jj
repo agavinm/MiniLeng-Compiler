@@ -1,27 +1,24 @@
 //*****************************************************************
 // File:   MiniLengCompiler.jj
 // Author: Andrés Gavín Murillo 716358
-// Date:   24/3/2019
-// Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V1.1
+// Date:   15/4/2019
+// Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V1.3
 //         JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
 //*****************************************************************
 options{    static = true;
-    ignore_case = true;
-    //error_reporting = true;}PARSER_BEGIN(MiniLengCompiler)
+    ignore_case = true;}PARSER_BEGIN(MiniLengCompiler)
 
 package javacc;
 
 import lib.TablaVeces;
-import lib.ErrorLexico;
 import java.io.FileInputStream;
 
 public class MiniLengCompiler {
     public static void main(String args []) throws ParseException {
-        System.out.println("Compilador de MiniLengCompiler V1.1 Autor: Andrés Gavín Murillo 716358. Ayuda: ./compilador -h\n");
+        System.out.println("Compilador de MiniLengCompiler V1.2 Autor: Andrés Gavín Murillo 716358. Ayuda: ./compilador -h\n");
         
         Boolean verbose = false;
         MiniLengCompiler compiler;
-        FileInputStream f = null;
         TablaVeces tabla = new TablaVeces();
 
         // Lanzar compilador
@@ -46,7 +43,6 @@ public class MiniLengCompiler {
                 }
 
                 try {
-                    f = new FileInputStream(args[n_arg]);
                     compiler = new MiniLengCompiler(new FileInputStream(args[n_arg]));
                 }
                 catch (java.io.FileNotFoundException e) {
@@ -65,7 +61,10 @@ public class MiniLengCompiler {
                 MiniLengCompiler.ReInit(System.in);
             }
             catch (Error e) { // Error léxico
-                ErrorLexico.generar(token, MiniLengCompilerTokenManager.curChar, f);
+                System.out.println("ERROR LÉXICO (<" + SimpleCharStream.getBeginLine() + ", " + 
+                    SimpleCharStream.getBeginColumn() + ">) : símbolo no reconocido: <" +
+                    SimpleCharStream.GetImage().charAt(MiniLengCompilerTokenManager.curLexState) + ">");
+                
                 return ;
             }
         }
@@ -87,51 +86,51 @@ public class MiniLengCompiler {
 TOKEN : /* Estructuras */
 {  < tPROGRAMA : "programa" >
     {
-        TablaVeces.incrementarValor(0);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tPROGRAMA);
     }
 | < tPRINCIPIO : "principio" >
     {
-        TablaVeces.incrementarValor(1);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tPRINCIPIO);
     }
 | < tFIN : "fin" >
     {
-        TablaVeces.incrementarValor(2);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tFIN);
     }
 | < tSI : "si" >
     {
-        TablaVeces.incrementarValor(3);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tSI);
     }
 | < tENT : "ent" >
     {
-        TablaVeces.incrementarValor(4);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tENT);
     }
 | < tSI_NO : "si_no" >
     {
-        TablaVeces.incrementarValor(5);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tSI_NO);
     }
 | < tFSI : "fsi" >
     {
-        TablaVeces.incrementarValor(6);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tFSI);
     }
 | < tMQ : "mq" >
     {
-        TablaVeces.incrementarValor(7);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tMQ);
     }
 | < tFMQ : "fmq" >
     {
-        TablaVeces.incrementarValor(8);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tFMQ);
     }
 | < tACCION : "accion" >
     {
-        TablaVeces.incrementarValor(9);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tACCION);
     }
 | < tPC : ";" >
     {
-        TablaVeces.incrementarValor(10);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tPC);
     }
 | < tC : "," >
     {
-        TablaVeces.incrementarValor(11);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tC);
     }
 }
 
@@ -139,27 +138,27 @@ TOKEN : /* Tipos de datos */
 {
   < tVAR : "var" >
     {
-        TablaVeces.incrementarValor(12);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tVAR);
     }
 | < tENTERO : "entero" >
     {
-        TablaVeces.incrementarValor(13);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tENTERO);
     }
 | < tBOOLEANO : "booleano" >
     {
-        TablaVeces.incrementarValor(14);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tBOOLEANO);
     }
 | < tCARACTER : "caracter" >
     {
-        TablaVeces.incrementarValor(15);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tCARACTER);
     }
 | < tVAL : "val" >
     {
-        TablaVeces.incrementarValor(16);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tVAL);
     }
 | < tREF : "ref" >
     {
-        TablaVeces.incrementarValor(17);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tREF);
     }
 }
 
@@ -167,47 +166,47 @@ TOKEN : /* Operadores lógicos */
 {
   < tAND : "and" >
     {
-        TablaVeces.incrementarValor(18);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tAND);
     }
 | < tOR : "or" >
     {
-        TablaVeces.incrementarValor(19);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tOR);
     }
 | < tNOT : "not" >
     {
-        TablaVeces.incrementarValor(20);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tNOT);
     }
 | < tMAYOR : ">" >
     {
-        TablaVeces.incrementarValor(21);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tMAYOR);
     }
 | < tMENOR : "<" >
     {
-        TablaVeces.incrementarValor(22);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tMENOR);
     }
 | < tIGUAL : "=" >
     {
-      TablaVeces.incrementarValor(23);
+      TablaVeces.incrementarValor(TablaVeces.tipo_token.tIGUAL);
     }
 | < tMAI : ">=" >
     {
-        TablaVeces.incrementarValor(24);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tMAI);
     }
 | < tMEI : "<=" >
     {
-        TablaVeces.incrementarValor(25);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tMEI);
     }
 | < tNI : "<>" >
     {
-        TablaVeces.incrementarValor(26);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tNI);
     }
 | < tTRUE : "true" >
     {
-        TablaVeces.incrementarValor(27);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tTRUE);
     }
 | < tFALSE : "false" >
     {
-        TablaVeces.incrementarValor(28);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tFALSE);
     }
 }
 
@@ -215,69 +214,69 @@ TOKEN : /* Operaciones */
 {
   < tESCRIBIR : "escribir" >
     {
-        TablaVeces.incrementarValor(29);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tESCRIBIR);
     }
 | < tLEER : "leer" >
     {
-        TablaVeces.incrementarValor(30);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tLEER);
     }
 | < tENTACAR : "entacar" >
     {
-        TablaVeces.incrementarValor(31);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tENTACAR);
     }
 | < tCARAENT : "caraent" >
     {
-        TablaVeces.incrementarValor(32);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tCARAENT);
     }
 }
 TOKEN : /* Operadores aritméticos */{
   < tMOD : "mod" >
     {
-        TablaVeces.incrementarValor(33);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tMOD);
     }
 | < tDIV : "div" | "/" >
     {
-        TablaVeces.incrementarValor(34);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tDIV);
     }
 | < tOPAS : ":=" >
     {
-        TablaVeces.incrementarValor(35);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tOPAS);
     }
 | < tSUMA : "+" >
     {
-        TablaVeces.incrementarValor(36);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tSUMA);
     }
 | < tRESTA : "-" >
     {
-        TablaVeces.incrementarValor(37);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tRESTA);
     }
 | < tMULTIPLICA : "*" >
     {
-        TablaVeces.incrementarValor(38);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tMULTIPLICA);
     }
 | < tAP : "(" >
     {
-        TablaVeces.incrementarValor(39);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tAP);
     }
 | < tCP : ")" >
     {
-        TablaVeces.incrementarValor(40);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tCP);
     }}TOKEN :{  < tCONSTENTERA : (< DIGITO >)+ >
     {
-        TablaVeces.incrementarValor(41);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tCONSTENTERA);
     }| < #DIGITO : [ "0"-"9" ] >
 | < tCONSTCHAR : ["\""] ~["\""] ["\""] >
     {
-        TablaVeces.incrementarValor(42);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tCONSTCHAR);
     }
 | < tCONSTCAD : ["\""] (~["\""])+ ["\""] >
     {
-        TablaVeces.incrementarValor(43);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tCONSTCAD);
     }
 | < tIDENTIFICADOR : (< LETRA > | (< LETRA > | "_") (< LETRA > | < DIGITO > | "_")*
     (< LETRA > | < DIGITO >)) >
     {
-        TablaVeces.incrementarValor(44);
+        TablaVeces.incrementarValor(TablaVeces.tipo_token.tIDENTIFICADOR);
     }
 | < #LETRA : [ "A"-"Z" ] >}
 
