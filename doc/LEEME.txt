@@ -1,0 +1,111 @@
+Autor: Andrés Gavín Murillo 716358
+Información sobre el compilador del lenguaje MiniLeng (análisis sintáctico).
+
+Modo de empleo:
+ ./compilador [argumentos] [archivo]
+    [...] : Opcional
+    Argumentos disponibles:
+     -h : Muestra el mensaje de ayuda.
+     -p : Uso del Panic mode (explicado en características).
+     -v : Muestra información adicional (explicado en características).
+    Ejemplos de uso:
+     ./compilador -h
+     ./compilador programa.ml
+     ./compilador -p programa.ml
+     ./compilador -v -p programa.ml
+
+Características:
+ El compilador está preparado para el lenguaje MiniLeng (extensión de ficheros común .ml).
+ 
+ Opciones disponibles:
+  Panic mode: Modo de recuperación que permite la compilación cuando falta algún ';' o fin de bloque (Fin).
+              En estos casos el compilador deja de comprobar nuevos tokens hasta que encuentra el token que
+              faltaba (';' o Fin) o un fin de línea. Puede generar nuevos errores o situaciones no deseadas,
+              por ejemplo si en la misma línea hay dos sentencias, y falta un ';' para separar ambas. En este
+              caso la segunda sentencia será ignorada (Ej: 'a := 5  a := a - 1;', esto será interpretado como
+              'a := 5;').
+              Se mostrará un mensaje de AVISO indicando donde se ha empleado el Panic mode.
+              
+  Información adicional: Modo 'verbose' que muestra una tabla con información de las apariciones de cada token,
+                         separadas en los bloques de Palabras reservadas, Operadores lógicos, Operaciones, 
+                         Operadores aritméticos, Constantes enteras, Caracteres, Cadenas e Identificadores.
+                                Opción verbose: Número de apariciones de:
+                                ---------------------------------------
+                                Palabras reservadas 'programa':    1
+                                .....
+                                Palabras reservadas 'ref':         0
+                                ---------------------------------------
+                                Operadores lógicos 'and':          0
+                                .....
+                                Operadores lógicos 'false':        0
+                                ---------------------------------------
+                                Operaciones 'escribir':            0
+                                .....
+                                Operaciones 'caraent':             0
+                                ---------------------------------------
+                                Operadores aritméticos 'mod':      1
+                                .....
+                                Operadores aritméticos ')':        5
+                                ---------------------------------------
+                                Constantes enteras:                3
+                                Caracteres:                        0
+                                Cadenas:                           0
+                                Identificadores:                  21
+                                ---------------------------------------
+ 
+ Léxico:
+  No hay distinción entre mayúsculas y minúsculas (no es case-sensitive).
+  
+  Se permiten comentarios de una línea comenzados por el carácter '%'.
+ 
+ Sintáctico:
+  La gramática admitida está definida en el fichero 'gramatica-BNF-miniLeng.html'.
+  
+  Se permiten funciones anidadas (acciones) definiéndolas entre el bloque de variables y el bloque de sentencias.
+        accion abuelo;
+        ... % Bloque de variables
+            accion padre();
+            ... % Bloque de variables
+                accion hijo(...);
+                ... % Bloque de variables
+                principio
+                ... % Bloque de sentencias
+                fin
+            principio
+            ... % Bloque de sentencias
+            fin
+        principio
+        ... % Bloque de sentencias
+        fin
+
+  Se permiten encadenamientos de bloques condicionales (si / si_no) de la siguiente manera:
+        si ... ent
+            si ... ent
+                si ... ent
+                    si ... ent
+                        ... % Bloque de sentencias
+                    si_no
+                        ... % Bloque de sentencias
+                    fsi
+                si_no
+                    si ... ent
+                        ... % Bloque de sentencias
+                    fsi
+                fsi
+            fsi 
+        fsi
+        
+  Se permiten los parámetros por valor o referencia en una acción, para ello se debe de indicar
+  delante del parámetro si es por valor ('val') o referencia ('ref'):
+        accion fib (Val entero n; ref entero r);
+        
+  Todo bloque de sentencias debe tener al menos una sentencia.
+  
+ Errores:
+  Errores léxicos: Si ha habido un error léxico, se muestra la línea y columna, junto con el error 
+  léxico localizado, y el compilador termina su ejecución.
+        "ERROR LÉXICO (<línea, columna>): símbolo no reconocido: <símbolo>"
+  
+  Errores sintácticos: Si ha habido un error sintáctico, se muestra la línea y columna, junto con 
+  un mensaje de error, y el compilador sigue su ejecución.
+        "ERROR SINTÁCTICO(<línea, columna>): <mensaje de error>"
