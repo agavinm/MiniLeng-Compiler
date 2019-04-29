@@ -1,14 +1,29 @@
 %-------------------------------------------------------------------
-programa errorLexico; %1
+programa errorSintactico; %2
 %-------------------------------------------------------------------
 
- caracter; respuesta, letra, min, max;
- booleano; headivinado;
+ caracter respuesta, letra, min, max;
+ booleano headivinado;
  caracter c, d;
  entero e;
 
 %-------------------------------------------------------------------
+accion parentesis());
+%-------------------------------------------------------------------
+
+ caracter c,ln;
+
+ principio
+  c := " ";
+  mq (((((c < "A"))))) or (((c > "Z")))
+    escribir("letra:");
+    leer(c, ln));
+  fmq
+  respuesta := c;
+ fin
+ 
+%-------------------------------------------------------------------
 principio
 %-------------------------------------------------------------------
- e := 5.0;
+ e := 5;
 fin

@@ -1,0 +1,377 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+<TITLE>BNF for minilengcompiler.jj</TITLE>
+</HEAD>
+<BODY>
+<H1 ALIGN=CENTER>BNF for minilengcompiler.jj</H1>
+<H2 ALIGN=CENTER>TOKENS</H2>
+<TABLE>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;DEFAULT&gt; SKIP : {
+" "
+| "\r"
+| "\t"
+| "\n"
+| "%" : COMENTARIO
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;COMENTARIO&gt; SKIP : {
+"\n" : DEFAULT
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;COMENTARIO&gt; MORE : {
+&lt;~[]&gt;
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;DEFAULT&gt; TOKEN : {
+&lt;tPROGRAMA: "programa"&gt; : {
+| &lt;tPRINCIPIO: "principio"&gt; : {
+| &lt;tFIN: "fin"&gt; : {
+| &lt;tSI: "si"&gt; : {
+| &lt;tENT: "ent"&gt; : {
+| &lt;tSI_NO: "si_no"&gt; : {
+| &lt;tFSI: "fsi"&gt; : {
+| &lt;tMQ: "mq"&gt; : {
+| &lt;tFMQ: "fmq"&gt; : {
+| &lt;tACCION: "accion"&gt; : {
+| &lt;tPC: ";"&gt; : {
+| &lt;tC: ","&gt; : {
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;DEFAULT&gt; TOKEN : {
+&lt;tVAR: "var"&gt; : {
+| &lt;tENTERO: "entero"&gt; : {
+| &lt;tBOOLEANO: "booleano"&gt; : {
+| &lt;tCARACTER: "caracter"&gt; : {
+| &lt;tVAL: "val"&gt; : {
+| &lt;tREF: "ref"&gt; : {
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;DEFAULT&gt; TOKEN : {
+&lt;tAND: "and"&gt; : {
+| &lt;tOR: "or"&gt; : {
+| &lt;tNOT: "not"&gt; : {
+| &lt;tMAYOR: "&gt;"&gt; : {
+| &lt;tMENOR: "&lt;"&gt; : {
+| &lt;tIGUAL: "="&gt; : {
+| &lt;tMAI: "&gt;="&gt; : {
+| &lt;tMEI: "&lt;="&gt; : {
+| &lt;tNI: "&lt;&gt;"&gt; : {
+| &lt;tTRUE: "true"&gt; : {
+| &lt;tFALSE: "false"&gt; : {
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;DEFAULT&gt; TOKEN : {
+&lt;tESCRIBIR: "escribir"&gt; : {
+| &lt;tLEER: "leer"&gt; : {
+| &lt;tENTACAR: "entacar"&gt; : {
+| &lt;tCARAENT: "caraent"&gt; : {
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;DEFAULT&gt; TOKEN : {
+&lt;tMOD: "mod"&gt; : {
+| &lt;tDIV: "div" | "/"&gt; : {
+| &lt;tOPAS: ":="&gt; : {
+| &lt;tSUMA: "+"&gt; : {
+| &lt;tRESTA: "-"&gt; : {
+| &lt;tMULTIPLICA: "*"&gt; : {
+| &lt;tAP: "("&gt; : {
+| &lt;tCP: ")"&gt; : {
+}
+
+   </PRE>
+  </TD>
+ </TR>
+ <!-- Token -->
+ <TR>
+  <TD>
+   <PRE>
+&lt;DEFAULT&gt; TOKEN : {
+&lt;tCONSTENTERA: (&lt;DIGITO&gt;)+&gt; : {
+| &lt;#DIGITO: ["0"-"9"]&gt;
+| &lt;tCONSTCHAR: ["\""] ~["\""] ["\""]&gt; : {
+| &lt;tCONSTCAD: ["\""] (~["\""])+ ["\""]&gt; : {
+| &lt;tIDENTIFICADOR: &lt;LETRA&gt; | (&lt;LETRA&gt; | "_") (&lt;LETRA&gt; | &lt;DIGITO&gt; | "_")* (&lt;LETRA&gt; | &lt;DIGITO&gt;)&gt; : {
+| &lt;#LETRA: ["A"-"Z"]&gt;
+}
+
+   </PRE>
+  </TD>
+ </TR>
+</TABLE>
+<H2 ALIGN=CENTER>NON-TERMINALS</H2>
+<TABLE>
+ <!-- Special token -->
+ <TR>
+  <TD>
+<PRE>
+// Análisis sintáctico
+</PRE>
+  </TD>
+ </TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod1">punto_y_coma</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;tPC&gt;</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod2">identificador</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;tIDENTIFICADOR&gt;</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod3">programa</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;tPROGRAMA&gt; <A HREF="#prod2">identificador</A> <A HREF="#prod1">punto_y_coma</A> <A HREF="#prod4">declaracion_variables</A> <A HREF="#prod5">declaracion_acciones</A> <A HREF="#prod6">bloque_sentencias</A> ( &lt;EOF&gt; )?</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod4">declaracion_variables</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( <A HREF="#prod7">declaracion</A> <A HREF="#prod1">punto_y_coma</A> )*</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod7">declaracion</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE><A HREF="#prod8">tipo_variables</A> <A HREF="#prod9">identificadores</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod8">tipo_variables</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( &lt;tENTERO&gt; | &lt;tCARACTER&gt; | &lt;tBOOLEANO&gt; )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod9">identificadores</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE><A HREF="#prod2">identificador</A> ( &lt;tC&gt; <A HREF="#prod2">identificador</A> )*</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod5">declaracion_acciones</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( <A HREF="#prod10">declaracion_accion</A> )*</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod10">declaracion_accion</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE><A HREF="#prod11">cabecera_accion</A> <A HREF="#prod1">punto_y_coma</A> <A HREF="#prod4">declaracion_variables</A> <A HREF="#prod5">declaracion_acciones</A> <A HREF="#prod6">bloque_sentencias</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod11">cabecera_accion</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;tACCION&gt; <A HREF="#prod2">identificador</A> <A HREF="#prod12">parametros_formales</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod13">ap</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;tAP&gt;</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod14">cp</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;tCP&gt;</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod12">parametros_formales</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( <A HREF="#prod13">ap</A> ( <A HREF="#prod15">parametros</A> )* <A HREF="#prod14">cp</A> )?</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod16">lista_parametros</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE><A HREF="#prod9">identificadores</A> ( <A HREF="#prod1">punto_y_coma</A> <A HREF="#prod15">parametros</A> )?</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod15">parametros</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE><A HREF="#prod17">clase_parametros</A> <A HREF="#prod8">tipo_variables</A> <A HREF="#prod16">lista_parametros</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod17">clase_parametros</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( &lt;tVAL&gt; | &lt;tREF&gt; )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod18">principio</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;tPRINCIPIO&gt;</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod6">bloque_sentencias</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE><A HREF="#prod18">principio</A> <A HREF="#prod19">lista_sentencias</A> &lt;tFIN&gt;</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod19">lista_sentencias</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( <A HREF="#prod20">sentencia</A> )+</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod20">sentencia</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( <A HREF="#prod21">leer</A> <A HREF="#prod1">punto_y_coma</A> | <A HREF="#prod22">escribir</A> <A HREF="#prod1">punto_y_coma</A> | <A HREF="#prod23">identificacion</A> | <A HREF="#prod24">seleccion</A> | <A HREF="#prod25">mientras_que</A> )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod21">leer</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;tLEER&gt; <A HREF="#prod13">ap</A> <A HREF="#prod26">lista_asignables</A> <A HREF="#prod14">cp</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod26">lista_asignables</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE><A HREF="#prod9">identificadores</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod22">escribir</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;tESCRIBIR&gt; <A HREF="#prod13">ap</A> <A HREF="#prod27">lista_escribibles</A> <A HREF="#prod14">cp</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod28">constcad</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;tCONSTCAD&gt;</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod27">lista_escribibles</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( <A HREF="#prod28">constcad</A> | <A HREF="#prod29">expresion</A> ) ( &lt;tC&gt; ( <A HREF="#prod28">constcad</A> | <A HREF="#prod29">expresion</A> ) )*</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod23">identificacion</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE><A HREF="#prod2">identificador</A> ( <A HREF="#prod30">asignacion</A> | <A HREF="#prod31">invocacion_accion</A> )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod30">asignacion</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;tOPAS&gt; <A HREF="#prod29">expresion</A> <A HREF="#prod1">punto_y_coma</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod31">invocacion_accion</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( <A HREF="#prod32">argumentos</A> )? <A HREF="#prod1">punto_y_coma</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod33">fmq</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;tFMQ&gt;</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod25">mientras_que</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;tMQ&gt; <A HREF="#prod29">expresion</A> <A HREF="#prod19">lista_sentencias</A> <A HREF="#prod33">fmq</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod34">ent</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;tENT&gt;</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod35">fsi</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;tFSI&gt;</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod24">seleccion</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>&lt;tSI&gt; <A HREF="#prod29">expresion</A> <A HREF="#prod34">ent</A> <A HREF="#prod19">lista_sentencias</A> ( &lt;tSI_NO&gt; <A HREF="#prod19">lista_sentencias</A> )? <A HREF="#prod35">fsi</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod32">argumentos</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE><A HREF="#prod13">ap</A> ( <A HREF="#prod36">lista_expresiones</A> )? <A HREF="#prod14">cp</A></TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod36">lista_expresiones</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE><A HREF="#prod29">expresion</A> ( &lt;tC&gt; <A HREF="#prod29">expresion</A> )*</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod29">expresion</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE><A HREF="#prod37">expresion_simple</A> ( <A HREF="#prod38">operador_relacional</A> <A HREF="#prod37">expresion_simple</A> )?</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod38">operador_relacional</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( &lt;tMAYOR&gt; | &lt;tMENOR&gt; | &lt;tIGUAL&gt; | &lt;tMAI&gt; | &lt;tMEI&gt; | &lt;tNI&gt; )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod37">expresion_simple</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE><A HREF="#prod39">termino</A> ( <A HREF="#prod40">operador_aditivo</A> <A HREF="#prod39">termino</A> )*</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod40">operador_aditivo</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( &lt;tSUMA&gt; | &lt;tRESTA&gt; | &lt;tOR&gt; )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod39">termino</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE><A HREF="#prod41">factor</A> ( <A HREF="#prod42">operador_multiplicativo</A> <A HREF="#prod41">factor</A> )*</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod42">operador_multiplicativo</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( &lt;tMOD&gt; | &lt;tDIV&gt; | &lt;tMULTIPLICA&gt; | &lt;tAND&gt; )</TD>
+</TR>
+<TR>
+<TD ALIGN=RIGHT VALIGN=BASELINE><A NAME="prod41">factor</A></TD>
+<TD ALIGN=CENTER VALIGN=BASELINE>::=</TD>
+<TD ALIGN=LEFT VALIGN=BASELINE>( &lt;tRESTA&gt; <A HREF="#prod41">factor</A> | &lt;tNOT&gt; <A HREF="#prod41">factor</A> | <A HREF="#prod13">ap</A> <A HREF="#prod29">expresion</A> <A HREF="#prod14">cp</A> | &lt;tENTACAR&gt; <A HREF="#prod13">ap</A> <A HREF="#prod29">expresion</A> <A HREF="#prod14">cp</A> | &lt;tCARAENT&gt; <A HREF="#prod13">ap</A> <A HREF="#prod29">expresion</A> <A HREF="#prod14">cp</A> | <A HREF="#prod2">identificador</A> | &lt;tCONSTENTERA&gt; | &lt;tCONSTCHAR&gt; | &lt;tTRUE&gt; | &lt;tFALSE&gt; )</TD>
+</TR>
+</TABLE>
+</BODY>
+</HTML>
