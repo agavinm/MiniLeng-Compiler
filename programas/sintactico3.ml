@@ -1,5 +1,5 @@
 %-------------------------------------------------------------------
-programa errorSintactico; %1
+programa errorSintactico; %3
 %-------------------------------------------------------------------
 
  caracter respuesta, letra, min, max;
@@ -8,8 +8,28 @@ programa errorSintactico; %1
  entero e;
 
 %-------------------------------------------------------------------
+accion abuelo;
+%-------------------------------------------------------------------
+ entero j;
+ 
+ accion padre();
+  entero j;
+  
+  accion hijo(ref entero j);
+   principio
+    j := j + 1;
+   fin
+   
+  principio
+   hijo(j);
+  fin
+  
+ principio
+  escribir("a");
+ fin
+ 
+%-------------------------------------------------------------------
 principio
 %-------------------------------------------------------------------
- e := 6 e := 5;
- a := 2
+ abuelo();
 fin
