@@ -1,8 +1,8 @@
 //*****************************************************************
 // File:   MiniLengCompiler.jj
 // Author: Andrés Gavín Murillo 716358
-// Date:   15/4/2019
-// Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V2.2
+// Date:   29/4/2019
+// Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V3.0
 //         JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
 //*****************************************************************
 options{    static = true;
@@ -18,7 +18,7 @@ public class MiniLengCompiler {
     static boolean panic_mode = false;
     
     public static void main(String args []) throws ParseException {
-        System.out.println("Compilador de MiniLengCompiler V2.2 Autor: Andrés Gavín Murillo 716358. Ayuda: ./compilador -h\n");
+        System.out.println("Compilador de MiniLengCompiler V3.0 Autor: Andrés Gavín Murillo 716358. Ayuda: ./compilador -h\n");
         
         Boolean verbose = false;
         MiniLengCompiler compiler;
