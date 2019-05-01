@@ -14,7 +14,19 @@ public class Simbolo {
     private Simbolo[] lista_parametros;
     private Long dir;
     
+    private void reset() {
+        this.nombre = null;
+        this.nivel = null;
+        this.tipo = null;
+        this.variable = null;
+        this.parametro = null;
+        this.visible = null;
+        this.lista_parametros = null;
+        this.dir = null;
+    }
+    
     public void introducir_programa(String nombre, Long dir) {
+        reset();
         this.nombre = nombre;
         this.nivel = new Integer(0);
         this.tipo = Tipo_simbolo.PROGRAMA;
@@ -23,6 +35,7 @@ public class Simbolo {
     
     public void introducir_variable(String nombre, Tipo_variable variable, Integer nivel, 
             Long dir) {
+        reset();
         this.nombre = nombre;
         this.nivel = nivel;
         this.tipo = Tipo_simbolo.VARIABLE;
@@ -31,6 +44,7 @@ public class Simbolo {
     }
     
     public void introducir_accion(String nombre, Integer nivel, Long dir, Simbolo[] lista_parametros) {
+        reset();
         this.nombre = nombre;
         this.nivel = nivel;
         this.tipo = Tipo_simbolo.ACCION;
@@ -40,6 +54,7 @@ public class Simbolo {
     
     public void introducir_parametro(String nombre, Tipo_variable tipo_var, 
             Clase_parametro clase_param, Integer nivel) {
+        reset();
         this.nombre = nombre;
         this.nivel = nivel;
         this.tipo = Tipo_simbolo.PARAMETRO;
@@ -82,14 +97,7 @@ public class Simbolo {
     }
     
     public Simbolo() {
-        this.nombre = null;
-        this.nivel = null;
-        this.tipo = null;
-        this.variable = null;
-        this.parametro = null;
-        this.visible = null;
-        this.lista_parametros = null;
-        this.dir = null;
+        reset();
     }
     
     /* Getters and setters */
