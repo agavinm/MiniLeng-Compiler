@@ -27,41 +27,37 @@ public class TablaDispersion {
     
     // Introduce el símbolo s sin comprobaciones previas
     public void introducir_simbolo(Simbolo s) {
-        tabla[hash(s.getNombre())].add(s);
+        tabla[hash(s.getNombre())].addFirst(s); // Nombres nuevos al comienzo, orden nivel descendente
     }
     
-    // Devuelve el símbolo con nombre s de mayor nivel, y si no existe lanza 
+    // Devuelve el símbolo con nombre s en primera posición, y si no existe lanza 
     // SimboloNoEncontradoException
     public Simbolo buscar_simbolo(String nombre) throws SimboloNoEncontradoException {
-        int h = hash(nombre);
-        int size = tabla[h].size();
-        Simbolo aux = null, resul = null;
-        
-        for (int i=0; i<size; i++) {
-            aux = tabla[h].get(i);
-            if (aux.getNombre() == nombre) {
-                if (resul == null || aux.getNivel() > resul.getNivel()) {
-                    resul = aux;
-                }
-            }
-        }
-        
-        if (resul != null) {
-            return resul;
-        }
-        else {
-            throw new SimboloNoEncontradoException("El simbolo introducido no existe");
-        }            
-    }
-    
-    // Si existe el símbolo s en el nivel n, lanza SimboloYaExistenteException
-    public void existe_simbolo(String nombre, Integer n) throws SimboloYaExistenteException {
         int h = hash(nombre);
         int size = tabla[h].size();
         Simbolo aux = null;
         
         for (int i=0; i<size; i++) {
             aux = tabla[h].get(i);
+            if (aux.getNombre() == nombre) {
+                return aux;
+            }
+        }
+        
+        throw new SimboloNoEncontradoException("El simbolo introducido no existe");          
+    }
+    
+    // Si existe el símbolo s en el nivel n, lanza SimboloYaExistenteException
+    public void existe_simbolo(String nombre, Integer n) throws SimboloYaExistenteException {
+        int h = hash(nombre);
+        int size = tabla[h].size();
+        int nivel = n;
+        Simbolo aux = null;
+        
+        for (int i=0; i<size && nivel >= n; i++) {
+            aux = tabla[h].get(i);
+            nivel = aux.getNivel();
+            
             if (aux.getNombre() == nombre && aux.getNivel() == n) {
                 throw new SimboloYaExistenteException("El simbolo introducido ya existe");
             }
@@ -72,13 +68,92 @@ public class TablaDispersion {
     public void eliminar_nivel(Integer n, Tipo_simbolo simbolo) {
         Simbolo aux;
         ListIterator<Simbolo> it;
+        int nivel = n;
         
         for (int i=0; i<M; i++) {
             it = tabla[i].listIterator();
-            while (it.hasNext()) {
+            
+            while (it.hasNext() && nivel >= n) {
                 aux = it.next();
+                nivel = aux.getNivel();
+                
                 if (aux.getNivel() == n && aux.getTipo() == simbolo) {
                     it.remove();
+                }
+            }
+        }
+    }
+    
+    // Elimina el símbolo con nombre nombre del nivel n
+    public void eliminar(Integer n, String nombre) {
+        Simbolo aux;
+        ListIterator<Simbolo> it;
+        int nivel = n;
+        boolean fin = false;
+        
+        for (int i=0; !fin && i<M; i++) {
+            it = tabla[i].listIterator();
+            
+            while (!fin && it.hasNext() && nivel >= n) {
+                aux = it.next();
+                nivel = aux.getNivel();
+                
+                if (aux.getNivel() == n && aux.getNombre() == nombre) {
+                    it.remove();
+                    fin = true;
+                }
+            }
+        }
+    }
+    
+    // Marca todos los parámetros de un nivel como ocultos para que no puedan
+    // ser encontrados, pero se mantenga la definición completa de la
+    // acción donde están declarados para verificación de
+    // invocaciones a la acción.
+    public void ocultar_parametros(Integer n) {
+        Simbolo aux;
+        ListIterator<Simbolo> it;
+        int nivel = n;
+        
+        for (int i=0; i<M; i++) {
+            it = tabla[i].listIterator();
+            
+            while (it.hasNext() && nivel >= n) {
+                aux = it.next();
+                nivel = aux.getNivel();
+                
+                if (aux.getNivel() == n && aux.getTipo() == Tipo_simbolo.PARAMETRO) {
+                    aux.setVisible(false);
+                }
+            }
+        }
+    }
+
+    // Elimina de la tabla todas los parámetros que hayan sido ocultados
+    // previamente. LOS PROCEDIMIENTOS Y FUNCIONES DONDE ESTABAN DECLARADOS
+    // DEBEN SER ELIMINADOS TAMBIEN PARA MANTENER LA COHERENCIA DE LA TABLA.
+    public void eliminar_parametros_ocultos(Integer n) {
+        Simbolo aux;
+        LinkedList<Simbolo> parametros;
+        ListIterator<Simbolo> it;
+        int nivel = n;
+        
+        for (int i=0; i<M; i++) {
+            it = tabla[i].listIterator();
+            
+            while (it.hasNext() && nivel >= n) {
+                aux = it.next();
+                nivel = aux.getNivel();
+                
+                if (aux.getNivel() == n && aux.getTipo() == Tipo_simbolo.ACCION) {
+                    parametros = aux.getLista_parametros();
+                    if (!parametros.getFirst().isVisible()) {
+                        for (int j=0; j<parametros.size(); j++) {
+                            this.eliminar(n, parametros.get(j).getNombre());
+                        }
+                        
+                        it.remove();
+                    }
                 }
             }
         }

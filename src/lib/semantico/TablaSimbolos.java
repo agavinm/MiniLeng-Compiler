@@ -6,6 +6,7 @@ import lib.semantico.Simbolo.Clase_parametro;
 
 public class TablaSimbolos {
     private TablaDispersion tabla;
+    private Simbolo ultima_accion;
     
     public TablaSimbolos() {
         inicializar_tabla();
@@ -15,6 +16,7 @@ public class TablaSimbolos {
     // antes de hacer ninguna operación con la tabla de símbolos.
     public void inicializar_tabla() {
         tabla = new TablaDispersion();
+        ultima_accion = null;
     }
 
     // Busca en la tabla el símbolo de mayor nivel cuyo nombre coincida
@@ -56,10 +58,10 @@ public class TablaSimbolos {
             throws SimboloYaExistenteException {
         tabla.existe_simbolo(nombre, nivel);
         
-        Simbolo s = new Simbolo();
-        s.introducir_accion(nombre, nivel, dir);
-        tabla.introducir_simbolo(s);
-        return s;
+        ultima_accion = new Simbolo();
+        ultima_accion.introducir_accion(nombre, nivel, dir);
+        tabla.introducir_simbolo(ultima_accion);
+        return ultima_accion;
     }
 
     // Si existe un símbolo en la tabla del mismo nivel y con el mismo
@@ -72,8 +74,10 @@ public class TablaSimbolos {
         Simbolo s = new Simbolo();
         s.introducir_parametro(nombre, variable, parametro, nivel, dir);
         tabla.introducir_simbolo(s);
-        return s;
         
+        ultima_accion.setParametro(s);
+        
+        return s;
     }
 
     // Elimina de la tabla todos los símbolos PROGRAMA de nivel 0 (debería
@@ -93,14 +97,14 @@ public class TablaSimbolos {
     // acción donde están declarados para verificación de
     // invocaciones a la acción.
     public void ocultar_parametros(int nivel) {
-        
+        tabla.ocultar_parametros(nivel);
     }
 
     // Elimina de la tabla todas los parámetros que hayan sido ocultados
     // previamente. LOS PROCEDIMIENTOS Y FUNCIONES DONDE ESTABAN DECLARADOS
     // DEBEN SER ELIMINAODS TAMBIEN PARA MANTENER LA COHERENCIA DE LA TABLA.
     public void eliminar_parametros_ocultos(int nivel) {
-        
+        tabla.eliminar_parametros_ocultos(nivel);
     }
 
     // Elimina de la tabla todas los procedimientos de un nivel.

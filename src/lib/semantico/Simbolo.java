@@ -1,5 +1,7 @@
 package lib.semantico;
 
+import java.util.LinkedList;
+
 public class Simbolo {
     public enum Tipo_simbolo {PROGRAMA, VARIABLE, ACCION, PARAMETRO};
     public enum Tipo_variable {DESCONOCIDO, ENTERO, BOOLEANO, CHAR, CADENA};
@@ -11,7 +13,7 @@ public class Simbolo {
     private Tipo_variable variable;
     private Clase_parametro parametro;
     private Boolean visible;
-    private Simbolo[] lista_parametros;
+    private LinkedList<Simbolo> lista_parametros;
     private Long dir;
     
     private void reset() {
@@ -48,6 +50,7 @@ public class Simbolo {
         this.nombre = nombre;
         this.nivel = nivel;
         this.tipo = Tipo_simbolo.ACCION;
+        this.lista_parametros = new LinkedList<Simbolo>();
         this.dir = dir;
     }
     
@@ -85,7 +88,8 @@ public class Simbolo {
     /* Constructores */
     
     public Simbolo(String nombre, Integer nivel, Tipo_simbolo tipo, Tipo_variable variable, 
-            Clase_parametro parametro, Boolean visible, Simbolo[] lista_parametros, Long dir) {
+            Clase_parametro parametro, Boolean visible, LinkedList<Simbolo> lista_parametros, 
+            Long dir) {
         this.nombre = nombre;
         this.nivel = nivel;
         this.tipo = tipo;
@@ -150,12 +154,16 @@ public class Simbolo {
         this.visible = visible;
     }
     
-    public Simbolo[] getLista_parametros() {
+    public LinkedList<Simbolo> getLista_parametros() {
         return lista_parametros;
     }
     
-    public void setLista_parametros(Simbolo[] lista_parametros) {
+    public void setLista_parametros(LinkedList<Simbolo> lista_parametros) {
         this.lista_parametros = lista_parametros;
+    }
+    
+    public void setParametro(Simbolo parametro) {
+        this.lista_parametros.add(parametro);
     }
     
     public Long getDir() {
