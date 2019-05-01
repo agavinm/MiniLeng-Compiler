@@ -6,7 +6,7 @@
 //         JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
 //*****************************************************************
 
-package lib;
+package lib.lexico;
 
 public class TablaVeces {
     private static final int N = 45;

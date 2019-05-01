@@ -10,7 +10,7 @@
 
 package javacc;
 
-import lib.TablaVeces;
+import lib.lexico.TablaVeces;
 import java.io.FileInputStream;
 
 public class MiniLengCompiler {

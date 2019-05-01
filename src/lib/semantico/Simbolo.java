@@ -1,4 +1,4 @@
-package lib;
+package lib.semantico;
 
 public class Simbolo {
     public enum Tipo_simbolo {PROGRAMA, VARIABLE, ACCION, PARAMETRO};
@@ -43,23 +43,23 @@ public class Simbolo {
         this.dir = dir;
     }
     
-    public void introducir_accion(String nombre, Integer nivel, Long dir, Simbolo[] lista_parametros) {
+    public void introducir_accion(String nombre, Integer nivel, Long dir) {
         reset();
         this.nombre = nombre;
         this.nivel = nivel;
         this.tipo = Tipo_simbolo.ACCION;
-        this.lista_parametros = lista_parametros;
         this.dir = dir;
     }
     
     public void introducir_parametro(String nombre, Tipo_variable tipo_var, 
-            Clase_parametro clase_param, Integer nivel) {
+            Clase_parametro clase_param, Integer nivel, Long dir) {
         reset();
         this.nombre = nombre;
         this.nivel = nivel;
         this.tipo = Tipo_simbolo.PARAMETRO;
         this.variable = tipo_var;
         this.parametro = clase_param;
+        this.dir = dir;
     }
     
     public boolean es_variable() {
