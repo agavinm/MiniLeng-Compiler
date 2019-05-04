@@ -1,3 +1,11 @@
+//*****************************************************************
+// File:   TablaDispersion.java
+// Author: Andrés Gavín Murillo 716358
+// Date:   4/5/2019
+// Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V3.0
+//         JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
+//*****************************************************************
+
 package lib.semantico;
 
 import java.util.ArrayList;
@@ -147,6 +155,28 @@ public class TablaDispersion {
                 }
             }
         }
+    }
+    
+    public String print() {
+        String resul = "---------------------------------------------------------------\n";
+        resul += String.format("| %-10s | %-20s | %-10s | %-10s |", "Hash", "Simbolo", 
+                "Nivel", "Tipo") + "\n";
+        LinkedList<Simbolo> fila;
+        Simbolo s;
+        
+        for (int i=0; i<M; i++) {
+            fila = tabla[i];
+            for (int j=0; j<fila.size(); j++) {
+                s = fila.get(j);
+                if (s.isVisible())
+                    resul += String.format("| %-10s | %-20s | %-10s | %-10s |", i, 
+                            s.getNombre(), s.getNivel(), s.getTipo()) + "\n";
+            }
+        }
+        
+        resul += "---------------------------------------------------------------\n";
+        
+        return resul;
     }
 
     // Función hash de Pearson, 90.

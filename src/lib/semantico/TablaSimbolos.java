@@ -1,3 +1,11 @@
+//*****************************************************************
+// File:   TablaSimbolos.java
+// Author: Andrés Gavín Murillo 716358
+// Date:   4/5/2019
+// Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V3.0
+//         JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
+//*****************************************************************
+
 package lib.semantico;
 
 import lib.semantico.Simbolo.Tipo_simbolo;
@@ -113,5 +121,9 @@ public class TablaSimbolos {
     public void eliminar_acciones(int nivel) {
         tabla.eliminar_nivel(nivel, Tipo_simbolo.ACCION);
         tabla.eliminar_nivel(nivel+1, Tipo_simbolo.PARAMETRO);
+    }
+    
+    public String print() {
+        return tabla.print();
     }
 }

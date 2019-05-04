@@ -1,7 +1,7 @@
 //*****************************************************************
 // File:   MiniLengCompiler.jj
 // Author: Andrés Gavín Murillo 716358
-// Date:   29/4/2019
+// Date:   4/5/2019
 // Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V3.0
 //         JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
 //*****************************************************************
@@ -23,9 +23,11 @@ import java.util.ArrayList;
 public class MiniLengCompiler {
     static boolean correcto = true;
     static boolean panic_mode = false;
+    
     static TablaSimbolos tabla_simbolos = new TablaSimbolos();
     static Long dir = new Long(0);
     static int nivel = 0;
+    static boolean tabla_simbolos_print = true;
     
     public static void main(String args []) throws ParseException {
         System.out.println("Compilador de MiniLengCompiler V3.0 Autor: Andrés Gavín Murillo 716358. Ayuda: ./compilador -h\n");
@@ -394,11 +396,17 @@ Token identificador() :
 	    bloque_sentencias()
 	    ( <EOF> )?
 	        {
-	            if (verbose && correcto)
-	                TablaVeces.print();
+	            if (correcto) {
                     tabla_simbolos.eliminar_variables(nivel);
-                    tabla_simbolos.eliminar_acciones(nivel); // igual a eliminar_parametros_ocultos(1)
+                    tabla_simbolos.eliminar_acciones(nivel);
+                    //tabla_simbolos.eliminar_parametros_ocultos(nivel+1); // TODO: Debería de ser como la anterior pero no va
                     tabla_simbolos.eliminar_programa();
+                    
+                    if (tabla_simbolos_print)
+                        System.out.print(tabla_simbolos.print());
+                    if (verbose)
+                        TablaVeces.print();
+                }
 	            return;
 	        }
     }
@@ -669,7 +677,10 @@ void bloque_sentencias() :
     try { 
         principio()
         lista_sentencias()
-        <tFIN>
+        <tFIN> {
+	        if (tabla_simbolos_print)
+	            System.out.print(tabla_simbolos.print());
+        }
     }
     catch (ParseException e) { // Error sintáctico
         if (panic_mode)
