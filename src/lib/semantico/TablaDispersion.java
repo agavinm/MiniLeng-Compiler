@@ -51,14 +51,12 @@ public class TablaDispersion {
     public void existe_simbolo(String nombre, Integer n) throws SimboloYaExistenteException {
         int h = hash(nombre);
         int size = tabla[h].size();
-        int nivel = n;
         Simbolo aux = null;
         
-        for (int i=0; i<size && nivel >= n; i++) {
+        for (int i=0; i<size; i++) {
             aux = tabla[h].get(i);
-            nivel = aux.getNivel();
             
-            if (aux.getNombre().equals(nombre) && aux.getNivel().equals(n)) {
+            if (aux.getNombre().equals(nombre) && aux.getNivel().equals(n) && aux.isVisible()) {
                 throw new SimboloYaExistenteException("El simbolo introducido ya existe");
             }
         }       
@@ -68,14 +66,12 @@ public class TablaDispersion {
     public void eliminar_nivel(Integer n, Tipo_simbolo simbolo) {
         Simbolo aux;
         ListIterator<Simbolo> it;
-        int nivel = n;
         
         for (int i=0; i<M; i++) {
             it = tabla[i].listIterator();
             
-            while (it.hasNext() && nivel >= n) {
+            while (it.hasNext()) {
                 aux = it.next();
-                nivel = aux.getNivel();
                 
                 if (aux.getNivel().equals(n) && aux.getTipo() == simbolo) {
                     it.remove();
@@ -88,15 +84,13 @@ public class TablaDispersion {
     public void eliminar(Integer n, String nombre) {
         Simbolo aux;
         ListIterator<Simbolo> it;
-        int nivel = n;
         boolean fin = false;
         
         for (int i=0; !fin && i<M; i++) {
             it = tabla[i].listIterator();
             
-            while (!fin && it.hasNext() && nivel >= n) {
+            while (!fin && it.hasNext()) {
                 aux = it.next();
-                nivel = aux.getNivel();
                 
                 if (aux.getNivel().equals(n) && aux.getNombre().equals(nombre)) {
                     it.remove();
@@ -113,14 +107,12 @@ public class TablaDispersion {
     public void ocultar_parametros(Integer n) {
         Simbolo aux;
         ListIterator<Simbolo> it;
-        int nivel = n;
         
         for (int i=0; i<M; i++) {
             it = tabla[i].listIterator();
             
-            while (it.hasNext() && nivel >= n) {
+            while (it.hasNext()) {
                 aux = it.next();
-                nivel = aux.getNivel();
                 
                 if (aux.getNivel().equals(n) && aux.getTipo() == Tipo_simbolo.PARAMETRO) { //TODO
                     aux.setVisible(false);
@@ -136,14 +128,12 @@ public class TablaDispersion {
         Simbolo aux;
         LinkedList<Simbolo> parametros;
         ListIterator<Simbolo> it;
-        int nivel = n;
         
         for (int i=0; i<M; i++) {
             it = tabla[i].listIterator();
             
-            while (it.hasNext() && nivel >= n) {
+            while (it.hasNext()) {
                 aux = it.next();
-                nivel = aux.getNivel();
                 
                 if (aux.getNivel().equals(n) && aux.getTipo() == Tipo_simbolo.ACCION) {
                     parametros = aux.getLista_parametros();

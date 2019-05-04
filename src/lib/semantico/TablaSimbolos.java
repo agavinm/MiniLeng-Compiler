@@ -112,6 +112,6 @@ public class TablaSimbolos {
     // DEBEN SER ELIMINADOS TAMBIEN PARA MANTENER LA COHERENCIA DE LA TABLA.
     public void eliminar_acciones(int nivel) {
         tabla.eliminar_nivel(nivel, Tipo_simbolo.ACCION);
-        tabla.eliminar_nivel(nivel, Tipo_simbolo.PARAMETRO);
+        tabla.eliminar_nivel(nivel+1, Tipo_simbolo.PARAMETRO);
     }
 }
