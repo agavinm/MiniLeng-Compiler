@@ -39,7 +39,7 @@ public class TablaDispersion {
         
         for (int i=0; i<size; i++) {
             aux = tabla[h].get(i);
-            if (aux.getNombre() == nombre) {
+            if (aux.getNombre().equals(nombre) && aux.isVisible()) {
                 return aux;
             }
         }
@@ -58,7 +58,7 @@ public class TablaDispersion {
             aux = tabla[h].get(i);
             nivel = aux.getNivel();
             
-            if (aux.getNombre() == nombre && aux.getNivel() == n) {
+            if (aux.getNombre().equals(nombre) && aux.getNivel().equals(n)) {
                 throw new SimboloYaExistenteException("El simbolo introducido ya existe");
             }
         }       
@@ -77,7 +77,7 @@ public class TablaDispersion {
                 aux = it.next();
                 nivel = aux.getNivel();
                 
-                if (aux.getNivel() == n && aux.getTipo() == simbolo) {
+                if (aux.getNivel().equals(n) && aux.getTipo() == simbolo) {
                     it.remove();
                 }
             }
@@ -98,7 +98,7 @@ public class TablaDispersion {
                 aux = it.next();
                 nivel = aux.getNivel();
                 
-                if (aux.getNivel() == n && aux.getNombre() == nombre) {
+                if (aux.getNivel().equals(n) && aux.getNombre().equals(nombre)) {
                     it.remove();
                     fin = true;
                 }
@@ -122,7 +122,7 @@ public class TablaDispersion {
                 aux = it.next();
                 nivel = aux.getNivel();
                 
-                if (aux.getNivel() == n && aux.getTipo() == Tipo_simbolo.PARAMETRO) {
+                if (aux.getNivel().equals(n) && aux.getTipo() == Tipo_simbolo.PARAMETRO) { //TODO
                     aux.setVisible(false);
                 }
             }
@@ -145,7 +145,7 @@ public class TablaDispersion {
                 aux = it.next();
                 nivel = aux.getNivel();
                 
-                if (aux.getNivel() == n && aux.getTipo() == Tipo_simbolo.ACCION) {
+                if (aux.getNivel().equals(n) && aux.getTipo() == Tipo_simbolo.ACCION) {
                     parametros = aux.getLista_parametros();
                     if (!parametros.getFirst().isVisible()) {
                         for (int j=0; j<parametros.size(); j++) {

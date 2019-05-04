@@ -22,7 +22,7 @@ public class Simbolo {
         this.tipo = null;
         this.variable = null;
         this.parametro = null;
-        this.visible = null;
+        this.visible = true;
         this.lista_parametros = null;
         this.dir = null;
     }
