@@ -1,7 +1,7 @@
 //*****************************************************************
 // File:   TablaSimbolos.java
 // Author: Andrés Gavín Murillo 716358
-// Date:   4/5/2019
+// Date:   5/5/2019
 // Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V3.0
 //         JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
 //*****************************************************************
@@ -123,7 +123,7 @@ public class TablaSimbolos {
         tabla.eliminar_nivel(nivel+1, Tipo_simbolo.PARAMETRO);
     }
     
-    public String print() {
-        return tabla.print();
+    public String toString() {
+        return tabla.toString();
     }
 }

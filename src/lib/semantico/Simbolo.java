@@ -1,7 +1,7 @@
 //*****************************************************************
 // File:   Simbolo.java
 // Author: Andrés Gavín Murillo 716358
-// Date:   4/5/2019
+// Date:   5/5/2019
 // Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V3.0
 //         JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
 //*****************************************************************
@@ -180,5 +180,46 @@ public class Simbolo {
     
     public void setDir(Long dir) {
         this.dir = dir;
+    }
+    
+    // To string
+    public String strVisible() {
+        String resul = "OCULTO";
+        if (this.visible) {
+            resul = "VISIBLE";
+        }
+        
+        return resul;
+    }
+
+    public String strVariable() {
+        String resul = "";
+        if (this.variable != null) {
+            resul = this.variable.toString();
+        }
+        
+        return resul;
+    }
+
+    public String strClase() {
+        String resul = "";
+        if (this.parametro != null) {
+            resul = this.parametro.toString();
+        }
+        
+        return resul;
+    }
+
+    public String strParametros() {
+        String resul = "";
+        if (this.lista_parametros != null) {
+            for (int i=0; i<this.lista_parametros.size(); i++) {
+                if (i>0)
+                    resul += ", ";
+                resul += this.lista_parametros.get(i).nombre;
+            }
+        }
+        
+        return resul;
     }
 }

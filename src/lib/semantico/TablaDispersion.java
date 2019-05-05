@@ -20,6 +20,7 @@ public class TablaDispersion {
     private final int M = 251; // Numero primo cercano a una potencia de 2 (256) -- 251
     private List<Integer> T;
     private LinkedList<Simbolo>[] tabla = new LinkedList[M];
+    private boolean primer_toString;
     
     public TablaDispersion() {
         T = new ArrayList<Integer>();
@@ -31,6 +32,8 @@ public class TablaDispersion {
         for (int i=0; i<M; i++) {
             tabla[i] = new LinkedList<Simbolo>();
         }
+        
+        primer_toString = true;
     }
     
     // Introduce el símbolo s sin comprobaciones previas
@@ -159,10 +162,20 @@ public class TablaDispersion {
         }
     }
     
-    public String print() {
-        String resul = "---------------------------------------------------------------\n";
-        resul += String.format("| %-10s | %-20s | %-10s | %-10s |", "Hash", "Simbolo", 
-                "Nivel", "Tipo") + "\n";
+    public String toString() {
+        String linea = new String(new char[107]).replace("\0", "-") + "\n";
+        String resul = "";
+        if (primer_toString) {
+            resul += linea;
+            resul += String.format("| %-41s  %-17s  %-41s |", "", "TABLA DE SÍMBOLOS", 
+                    "") + "\n";
+            resul += linea;
+            resul += String.format("| %-4s | %-20s | %-5s | %-9s | %-8s | %-11s | %-5s | %-20s |", 
+                    "Hash", "Simbolo", "Nivel", "Tipo", "Visible", "Variable", "Clase", "Parametros") + "\n";
+            resul += linea;
+            primer_toString = false;
+        }
+        
         LinkedList<Simbolo> fila;
         Simbolo s;
         
@@ -170,13 +183,13 @@ public class TablaDispersion {
             fila = tabla[i];
             for (int j=0; j<fila.size(); j++) {
                 s = fila.get(j);
-                if (s.isVisible())
-                    resul += String.format("| %-10s | %-20s | %-10s | %-10s |", i, 
-                            s.getNombre(), s.getNivel(), s.getTipo()) + "\n";
+                resul += String.format("| %-4s | %-20s | %-5s | %-9s | %-8s | %-11s | %-5s | %-20s |", i, 
+                        s.getNombre(), s.getNivel(), s.getTipo(), s.strVisible(), s.strVariable(),
+                        s.strClase(), s.strParametros()) + "\n";
             }
         }
         
-        resul += "---------------------------------------------------------------\n";
+        resul += linea;
         
         return resul;
     }

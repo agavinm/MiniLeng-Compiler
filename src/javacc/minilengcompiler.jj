@@ -27,7 +27,7 @@ public class MiniLengCompiler {
     static TablaSimbolos tabla_simbolos = new TablaSimbolos();
     static Long dir = new Long(0);
     static int nivel = 0;
-    static boolean tabla_simbolos_print = true;
+    static boolean tabla_simbolos_print = false;
     
     public static void main(String args []) throws ParseException {
         System.out.println("Compilador de MiniLengCompiler V3.0 Autor: Andrés Gavín Murillo 716358. Ayuda: ./compilador -h\n");
@@ -48,7 +48,8 @@ public class MiniLengCompiler {
                 System.out.println("Argumentos:");
                 System.out.println("    -h  -> Muestra la ayuda");
                 System.out.println("    -p  -> Panic mode");
-                System.out.println("    -v  -> Muestra información adicional");
+                System.out.println("    -v  -> Muestra un resumen de las apariciones de los símbolos");
+                System.out.println("    -s  -> Muestra la tabla de símbolos cada vez que se cierre un bloque");
                 return ;
             }
             else {
@@ -59,6 +60,8 @@ public class MiniLengCompiler {
                         panic_mode = true;
                     else if (args[i].equals("-v"))
                         verbose = true;
+                    else if (args[i].equals("-s"))
+                        tabla_simbolos_print = true;
                     else
                         file_name = args[i];
                 }
@@ -83,7 +86,8 @@ public class MiniLengCompiler {
                 if (correcto)
                     System.out.println("Compilación correcta.");
             }
-            catch (TokenMgrError e) { // Error léxico
+            catch (Exception ignored) { }
+            catch (Error e) { // Error léxico
                 System.out.println("ERROR LÉXICO (<" + SimpleCharStream.getBeginLine() + ", " + 
                     SimpleCharStream.getBeginColumn() + ">) : símbolo no reconocido: <" +
                     SimpleCharStream.GetImage().charAt(MiniLengCompilerTokenManager.curLexState) + ">");
@@ -403,7 +407,7 @@ Token identificador() :
                     tabla_simbolos.eliminar_programa();
                     
                     if (tabla_simbolos_print)
-                        System.out.print(tabla_simbolos.print());
+                        System.out.println(tabla_simbolos.toString());
                     if (verbose)
                         TablaVeces.print();
                 }
@@ -679,7 +683,7 @@ void bloque_sentencias() :
         lista_sentencias()
         <tFIN> {
 	        if (tabla_simbolos_print)
-	            System.out.print(tabla_simbolos.print());
+	            System.out.print(tabla_simbolos.toString());
         }
     }
     catch (ParseException e) { // Error sintáctico
