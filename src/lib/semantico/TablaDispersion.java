@@ -1,7 +1,7 @@
 //*****************************************************************
 // File:   TablaDispersion.java
 // Author: Andrés Gavín Murillo 716358
-// Date:   4/5/2019
+// Date:   5/5/2019
 // Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V3.0
 //         JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
 //*****************************************************************
@@ -17,7 +17,7 @@ import java.util.ListIterator;
 import lib.semantico.Simbolo.Tipo_simbolo;
 
 public class TablaDispersion {
-    private final int M = 251; // Numero primo cercano a una potencia de 2 (256)
+    private final int M = 251; // Numero primo cercano a una potencia de 2 (256) -- 251
     private List<Integer> T;
     private LinkedList<Simbolo>[] tabla = new LinkedList[M];
     
@@ -122,7 +122,7 @@ public class TablaDispersion {
             while (it.hasNext()) {
                 aux = it.next();
                 
-                if (aux.getNivel().equals(n) && aux.getTipo() == Tipo_simbolo.PARAMETRO) { //TODO
+                if (aux.getNivel().equals(n) && aux.getTipo() == Tipo_simbolo.PARAMETRO) {
                     aux.setVisible(false);
                 }
             }
@@ -143,14 +143,16 @@ public class TablaDispersion {
             while (it.hasNext()) {
                 aux = it.next();
                 
-                if (aux.getNivel().equals(n) && aux.getTipo() == Tipo_simbolo.ACCION) {
+                if (aux.getNivel().equals(n-1) && aux.getTipo() == Tipo_simbolo.ACCION) {
                     parametros = aux.getLista_parametros();
-                    if (!parametros.getFirst().isVisible()) {
+                    if (!parametros.isEmpty() && !parametros.getFirst().isVisible()) {
+                        it.remove();
+                        
                         for (int j=0; j<parametros.size(); j++) {
                             this.eliminar(n, parametros.get(j).getNombre());
-                        }
+                        } // Los parámetros van antes en la tabla que su acción, por tanto el iterador avanza
                         
-                        it.remove();
+                        it = tabla[i].listIterator();
                     }
                 }
             }

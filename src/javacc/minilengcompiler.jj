@@ -1,7 +1,7 @@
 //*****************************************************************
 // File:   MiniLengCompiler.jj
 // Author: Andrés Gavín Murillo 716358
-// Date:   4/5/2019
+// Date:   5/5/2019
 // Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V3.0
 //         JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
 //*****************************************************************
@@ -399,7 +399,7 @@ Token identificador() :
 	            if (correcto) {
                     tabla_simbolos.eliminar_variables(nivel);
                     tabla_simbolos.eliminar_acciones(nivel);
-                    //tabla_simbolos.eliminar_parametros_ocultos(nivel+1); // TODO: Debería de ser como la anterior pero no va
+                    //tabla_simbolos.eliminar_parametros_ocultos(nivel+1); // Si todas acciones tienen param 
                     tabla_simbolos.eliminar_programa();
                     
                     if (tabla_simbolos_print)
