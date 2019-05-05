@@ -1,8 +1,8 @@
 //*****************************************************************
 // File:   MiniLengCompiler.jj
 // Author: Andrés Gavín Murillo 716358
-// Date:   15/4/2019
-// Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V2.2
+// Date:   5/5/2019
+// Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V3.0
 //         JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
 //*****************************************************************
 options{    static = true;
@@ -10,15 +10,27 @@
 
 package javacc;
 
-import lib.TablaVeces;
 import java.io.FileInputStream;
+import lib.lexico.TablaVeces;
+import lib.semantico.TablaSimbolos;
+import lib.semantico.Simbolo;
+import lib.semantico.Simbolo.Clase_parametro;
+import lib.semantico.Simbolo.Tipo_variable;
+import lib.semantico.SimboloNoEncontradoException;
+import lib.semantico.SimboloYaExistenteException;
+import java.util.ArrayList;
 
 public class MiniLengCompiler {
     static boolean correcto = true;
     static boolean panic_mode = false;
     
+    static TablaSimbolos tabla_simbolos = new TablaSimbolos();
+    static Long dir = new Long(0);
+    static int nivel = 0;
+    static boolean tabla_simbolos_print = false;
+    
     public static void main(String args []) throws ParseException {
-        System.out.println("Compilador de MiniLengCompiler V2.2 Autor: Andrés Gavín Murillo 716358. Ayuda: ./compilador -h\n");
+        System.out.println("Compilador de MiniLengCompiler V3.0 Autor: Andrés Gavín Murillo 716358. Ayuda: ./compilador -h\n");
         
         Boolean verbose = false;
         MiniLengCompiler compiler;
@@ -36,7 +48,8 @@ public class MiniLengCompiler {
                 System.out.println("Argumentos:");
                 System.out.println("    -h  -> Muestra la ayuda");
                 System.out.println("    -p  -> Panic mode");
-                System.out.println("    -v  -> Muestra información adicional");
+                System.out.println("    -v  -> Muestra un resumen de las apariciones de los símbolos");
+                System.out.println("    -s  -> Muestra la tabla de símbolos cada vez que se cierre un bloque");
                 return ;
             }
             else {
@@ -47,6 +60,8 @@ public class MiniLengCompiler {
                         panic_mode = true;
                     else if (args[i].equals("-v"))
                         verbose = true;
+                    else if (args[i].equals("-s"))
+                        tabla_simbolos_print = true;
                     else
                         file_name = args[i];
                 }
@@ -71,6 +86,7 @@ public class MiniLengCompiler {
                 if (correcto)
                     System.out.println("Compilación correcta.");
             }
+            catch (Exception ignored) { }
             catch (Error e) { // Error léxico
                 System.out.println("ERROR LÉXICO (<" + SimpleCharStream.getBeginLine() + ", " + 
                     SimpleCharStream.getBeginColumn() + ">) : símbolo no reconocido: <" +
@@ -81,7 +97,7 @@ public class MiniLengCompiler {
         }
     }
 
-    private static void panic(Exception e, String msg, int kind) {
+    private static void panic(ParseException e, String msg, int kind) {
         Token lastRead = MiniLengCompiler.getNextToken();
 
         while (token.kind != kind && token.kind != EOF)
@@ -96,7 +112,7 @@ public class MiniLengCompiler {
         System.out.println(error_msg);
     }
 
-    private static void error_sintactico(Exception e, String msg) {
+    private static void error_sintactico(ParseException e, String msg) {
         correcto = false;
         Token lastRead = MiniLengCompiler.getNextToken();
         
@@ -105,8 +121,24 @@ public class MiniLengCompiler {
             "'. " + msg + ">");
     }
 
-    private static void error_sintactico(Exception e) {
+    private static void error_sintactico(ParseException e) {
         error_sintactico(e, "");
+    }
+
+    private static void error_semantico(SimboloNoEncontradoException e, Token t) {
+        correcto = false;
+        
+        System.out.println("ERROR SEMÁNTICO (<" + t.beginLine + ", " + 
+            t.beginColumn + ">) : <No existe ningún símbolo con nombre '" +
+            t.image + "'>");
+    }
+    
+    private static void error_semantico(SimboloYaExistenteException e, Token t) {
+        correcto = false;
+        
+        System.out.println("ERROR SEMÁNTICO (<" + t.beginLine + ", " + 
+            t.beginColumn + ">) : <Ya existe un símbolo con nombre '" +
+            t.image + "'>");
     }
 }
 // Análisis léxico
@@ -328,7 +360,7 @@ void punto_y_coma() :
     try { 
         <tPC>
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         if (panic_mode)
             panic(e, "Se esperaba ';'", tPC);
         else
@@ -336,29 +368,53 @@ void punto_y_coma() :
     }
 }
 
-void identificador() :
-{}
+Token identificador() :
+{
+    Token t = null;
+}
 {
     try { 
-        <tIDENTIFICADOR>
+        t = <tIDENTIFICADOR>
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e, "Se esperaba un identificador");
+    }
+    
+    {
+        return t;
     }
 }
 void programa(Boolean verbose) :
-{}
+{
+    Token t = null;
+}
 {
     try { 
-	    <tPROGRAMA> identificador() punto_y_coma() declaracion_variables() declaracion_acciones()
-	     bloque_sentencias() ( <EOF> )?
+	    <tPROGRAMA>
+	    t = identificador() {
+	        tabla_simbolos.introducir_programa(t.image, dir);
+	    }
+	    punto_y_coma()
+	    declaracion_variables()
+	    declaracion_acciones()
+	    bloque_sentencias()
+	    ( <EOF> )?
 	        {
-	            if (verbose && correcto)
-	                TablaVeces.print();
+	            if (correcto) {
+                    tabla_simbolos.eliminar_variables(nivel);
+                    tabla_simbolos.eliminar_acciones(nivel);
+                    //tabla_simbolos.eliminar_parametros_ocultos(nivel+1); // Si todas acciones tienen param 
+                    tabla_simbolos.eliminar_programa();
+                    
+                    if (tabla_simbolos_print)
+                        System.out.println(tabla_simbolos.toString());
+                    if (verbose)
+                        TablaVeces.print();
+                }
 	            return;
 	        }
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e, "Se esperaba la declaración del programa");
     }
 }
@@ -367,43 +423,88 @@ void declaracion_variables() :
 {}
 {
     try { 
-        ( declaracion() punto_y_coma() )*
+        (
+          declaracion()
+          punto_y_coma()
+        )*
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e);
     }
 }
 
 void declaracion() :
-{}
+{
+    Token t = null;
+    ArrayList<Token> ids;
+    Tipo_variable tipo;
+}
 {
     try { 
-        tipo_variables() identificadores()
+        tipo = tipo_variables()
+        ids = identificadores() {
+            for (int i=0; i<ids.size(); i++) {
+                t = ids.get(i);
+                tabla_simbolos.introducir_variable(t.image, tipo, nivel, dir);
+            }
+        }
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e);
+    }
+    catch (SimboloYaExistenteException e) { // Error semántico
+        error_semantico(e, t);
     }
 }
 
-void tipo_variables() :
-{}
+Tipo_variable tipo_variables() :
+{
+    Tipo_variable tipo = null;
+}
 {
     try { 
-        <tENTERO> | <tCARACTER> | <tBOOLEANO>
+          <tENTERO> {
+              tipo = Tipo_variable.ENTERO;
+          }
+        | <tCARACTER> {
+              tipo = Tipo_variable.CHAR;
+          }
+        | <tBOOLEANO> {
+              tipo = Tipo_variable.BOOLEANO;
+          }
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e, "Se esperaba el tipo de varibale");
     }
+
+    {
+        return tipo;
+    }
 }
 
-void identificadores() :
-{}
+ArrayList<Token> identificadores() :
+{
+    ArrayList<Token> tokens = new ArrayList<Token>();
+    Token t = null;
+}
 {
     try { 
-        identificador() ( <tC> identificador() )*
+        t = identificador() {
+            tokens.add(t);
+        }
+        (
+          <tC>
+          t = identificador() {
+              tokens.add(t);
+          }
+        )*
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e);
+    }
+
+    {
+        return tokens;
     }
 }
 
@@ -411,9 +512,11 @@ void declaracion_acciones() :
 {}
 {
     try { 
-        ( declaracion_accion() )*
+        (
+          declaracion_accion()
+        )*
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e);
     }
 }
@@ -422,22 +525,40 @@ void declaracion_accion() :
 {}
 {
     try { 
-        cabecera_accion() punto_y_coma() declaracion_variables()
-         declaracion_acciones() bloque_sentencias()
+        cabecera_accion()
+        punto_y_coma()
+        declaracion_variables()
+        declaracion_acciones()
+        bloque_sentencias() {
+            tabla_simbolos.eliminar_variables(nivel);
+            tabla_simbolos.eliminar_acciones(nivel);
+            tabla_simbolos.ocultar_parametros(nivel);
+            nivel--;
+        }
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e);
     }
 }
 
 void cabecera_accion() :
-{}
+{
+    Token t = null;
+}
 {
     try { 
-        <tACCION> identificador() parametros_formales()
+        <tACCION>
+        t = identificador() {
+            tabla_simbolos.introducir_accion(t.image, nivel, dir);
+            nivel++;
+        }
+        parametros_formales()
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e, "Se esperaba la declaración de una acción");
+    }
+    catch (SimboloYaExistenteException e) { // Error semántico
+        error_semantico(e, t);
     }
 }
 
@@ -447,7 +568,7 @@ void ap() :
     try { 
         <tAP>
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e, "Se esperaba '('");
     }
 }
@@ -458,7 +579,7 @@ void cp() :
     try { 
         <tCP>
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e, "Se esperaba ')'");
     }
 }
@@ -467,9 +588,15 @@ void parametros_formales() :
 {}
 {
     try { 
-        ( ap() ( parametros() )* cp() )?
+        (
+          ap()
+          (
+            parametros()
+          )*
+          cp()
+        )?
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e);
     }
 }
@@ -478,32 +605,62 @@ void lista_parametros() :
 {}
 {
     try { 
-        identificadores() ( punto_y_coma() parametros() )?
+        (
+          punto_y_coma()
+          parametros()
+        )?
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e);
     }
 }
 
 void parametros() :
-{}
+{
+    Token t = null;
+    ArrayList<Token> ids;
+    Clase_parametro clase;
+    Tipo_variable tipo;
+}
 {
     try { 
-        clase_parametros() tipo_variables() lista_parametros()
+        clase = clase_parametros()
+        tipo = tipo_variables()
+        ids = identificadores() {
+            for (int i=0; i<ids.size(); i++) {
+                t = ids.get(i);
+                tabla_simbolos.introducir_parametro(t.image, tipo, clase, nivel, dir);
+            }
+        }
+        lista_parametros()
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e);
+    }
+    catch (SimboloYaExistenteException e) { // Error semántico
+        error_semantico(e, t);
     }
 }
 
-void clase_parametros() :
-{}
+Clase_parametro clase_parametros() :
+{
+    Clase_parametro clase = null;
+}
 {
     try { 
-        <tVAL> | <tREF>
+          <tVAL> {
+              clase = Clase_parametro.VAL;
+          }
+        | <tREF> {
+              clase = Clase_parametro.REF;
+          }
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e, "Se esperaba la clase de parámetro");
+    }
+
+    {
+        return clase;
     }
 }
 
@@ -513,7 +670,7 @@ void principio() :
     try { 
         <tPRINCIPIO>
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e, "Se esperaba la declaración del principio del bloque");
     }
 }
@@ -522,9 +679,14 @@ void bloque_sentencias() :
 {}
 {
     try { 
-        principio() lista_sentencias() <tFIN>
+        principio()
+        lista_sentencias()
+        <tFIN> {
+	        if (tabla_simbolos_print)
+	            System.out.print(tabla_simbolos.toString());
+        }
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         if (panic_mode)
             panic(e, "Se esperaba la declaración del fin del bloque", tFIN);
         else
@@ -536,9 +698,11 @@ void lista_sentencias() :
 {}
 {
     try { 
-        ( sentencia() )+
+        (
+          sentencia()
+        )+
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e);
     }
 }
@@ -547,13 +711,13 @@ void sentencia() :
 {}
 {
     try { 
-        leer() punto_y_coma()
+          leer() punto_y_coma()
 	    | escribir() punto_y_coma()
 	    | identificacion()
 	    | seleccion()
 	    | mientras_que()
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e);
     }
 }
@@ -562,9 +726,12 @@ void leer() :
 {}
 {
     try { 
-        <tLEER> ap() lista_asignables() cp()
+        <tLEER>
+        ap()
+        lista_asignables()
+        cp()
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e);
     }
 }
@@ -575,7 +742,7 @@ void lista_asignables() :
     try { 
         identificadores()
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e);
     }
 }
@@ -584,9 +751,12 @@ void escribir() :
 {}
 {
     try { 
-        <tESCRIBIR> ap() lista_escribibles() cp()
+        <tESCRIBIR>
+        ap()
+        lista_escribibles()
+        cp()
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e);
     }
 }
@@ -597,7 +767,7 @@ void constcad() :
     try { 
         <tCONSTCAD>
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e, "Se esperaba una cadena de texto");
     }
 }
@@ -606,20 +776,36 @@ void lista_escribibles() :
 {}
 {
     try { 
-        ( constcad() | expresion() ) ( <tC> ( constcad() | expresion() ) )*
+        (
+            constcad()
+          | expresion()
+        )
+        (
+          <tC>
+          (
+              constcad()
+            | expresion()
+          )
+        )*
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e);
     }
 }
 
 void identificacion() :
-{}
+{
+    Token t = null;
+}
 {
     try { 
-        identificador() ( asignacion() | invocacion_accion() )
+        t = identificador()
+        (
+            asignacion()
+          | invocacion_accion()
+        )
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e);
     }
 }
@@ -628,9 +814,11 @@ void asignacion() :
 {}
 {
     try { 
-        <tOPAS> expresion() punto_y_coma()
+        <tOPAS>
+        expresion()
+        punto_y_coma()
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e, "Se esperaba una asignación ':='");
     }
 }
@@ -639,9 +827,12 @@ void invocacion_accion() :
 {}
 {
     try { 
-        ( argumentos() )? punto_y_coma()
+        (
+          argumentos()
+        )?
+        punto_y_coma()
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e);
     }
 }
@@ -652,7 +843,7 @@ void fmq() :
     try { 
         <tFMQ>
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e, "Se esperaba el fin del bloque MQ");
     }
 }
@@ -661,9 +852,12 @@ void mientras_que() :
 {}
 {
     try { 
-        <tMQ> expresion() lista_sentencias() fmq()
+        <tMQ>
+        expresion()
+        lista_sentencias()
+        fmq()
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e);
     }
 }
@@ -674,7 +868,7 @@ void ent() :
     try { 
         <tENT>
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e, "Se esperaba 'ent'");
     }
 }
@@ -685,7 +879,7 @@ void fsi() :
     try { 
         <tFSI>
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e, "Se esperaba el fin del bloque SI");
     }
 }
@@ -694,9 +888,17 @@ void seleccion() :
 {}
 {
     try { 
-        <tSI> expresion() ent() lista_sentencias() ( <tSI_NO> lista_sentencias() )? fsi()
+        <tSI>
+        expresion()
+        ent()
+        lista_sentencias()
+        (
+          <tSI_NO>
+          lista_sentencias()
+        )?
+        fsi()
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e);
     }
 }
@@ -705,9 +907,13 @@ void argumentos() :
 {}
 {
     try { 
-        ap() ( lista_expresiones() )? cp()
+        ap()
+        (
+          lista_expresiones()
+        )?
+        cp()
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e);
     }
 }
@@ -716,9 +922,13 @@ void lista_expresiones() :
 {}
 {
     try { 
-        expresion() ( <tC> expresion() )*
+        expresion()
+        (
+          <tC>
+          expresion()
+        )*
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e);
     }
 }
@@ -727,9 +937,13 @@ void expresion() :
 {}
 {
     try { 
-        expresion_simple() ( operador_relacional() expresion_simple() )?
+        expresion_simple()
+        (
+          operador_relacional()
+          expresion_simple()
+        )?
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e);
     }
 }
@@ -738,9 +952,14 @@ void operador_relacional() :
 {}
 {
     try { 
-        <tMAYOR> | <tMENOR> | <tIGUAL> | <tMAI> | <tMEI> | <tNI>
+          <tMAYOR>
+        | <tMENOR>
+        | <tIGUAL>
+        | <tMAI>
+        | <tMEI>
+        | <tNI>
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e, "Se esperaba un operador relacional");
     }
 }
@@ -749,9 +968,13 @@ void expresion_simple() :
 {}
 {
     try { 
-        termino() ( operador_aditivo() termino() )*
+        termino()
+        (
+          operador_aditivo()
+          termino()
+        )*
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e);
     }
 }
@@ -760,9 +983,11 @@ void operador_aditivo() :
 {}
 {
     try { 
-        <tSUMA> | <tRESTA> | <tOR>
+          <tSUMA>
+        | <tRESTA>
+        | <tOR>
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e, "Se esperaba un operador aditivo");
     }
 }
@@ -771,9 +996,13 @@ void termino() :
 {}
 {
     try { 
-        factor() ( operador_multiplicativo() factor() )*
+        factor()
+        (
+          operador_multiplicativo()
+          factor()
+        )*
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e);
     }
 }
@@ -782,29 +1011,34 @@ void operador_multiplicativo() :
 {}
 {
     try { 
-        <tMOD> | <tDIV> | <tMULTIPLICA> | <tAND>
+          <tMOD>
+        | <tDIV>
+        | <tMULTIPLICA>
+        | <tAND>
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e, "Se esperaba un operador multiplicativo");
     }
 }
 
 void factor() :
-{}
+{
+    Token t = null;
+}
 {
     try { 
-        <tRESTA> factor()
+          <tRESTA> factor()
 	    | <tNOT> factor()
 	    | ap() expresion() cp()
 	    | <tENTACAR> ap() expresion() cp()
 	    | <tCARAENT> ap() expresion() cp()
-	    | identificador()
+	    | t = identificador()
 	    | <tCONSTENTERA>
 	    | <tCONSTCHAR>
 	    | <tTRUE>
 	    | <tFALSE>
     }
-    catch (Exception e) { // Error sintáctico
+    catch (ParseException e) { // Error sintáctico
         error_sintactico(e, "Se esperaba un factor");
     }
 }
