@@ -86,7 +86,7 @@ public class MiniLengCompiler {
                 if (correcto)
                     System.out.println("Compilación correcta.");
             }
-            catch (Exception ignored) { }
+            catch (Exception e) { System.err.println(e); }
             catch (Error e) { // Error léxico
                 System.out.println("ERROR LÉXICO (<" + SimpleCharStream.getBeginLine() + ", " + 
                     SimpleCharStream.getBeginColumn() + ">) : símbolo no reconocido: <" +
@@ -392,7 +392,7 @@ Token identificador() :
     try { 
 	    <tPROGRAMA>
 	    t = identificador() {
-	        tabla_simbolos.introducir_programa(t.image, dir);
+	       tabla_simbolos.introducir_programa(t.image, dir);
 	    }
 	    punto_y_coma()
 	    declaracion_variables()
@@ -445,15 +445,17 @@ void declaracion() :
         ids = identificadores() {
             for (int i=0; i<ids.size(); i++) {
                 t = ids.get(i);
-                tabla_simbolos.introducir_variable(t.image, tipo, nivel, dir);
+                try { 
+                    tabla_simbolos.introducir_variable(t.image, tipo, nivel, dir);
+                }
+			    catch (SimboloYaExistenteException e) { // Error semántico
+			        error_semantico(e, t);
+			    }
             }
         }
     }
     catch (ParseException e) { // Error sintáctico
         error_sintactico(e);
-    }
-    catch (SimboloYaExistenteException e) { // Error semántico
-        error_semantico(e, t);
     }
 }
 
@@ -549,16 +551,18 @@ void cabecera_accion() :
     try { 
         <tACCION>
         t = identificador() {
-            tabla_simbolos.introducir_accion(t.image, nivel, dir);
+            try { 
+                tabla_simbolos.introducir_accion(t.image, nivel, dir);
+            }
+		    catch (SimboloYaExistenteException e) { // Error semántico
+		        error_semantico(e, t);
+		    }
             nivel++;
         }
         parametros_formales()
     }
     catch (ParseException e) { // Error sintáctico
         error_sintactico(e, "Se esperaba la declaración de una acción");
-    }
-    catch (SimboloYaExistenteException e) { // Error semántico
-        error_semantico(e, t);
     }
 }
 
@@ -629,16 +633,18 @@ void parametros() :
         ids = identificadores() {
             for (int i=0; i<ids.size(); i++) {
                 t = ids.get(i);
-                tabla_simbolos.introducir_parametro(t.image, tipo, clase, nivel, dir);
+                try { 
+                    tabla_simbolos.introducir_parametro(t.image, tipo, clase, nivel, dir);
+                }
+			    catch (SimboloYaExistenteException e) { // Error semántico
+			        error_semantico(e, t);
+			    }
             }
         }
         lista_parametros()
     }
     catch (ParseException e) { // Error sintáctico
         error_sintactico(e);
-    }
-    catch (SimboloYaExistenteException e) { // Error semántico
-        error_semantico(e, t);
     }
 }
 
