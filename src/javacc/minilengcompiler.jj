@@ -71,14 +71,25 @@ public class MiniLengCompiler {
     }
 }
 PARSER_END(MiniLengCompiler)SKIP :{  " "| "\r"| "\t"| "\n"
-| "%" : COMENTARIO}
+| < ["%"] ~["%"] > : COMENTARIO
+| < ["%"] ["%"] > : COMENTARIO_DOBLE}
 
-< COMENTARIO > SKIP : // Comentarios de varias lineas %% opcional
+< COMENTARIO > SKIP :
 {
   "\n" : DEFAULT
 }
 
 < COMENTARIO > MORE :
+{
+  < ~[] >
+}
+
+< COMENTARIO_DOBLE > SKIP :
+{
+  "%%" : DEFAULT
+}
+
+< COMENTARIO_DOBLE > MORE :
 {
   < ~[] >
 }
