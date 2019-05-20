@@ -141,9 +141,9 @@ public class MiniLengCompiler {
             t.image + "'>");
     }
 }
-// Análisis léxico
-PARSER_END(MiniLengCompiler)SKIP :{  " "| "\r"| "\t"| "\n"
-| "%" : COMENTARIO}
+PARSER_END(MiniLengCompiler)SKIP :{  " "| "\r"| "\t"| "\n"
+| < ["%"] ~["%"] > : COMENTARIO
+| < ["%"] ["%"] > : COMENTARIO_DOBLE}
 
 < COMENTARIO > SKIP :
 {
@@ -151,6 +151,16 @@ public class MiniLengCompiler {
 }
 
 < COMENTARIO > MORE :
+{
+  < ~[] >
+}
+
+< COMENTARIO_DOBLE > SKIP :
+{
+  "%%" : DEFAULT
+}
+
+< COMENTARIO_DOBLE > MORE :
 {
   < ~[] >
 }
