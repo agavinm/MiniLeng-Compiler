@@ -114,11 +114,11 @@ public class MiniLengCompiler {
 
     private static void error_sintactico(ParseException e, String msg) {
         correcto = false;
-        Token lastRead = MiniLengCompiler.getNextToken();
-        
-        System.out.println("ERROR SINTÁCTICO (<" + lastRead.beginLine + ", " + 
-            lastRead.beginColumn + ">) : <Símbolo obtenido: '" + lastRead.image +
-            "'. " + msg + ">");
+        Token lastRead = MiniLengCompiler.getNextToken(); //TODO
+        //Token lastRead = MiniLengCompiler.token.next;
+	    System.out.println("ERROR SINTÁCTICO (<" + lastRead.beginLine + ", " + 
+	        lastRead.beginColumn + ">) : <Símbolo obtenido: '" + lastRead.image +
+	        "'. " + msg + ">");
     }
 
     private static void error_sintactico(ParseException e) {
@@ -734,7 +734,7 @@ void sentencia() :
 	    | mientras_que()
     }
     catch (ParseException e) { // Error sintáctico
-        error_sintactico(e);
+        error_sintactico(e, "Se esperaba una instrucción");
     }
 }
 
@@ -748,7 +748,7 @@ void leer() :
         cp()
     }
     catch (ParseException e) { // Error sintáctico
-        error_sintactico(e);
+        error_sintactico(e, "Se esperaba una operación de lectura");
     }
 }
 
@@ -773,7 +773,7 @@ void escribir() :
         cp()
     }
     catch (ParseException e) { // Error sintáctico
-        error_sintactico(e);
+        error_sintactico(e, "Se esperaba una operación de escritura");
     }
 }
 
@@ -805,7 +805,7 @@ void lista_escribibles() :
         )*
     }
     catch (ParseException e) { // Error sintáctico
-        error_sintactico(e);
+        error_sintactico(e, "Se esperaba una cadena o una expresión");
     }
 }
 
@@ -822,7 +822,7 @@ void identificacion() :
         )
     }
     catch (ParseException e) { // Error sintáctico
-        error_sintactico(e);
+        error_sintactico(e, "Se esperaba una asignación o una acción");
     }
 }
 
@@ -874,7 +874,7 @@ void mientras_que() :
         fmq()
     }
     catch (ParseException e) { // Error sintáctico
-        error_sintactico(e);
+        error_sintactico(e, "Se esperaba un bloque MQ");
     }
 }
 
@@ -915,7 +915,7 @@ void seleccion() :
         fsi()
     }
     catch (ParseException e) { // Error sintáctico
-        error_sintactico(e);
+        error_sintactico(e, "Se esperaba un bloque SI");
     }
 }
 
