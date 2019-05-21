@@ -114,7 +114,7 @@ public class MiniLengCompiler {
 
     private static void error_sintactico(ParseException e, String msg) {
         correcto = false;
-        Token lastRead = MiniLengCompiler.getNextToken(); //TODO
+        Token lastRead = MiniLengCompiler.getNextToken();
         //Token lastRead = MiniLengCompiler.token.next;
 	    System.out.println("ERROR SINTÁCTICO (<" + lastRead.beginLine + ", " + 
 	        lastRead.beginColumn + ">) : <Símbolo obtenido: '" + lastRead.image +
@@ -402,7 +402,8 @@ Token identificador() :
     try { 
 	    <tPROGRAMA>
 	    t = identificador() {
-	       tabla_simbolos.introducir_programa(t.image, dir);
+	        if (t != null) 
+	            tabla_simbolos.introducir_programa(t.image, dir);
 	    }
 	    punto_y_coma()
 	    declaracion_variables()
@@ -502,12 +503,14 @@ ArrayList<Token> identificadores() :
 {
     try { 
         t = identificador() {
-            tokens.add(t);
+            if (t != null) 
+                tokens.add(t);
         }
         (
           <tC>
           t = identificador() {
-              tokens.add(t);
+              if (t != null) 
+                  tokens.add(t);
           }
         )*
     }
@@ -561,13 +564,15 @@ void cabecera_accion() :
     try { 
         <tACCION>
         t = identificador() {
-            try { 
-                tabla_simbolos.introducir_accion(t.image, nivel, dir);
-            }
-		    catch (SimboloYaExistenteException e) { // Error semántico
-		        error_semantico(e, t);
-		    }
-            nivel++;
+            if (t != null) { 
+	            try { 
+	                tabla_simbolos.introducir_accion(t.image, nivel, dir);
+	            }
+			    catch (SimboloYaExistenteException e) { // Error semántico
+			        error_semantico(e, t);
+			    }
+	            nivel++;
+	        }
         }
         parametros_formales()
     }

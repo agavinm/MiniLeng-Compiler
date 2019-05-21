@@ -4,7 +4,7 @@ programa sintactico; %1
 
  caracter respuesta, letra, min, max;
  booleano headivinado;
- caracter c, d;
+ caracter caracter, d;
  entero e;
 
 %-------------------------------------------------------------------
