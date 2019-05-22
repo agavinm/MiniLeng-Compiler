@@ -19,6 +19,7 @@ import lib.semantico.Simbolo.Tipo_variable;
 import lib.semantico.SimboloNoEncontradoException;
 import lib.semantico.SimboloNoAsignableException;
 import lib.semantico.SimboloYaExistenteException;
+import lib.semantico.SimboloNoConcuerdaException;
 import java.util.ArrayList;
 
 public class MiniLengCompiler {
@@ -148,6 +149,13 @@ public class MiniLengCompiler {
         System.out.println("ERROR SEMÁNTICO (<" + t.beginLine + ", " + 
             t.beginColumn + ">) : <Ya existe un símbolo con nombre '" +
             t.image + "'>");
+    }
+
+    private static void error_semantico(SimboloNoConcuerdaException e, Token t) {
+        correcto = false;
+        
+        System.out.println("ERROR SEMÁNTICO (<" + t.next.beginLine + ", " + 
+            t.next.beginColumn + ">) : <Los tipos no concuerdan>");
     }
 }
 PARSER_END(MiniLengCompiler)SKIP :{  " "| "\r"| "\t"| "\n"
@@ -1006,82 +1014,129 @@ void lista_expresiones() :
     }
 }
 
-void expresion() :
-{}
+Tipo_variable expresion() :
+{
+    Tipo_variable tipo1 = null, tipo2 = null;
+    Token t = null;
+}
 {
     try { 
-        expresion_simple()
+        tipo1 = expresion_simple()
         (
-          operador_relacional()
-          expresion_simple()
+          t = operador_relacional()
+          tipo2 = expresion_simple() {
+              if (tipo1 != tipo2) {
+                  error_semantico(new SimboloNoConcuerdaException(), t);
+              }
+          }
         )?
     }
     catch (ParseException e) { // Error sintáctico
         error_sintactico(e);
     }
+
+    {
+        return tipo1;
+    }
 }
 
-void operador_relacional() :
-{}
+Token operador_relacional() :
+{
+    Token t = null;
+}
 {
     try { 
-          <tMAYOR>
-        | <tMENOR>
-        | <tIGUAL>
-        | <tMAI>
-        | <tMEI>
-        | <tNI>
+          t = <tMAYOR>
+        | t = <tMENOR>
+        | t = <tIGUAL>
+        | t = <tMAI>
+        | t = <tMEI>
+        | t = <tNI>
     }
     catch (ParseException e) { // Error sintáctico
         error_sintactico(e, "Se esperaba un operador relacional");
     }
+
+    {
+        return t;
+    }
 }
 
-void expresion_simple() :
-{}
+Tipo_variable expresion_simple() :
+{
+    Tipo_variable tipo1 = null, tipo2 = null;
+    Token t = null;
+}
 {
     try { 
-        termino()
+        tipo1 = termino()
         (
-          operador_aditivo()
-          termino()
+          t = operador_aditivo()
+          tipo2 = termino() {
+              if (tipo1 != tipo2) {
+                  error_semantico(new SimboloNoConcuerdaException(), t);
+              }
+          }
         )*
     }
     catch (ParseException e) { // Error sintáctico
         error_sintactico(e);
     }
+
+    {
+        return tipo1;
+    }
 }
 
-void operador_aditivo() :
-{}
+Token operador_aditivo() :
+{
+    Token t = null;
+}
 {
     try { 
-          <tSUMA>
-        | <tRESTA>
-        | <tOR>
+          t = <tSUMA>
+        | t = <tRESTA>
+        | t = <tOR>
     }
     catch (ParseException e) { // Error sintáctico
         error_sintactico(e, "Se esperaba un operador aditivo");
     }
+
+    {
+        return t;
+    }
 }
 
-void termino() :
-{}
+Tipo_variable termino() :
+{
+    Tipo_variable tipo1 = null, tipo2 = null;
+    Token t = null;
+}
 {
     try { 
-        factor()
+        tipo1 = factor()
         (
-          operador_multiplicativo()
-          factor()
+          t = operador_multiplicativo()
+          tipo2 = factor() {
+              if (tipo1 != tipo2) {
+                  error_semantico(new SimboloNoConcuerdaException(), t);
+              }
+          }
         )*
     }
     catch (ParseException e) { // Error sintáctico
         error_sintactico(e);
     }
+
+    {
+        return tipo1;
+    }
 }
 
-void operador_multiplicativo() :
-{}
+Token operador_multiplicativo() :
+{
+    Token t = null;
+}
 {
     try { 
           <tMOD>
@@ -1092,38 +1147,75 @@ void operador_multiplicativo() :
     catch (ParseException e) { // Error sintáctico
         error_sintactico(e, "Se esperaba un operador multiplicativo");
     }
+
+    {
+        return t;
+    }
 }
 
-void factor() :
+Tipo_variable factor() :
 {
     Token t = null;
     Simbolo s = null;
+    Tipo_variable tipo = null;
 }
 {
     try { 
-          <tRESTA> factor()
-	    | <tNOT> factor()
-	    | ap() expresion() cp()
-	    | <tENTACAR> ap() expresion() cp()
-	    | <tCARAENT> ap() expresion() cp()
+          t = <tRESTA>
+          tipo = factor() {
+              if (tipo != Tipo_variable.ENTERO && tipo != Tipo_variable.DESCONOCIDO) {
+                  error_semantico(new SimboloNoConcuerdaException(), t);
+              }
+          }
+	    | t = <tNOT>
+	      tipo = factor() {
+              if (tipo != Tipo_variable.BOOLEANO && tipo != Tipo_variable.DESCONOCIDO) {
+                  error_semantico(new SimboloNoConcuerdaException(), t);
+              }
+          }
+	    | ap()
+	      tipo = expresion()
+	      cp()
+	    | <tENTACAR> //TODO
+	      ap()
+	      tipo = expresion()
+	      cp()
+	    | <tCARAENT> //TODO
+	      ap()
+	      tipo = expresion()
+	      cp()
 	    | t = identificador() {
 	          try { 
                   s = tabla_simbolos.buscar_simbolo(t.image);
+                  tipo = s.getVariable();
               }
               catch (SimboloNoEncontradoException e) {
                   error_semantico(e, t);
                   try { 
                       s = tabla_simbolos.introducir_variable(t.image, Tipo_variable.DESCONOCIDO, nivel, dir);
+                      tipo = Tipo_variable.DESCONOCIDO;
                   }
                   catch (SimboloYaExistenteException ignored) { } // Imposible
               }
 	      }
-	    | <tCONSTENTERA>
-	    | <tCONSTCHAR>
-	    | <tTRUE>
-	    | <tFALSE>
+	    | <tCONSTENTERA> {
+	          tipo = Tipo_variable.ENTERO;
+	      }
+	    | <tCONSTCHAR> {
+              tipo = Tipo_variable.CHAR;
+          }
+	    | <tTRUE> {
+              tipo = Tipo_variable.BOOLEANO;
+          }
+	    | <tFALSE> {
+              tipo = Tipo_variable.BOOLEANO;
+          }
     }
     catch (ParseException e) { // Error sintáctico
         error_sintactico(e, "Se esperaba un factor");
+    }
+
+    {
+        return tipo;
     }
 }

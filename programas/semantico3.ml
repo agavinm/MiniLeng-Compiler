@@ -3,6 +3,7 @@ programa semantico; %3
 %-------------------------------------------------------------------
 
  caracter a, b; % error
+ entero ww;
  
 %-----------------------------------------------------------
 accion accion1 (val entero j);
@@ -31,5 +32,11 @@ principio
   a := a;
   a := dd;
   a := (z > t) < z;
-  y := 5;
+  y := -5;
+  ww := -5;
+  ww := -ww;
+  a := -5;
+  y := -a;
+  a := -y;
+  a := 5 > 3;
 fin
