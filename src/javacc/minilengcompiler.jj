@@ -17,6 +17,7 @@ import lib.semantico.Simbolo;
 import lib.semantico.Simbolo.Clase_parametro;
 import lib.semantico.Simbolo.Tipo_variable;
 import lib.semantico.SimboloNoEncontradoException;
+import lib.semantico.SimboloNoAsignableException;
 import lib.semantico.SimboloYaExistenteException;
 import java.util.ArrayList;
 
@@ -131,6 +132,14 @@ public class MiniLengCompiler {
         System.out.println("ERROR SEMÁNTICO (<" + t.beginLine + ", " + 
             t.beginColumn + ">) : <No existe ningún símbolo con nombre '" +
             t.image + "'>");
+    }
+
+    private static void error_semantico(SimboloNoAsignableException e, Token t) {
+        correcto = false;
+        
+        System.out.println("ERROR SEMÁNTICO (<" + t.beginLine + ", " + 
+            t.beginColumn + ">) : <El símbolo con nombre '" +
+            t.image + "' no es asignable>");
     }
     
     private static void error_semantico(SimboloYaExistenteException e, Token t) {
@@ -758,10 +767,33 @@ void leer() :
 }
 
 void lista_asignables() :
-{}
+{
+    ArrayList<Token> ids = null;
+    Token t = null;
+    Simbolo s = null;
+}
 {
     try { 
-        identificadores()
+        ids = identificadores() {
+            for (int i=0; i<ids.size(); i++) {
+                t = ids.get(i);
+	            if (t != null) {
+	                try { 
+	                    s = tabla_simbolos.buscar_simbolo(t.image);
+		                if (!(s.es_variable() || (s.es_parametro() && s.es_referencia()))) {
+		                    error_semantico(new SimboloNoAsignableException(), t);
+		                }
+	                }
+	                catch (SimboloNoEncontradoException e) {
+	                    error_semantico(e, t);
+	                    try { 
+	                        s = tabla_simbolos.introducir_variable(t.image, Tipo_variable.DESCONOCIDO, nivel, dir);
+	                    }
+	                    catch (SimboloYaExistenteException ignored) { } // Imposible
+	                }
+	            }
+            }
+        }
     }
     catch (ParseException e) { // Error sintáctico
         error_sintactico(e);
@@ -817,13 +849,31 @@ void lista_escribibles() :
 void identificacion() :
 {
     Token t = null;
+    Simbolo s = null;
 }
 {
     try { 
-        t = identificador()
+        t = identificador() {
+            if (t != null) {
+                try { 
+                    s = tabla_simbolos.buscar_simbolo(t.image);
+                }
+                catch (SimboloNoEncontradoException e) {
+                    error_semantico(e, t);
+                    try { 
+                        s = tabla_simbolos.introducir_variable(t.image, Tipo_variable.DESCONOCIDO, nivel, dir);
+                    }
+                    catch (SimboloYaExistenteException ignored) { } // Imposible
+                }
+            }
+        }
         (
-            asignacion()
-          | invocacion_accion()
+            asignacion() {
+                if (!(s.es_variable() || (s.es_parametro() && s.es_referencia()))) {
+                    error_semantico(new SimboloNoAsignableException(), t);
+                }
+            }
+          | invocacion_accion() { /*TODO: Comprobar si los argumentos son correctos*/ }
         )
     }
     catch (ParseException e) { // Error sintáctico

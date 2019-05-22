@@ -15,7 +15,7 @@ accion abuelo;
  accion padre();
   entero j;
   
-  accion hijo(ref entero j);
+  accion hijo(ref entero j, r, k; val entero i, u);
    principio
     j := j + 1;
    fin
