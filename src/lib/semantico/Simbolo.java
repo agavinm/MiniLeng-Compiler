@@ -73,6 +73,7 @@ public class Simbolo {
         this.dir = dir;
     }
     
+    // Tipo de símbolo
     public boolean es_variable() {
         return this.tipo == Tipo_simbolo.VARIABLE;
     }
@@ -85,12 +86,39 @@ public class Simbolo {
         return this.tipo == Tipo_simbolo.ACCION;
     }
     
+    // Clase de parámetro
     public boolean es_valor() {
         return this.tipo == Tipo_simbolo.PARAMETRO && this.parametro == Clase_parametro.VAL;
     }
     
     public boolean es_referencia() {
         return this.tipo == Tipo_simbolo.PARAMETRO && this.parametro == Clase_parametro.REF;
+    }
+    
+    // Tipo de variable
+    public boolean es_desconocido() {
+        return (this.tipo == Tipo_simbolo.PARAMETRO || this.tipo == Tipo_simbolo.VARIABLE) 
+                && this.variable == Tipo_variable.DESCONOCIDO;
+    }
+    
+    public boolean es_entero() {
+        return (this.tipo == Tipo_simbolo.PARAMETRO || this.tipo == Tipo_simbolo.VARIABLE) 
+                && this.variable == Tipo_variable.ENTERO;
+    }
+    
+    public boolean es_booleano() {
+        return (this.tipo == Tipo_simbolo.PARAMETRO || this.tipo == Tipo_simbolo.VARIABLE) 
+                && this.variable == Tipo_variable.BOOLEANO;
+    }
+    
+    public boolean es_caracter() {
+        return (this.tipo == Tipo_simbolo.PARAMETRO || this.tipo == Tipo_simbolo.VARIABLE) 
+                && this.variable == Tipo_variable.CHAR;
+    }
+    
+    // Para que un símbolo sea asignable debe ser variable o parámetro referencia
+    public boolean es_asignable() {
+        return this.es_variable() || (this.es_parametro() && this.es_referencia());
     }
     
     /* Constructores */

@@ -20,7 +20,7 @@ Principio
   dato := 5;
   dato := 6+3;
   j := 5;
-  leer(j,c);
+  leer(j,c,c);
   accion2(r);
 Fin
 
@@ -29,4 +29,7 @@ principio
 %-------------------------------------------------------------------
   a := a + b;
   a := a;
+  a := dd;
+  a := z > t;
+  y := 5;
 fin

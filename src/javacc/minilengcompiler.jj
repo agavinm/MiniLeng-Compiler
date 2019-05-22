@@ -780,7 +780,9 @@ void lista_asignables() :
 	            if (t != null) {
 	                try { 
 	                    s = tabla_simbolos.buscar_simbolo(t.image);
-		                if (!(s.es_variable() || (s.es_parametro() && s.es_referencia()))) {
+	                    // Lectura: Debe ser asignable y del tipo entero, carácter o desconocido
+		                if (!(s.es_asignable() &&
+		                      (s.es_entero() || s.es_caracter() || s.es_desconocido()))) {
 		                    error_semantico(new SimboloNoAsignableException(), t);
 		                }
 	                }
