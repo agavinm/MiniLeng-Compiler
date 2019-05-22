@@ -1,8 +1,8 @@
 //*****************************************************************
 // File:   MiniLengCompiler.jj
 // Author: Andrés Gavín Murillo 716358
-// Date:   5/5/2019
-// Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V3.0
+// Date:   22/5/2019
+// Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V3.1
 //         JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
 //*****************************************************************
 options{    static = true;
@@ -31,7 +31,7 @@ public class MiniLengCompiler {
     static boolean tabla_simbolos_print = false;
     
     public static void main(String args []) throws ParseException {
-        System.out.println("Compilador de MiniLengCompiler V3.0 Autor: Andrés Gavín Murillo 716358. Ayuda: ./compilador -h\n");
+        System.out.println("Compilador de MiniLengCompiler V3.1 Autor: Andrés Gavín Murillo 716358. Ayuda: ./compilador -h\n");
         
         Boolean verbose = false;
         MiniLengCompiler compiler;
@@ -1097,6 +1097,7 @@ void operador_multiplicativo() :
 void factor() :
 {
     Token t = null;
+    Simbolo s = null;
 }
 {
     try { 
@@ -1105,7 +1106,18 @@ void factor() :
 	    | ap() expresion() cp()
 	    | <tENTACAR> ap() expresion() cp()
 	    | <tCARAENT> ap() expresion() cp()
-	    | t = identificador()
+	    | t = identificador() {
+	          try { 
+                  s = tabla_simbolos.buscar_simbolo(t.image);
+              }
+              catch (SimboloNoEncontradoException e) {
+                  error_semantico(e, t);
+                  try { 
+                      s = tabla_simbolos.introducir_variable(t.image, Tipo_variable.DESCONOCIDO, nivel, dir);
+                  }
+                  catch (SimboloYaExistenteException ignored) { } // Imposible
+              }
+	      }
 	    | <tCONSTENTERA>
 	    | <tCONSTCHAR>
 	    | <tTRUE>

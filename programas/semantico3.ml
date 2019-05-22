@@ -30,6 +30,6 @@ principio
   a := a + b;
   a := a;
   a := dd;
-  a := z > t;
+  a := (z > t) < z;
   y := 5;
 fin
