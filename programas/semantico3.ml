@@ -40,4 +40,20 @@ principio
   y := -a;
   a := -y;
   a := 5 > 3;
+  
+  si (a = "b") ent
+    a:= true;
+  fsi
+  
+  mq (a <> "b")
+    a:= "b";
+  fmq
+  
+  ww := 5 + 6;
+  ww := 5 - 6;
+  ww := 5 OR 6;
+  ww := 5 MOD 6;
+  ww := 5 DIV 6;
+  ww := 5 * 6;
+  ww := 5 AND 6;
 fin

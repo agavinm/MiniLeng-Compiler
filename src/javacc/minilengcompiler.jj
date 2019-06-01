@@ -930,11 +930,20 @@ void fmq() :
 }
 
 void mientras_que() :
-{}
+{
+    Tipo_variable tipo = null;
+    Token t = null;
+}
 {
     try { 
-        <tMQ>
-        expresion()
+        <tMQ> {
+            t = token;
+        }
+        tipo = expresion() {
+              if (tipo != Tipo_variable.BOOLEANO) {
+                  error_semantico(new SimboloNoConcuerdaException(), t);
+              }
+        }
         lista_sentencias()
         fmq()
     }
@@ -966,11 +975,20 @@ void fsi() :
 }
 
 void seleccion() :
-{}
+{
+    Tipo_variable tipo = null;
+    Token t = null;
+}
 {
     try { 
-        <tSI>
-        expresion()
+        <tSI> {
+            t = token;
+        }
+        tipo = expresion() {
+              if (tipo != Tipo_variable.BOOLEANO) {
+                  error_semantico(new SimboloNoConcuerdaException(), t);
+              }
+        }
         ent()
         lista_sentencias()
         (
@@ -1026,8 +1044,10 @@ Tipo_variable expresion() :
           t = operador_relacional()
           tipo2 = expresion_simple() {
               if (tipo1 != tipo2 && tipo1 != Tipo_variable.DESCONOCIDO && tipo2 != Tipo_variable.DESCONOCIDO) {
-                  error_semantico(new SimboloNoConcuerdaException(), t);
+                  error_semantico(new SimboloNoConcuerdaException(), t); // TODO: Todos comparables o restringir a enteros?
               }
+
+              tipo1 = Tipo_variable.BOOLEANO; // Expresión relacional
           }
         )?
     }
@@ -1069,9 +1089,16 @@ Tipo_variable expresion_simple() :
 }
 {
     try { 
-        tipo1 = termino()
+        tipo1 = termino() {
+            t = token;
+        }
         (
-          t = operador_aditivo()
+          tipo2 = operador_aditivo() {
+              if (tipo2 == Tipo_variable.BOOLEANO && tipo1 != Tipo_variable.BOOLEANO) {
+                  error_semantico(new SimboloNoConcuerdaException(), t);
+              }
+              t = token;
+          }
           tipo2 = termino() {
               if (tipo1 != tipo2 && tipo1 != Tipo_variable.DESCONOCIDO && tipo2 != Tipo_variable.DESCONOCIDO) {
                   error_semantico(new SimboloNoConcuerdaException(), t);
@@ -1088,22 +1115,24 @@ Tipo_variable expresion_simple() :
     }
 }
 
-Token operador_aditivo() :
+Tipo_variable operador_aditivo() :
 {
-    Token t = null;
+    Tipo_variable tipo = null;
 }
 {
     try { 
-          t = <tSUMA>
-        | t = <tRESTA>
-        | t = <tOR>
+          <tSUMA>
+        | <tRESTA>
+        | <tOR> {
+            tipo = Tipo_variable.BOOLEANO;
+        }
     }
     catch (ParseException e) { // Error sintáctico
         error_sintactico(e, "Se esperaba un operador aditivo");
     }
 
     {
-        return t;
+        return tipo;
     }
 }
 
@@ -1114,9 +1143,16 @@ Tipo_variable termino() :
 }
 {
     try { 
-        tipo1 = factor()
+        tipo1 = factor() {
+            t = token;
+        }
         (
-          t = operador_multiplicativo()
+          tipo2 = operador_multiplicativo() {
+              if (tipo2 == Tipo_variable.BOOLEANO && tipo1 != Tipo_variable.BOOLEANO) {
+                  error_semantico(new SimboloNoConcuerdaException(), t);
+              }
+              t = token;
+          }
           tipo2 = factor() {
               if (tipo1 != tipo2 && tipo1 != Tipo_variable.DESCONOCIDO && tipo2 != Tipo_variable.DESCONOCIDO) {
                   error_semantico(new SimboloNoConcuerdaException(), t);
@@ -1133,23 +1169,25 @@ Tipo_variable termino() :
     }
 }
 
-Token operador_multiplicativo() :
+Tipo_variable operador_multiplicativo() :
 {
-    Token t = null;
+    Tipo_variable tipo = null;
 }
 {
     try { 
           <tMOD>
         | <tDIV>
         | <tMULTIPLICA>
-        | <tAND>
+        | <tAND> {
+            tipo = Tipo_variable.BOOLEANO;
+        }
     }
     catch (ParseException e) { // Error sintáctico
         error_sintactico(e, "Se esperaba un operador multiplicativo");
     }
 
     {
-        return t;
+        return tipo;
     }
 }
 
