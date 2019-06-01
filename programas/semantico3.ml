@@ -15,6 +15,7 @@ accion accion2 (ref entero j);
 
 Principio
   j := 5;
+  z:=3;
 Fin
 
 Principio

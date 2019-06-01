@@ -841,7 +841,7 @@ void lista_escribibles() :
     try { 
         (
             constcad()
-          | expresion()
+          | expresion() // To string cualquier valor menos desconocido
         )
         (
           <tC>
@@ -858,8 +858,9 @@ void lista_escribibles() :
 
 void identificacion() :
 {
-    Token t = null;
+    Token t = null, t2 = null;
     Simbolo s = null;
+    Tipo_variable tipo = null;
 }
 {
     try { 
@@ -875,12 +876,20 @@ void identificacion() :
                     }
                     catch (SimboloYaExistenteException ignored) { } // Imposible
                 }
+
+                t2 = token;
             }
         }
         (
-            asignacion() {
-                if (!(s.es_variable() || (s.es_parametro() && s.es_referencia()))) {
-                    error_semantico(new SimboloNoAsignableException(), t);
+            tipo = asignacion() {
+                if (t != null) { 
+	                if (!(s.es_variable() || (s.es_parametro() && s.es_referencia()))) {
+	                    error_semantico(new SimboloNoAsignableException(), t);
+	                }
+	                else if (tipo != Tipo_variable.DESCONOCIDO && s.getVariable() != Tipo_variable.DESCONOCIDO &&
+	                           tipo != s.getVariable()) {
+                        error_semantico(new SimboloNoConcuerdaException(), t2);
+	                }
                 }
             }
           | invocacion_accion() { /*TODO: Comprobar si los argumentos son correctos*/ }
@@ -891,16 +900,22 @@ void identificacion() :
     }
 }
 
-void asignacion() :
-{}
+Tipo_variable asignacion() :
+{
+    Tipo_variable tipo = null;
+}
 {
     try { 
         <tOPAS>
-        expresion()
+        tipo = expresion()
         punto_y_coma()
     }
     catch (ParseException e) { // Error sintáctico
         error_sintactico(e, "Se esperaba una asignación ':='");
+    }
+
+    {
+        return tipo;
     }
 }
 
