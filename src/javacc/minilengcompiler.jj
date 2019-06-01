@@ -1025,7 +1025,7 @@ Tipo_variable expresion() :
         (
           t = operador_relacional()
           tipo2 = expresion_simple() {
-              if (tipo1 != tipo2) {
+              if (tipo1 != tipo2 && tipo1 != Tipo_variable.DESCONOCIDO && tipo2 != Tipo_variable.DESCONOCIDO) {
                   error_semantico(new SimboloNoConcuerdaException(), t);
               }
           }
@@ -1073,7 +1073,7 @@ Tipo_variable expresion_simple() :
         (
           t = operador_aditivo()
           tipo2 = termino() {
-              if (tipo1 != tipo2) {
+              if (tipo1 != tipo2 && tipo1 != Tipo_variable.DESCONOCIDO && tipo2 != Tipo_variable.DESCONOCIDO) {
                   error_semantico(new SimboloNoConcuerdaException(), t);
               }
           }
@@ -1118,7 +1118,7 @@ Tipo_variable termino() :
         (
           t = operador_multiplicativo()
           tipo2 = factor() {
-              if (tipo1 != tipo2) {
+              if (tipo1 != tipo2 && tipo1 != Tipo_variable.DESCONOCIDO && tipo2 != Tipo_variable.DESCONOCIDO) {
                   error_semantico(new SimboloNoConcuerdaException(), t);
               }
           }

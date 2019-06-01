@@ -36,6 +36,7 @@ principio
   ww := -5;
   ww := -ww;
   a := -5;
+  y := (y=true);
   y := -a;
   a := -y;
   a := 5 > 3;
