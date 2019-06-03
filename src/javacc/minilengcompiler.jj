@@ -16,11 +16,16 @@ import lib.semantico.TablaSimbolos;
 import lib.semantico.Simbolo;
 import lib.semantico.Simbolo.Clase_parametro;
 import lib.semantico.Simbolo.Tipo_variable;
+import lib.semantico.Simbolo.Tipo_simbolo;
 import lib.semantico.SimboloNoEncontradoException;
 import lib.semantico.SimboloNoAsignableException;
 import lib.semantico.SimboloYaExistenteException;
 import lib.semantico.SimboloNoConcuerdaException;
+import lib.semantico.SimboloNoAccionException;
+import lib.semantico.ExcesoParametrosException;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.ListIterator;
 
 public class MiniLengCompiler {
     static boolean correcto = true;
@@ -156,6 +161,21 @@ public class MiniLengCompiler {
         
         System.out.println("ERROR SEMÁNTICO (<" + t.next.beginLine + ", " + 
             t.next.beginColumn + ">) : <Los tipos no concuerdan>");
+    }
+
+    private static void error_semantico(SimboloNoAccionException e, Token t) {
+        correcto = false;
+        
+        System.out.println("ERROR SEMÁNTICO (<" + t.beginLine + ", " + 
+            t.beginColumn + ">) : <El símbolo con nombre '" +
+            t.image + "' no es una acción>");
+    }
+
+    private static void error_semantico(ExcesoParametrosException e, Token t) {
+        correcto = false;
+        
+        System.out.println("ERROR SEMÁNTICO (<" + t.beginLine + ", " + 
+            t.beginColumn + ">) : <Exceso de parámetros>");
     }
 }
 PARSER_END(MiniLengCompiler)SKIP :{  " "| "\r"| "\t"| "\n"
@@ -861,6 +881,7 @@ void identificacion() :
     Token t = null, t2 = null;
     Simbolo s = null;
     Tipo_variable tipo = null;
+    ArrayList<Simbolo> exp = new ArrayList<Simbolo>();
 }
 {
     try { 
@@ -892,7 +913,13 @@ void identificacion() :
 	                }
                 }
             }
-          | invocacion_accion() { /*TODO: Comprobar si los argumentos son correctos*/ }
+          | invocacion_accion(s) {
+                if (s.getVariable() != Tipo_variable.DESCONOCIDO) {
+                    if (s.getTipo() != Tipo_simbolo.ACCION) {
+                        error_semantico(new SimboloNoAccionException(), t);
+                    }
+                }
+            }
         )
     }
     catch (ParseException e) { // Error sintáctico
@@ -903,11 +930,14 @@ void identificacion() :
 Tipo_variable asignacion() :
 {
     Tipo_variable tipo = null;
+    Simbolo s;
 }
 {
     try { 
         <tOPAS>
-        tipo = expresion()
+        s = expresion() {
+            tipo = s.getVariable();
+        }
         punto_y_coma()
     }
     catch (ParseException e) { // Error sintáctico
@@ -919,12 +949,12 @@ Tipo_variable asignacion() :
     }
 }
 
-void invocacion_accion() :
+void invocacion_accion(Simbolo s) :
 {}
 {
     try { 
         (
-          argumentos()
+          argumentos(s)
         )?
         punto_y_coma()
     }
@@ -948,16 +978,18 @@ void mientras_que() :
 {
     Tipo_variable tipo = null;
     Token t = null;
+    Simbolo s;
 }
 {
     try { 
         <tMQ> {
             t = token;
         }
-        tipo = expresion() {
-              if (tipo != Tipo_variable.BOOLEANO) {
-                  error_semantico(new SimboloNoConcuerdaException(), t);
-              }
+        s = expresion() {
+            tipo = s.getVariable();
+            if (tipo != Tipo_variable.BOOLEANO) {
+                error_semantico(new SimboloNoConcuerdaException(), t);
+            }
         }
         lista_sentencias()
         fmq()
@@ -993,16 +1025,18 @@ void seleccion() :
 {
     Tipo_variable tipo = null;
     Token t = null;
+    Simbolo s;
 }
 {
     try { 
         <tSI> {
             t = token;
         }
-        tipo = expresion() {
-              if (tipo != Tipo_variable.BOOLEANO) {
-                  error_semantico(new SimboloNoConcuerdaException(), t);
-              }
+        s = expresion() {
+            tipo = s.getVariable();
+            if (tipo != Tipo_variable.BOOLEANO) {
+                error_semantico(new SimboloNoConcuerdaException(), t);
+            }
         }
         ent()
         lista_sentencias()
@@ -1017,13 +1051,13 @@ void seleccion() :
     }
 }
 
-void argumentos() :
+void argumentos(Simbolo s) :
 {}
 {
     try { 
         ap()
         (
-          lista_expresiones()
+          lista_expresiones(s)
         )?
         cp()
     }
@@ -1032,14 +1066,69 @@ void argumentos() :
     }
 }
 
-void lista_expresiones() :
-{}
+void lista_expresiones(Simbolo simb) :
+{
+    LinkedList<Simbolo> exp = null;
+    ListIterator<Simbolo> it = null;
+    Simbolo s = null, param = null;
+    Token t = token;
+    boolean exceso = false;
+
+    if (simb.getVariable() != Tipo_variable.DESCONOCIDO && simb.getTipo() == Tipo_simbolo.ACCION) {
+        exp = simb.getLista_parametros();
+        it = exp.listIterator();
+    }
+}
 {
     try { 
-        expresion()
+        s = expresion() {
+            if (it != null) {
+	            if (it.hasNext()) {
+	                param = it.next();
+	                
+	                if (s.getVariable() != Tipo_variable.DESCONOCIDO) {
+	                    if (s.getVariable() != param.getVariable()) {
+	                        error_semantico(new SimboloNoConcuerdaException(), t);
+	                    }
+
+	                    if (param.es_referencia() && s.es_valor()) {
+                            error_semantico(new SimboloNoAsignableException(), t.next);
+                        }
+	                }
+	            }
+	            else {
+	                error_semantico(new ExcesoParametrosException(), t.next);
+                    exceso = true;
+	            }
+	        }
+        }
         (
-          <tC>
-          expresion()
+          <tC> {
+              t = token;
+          }
+          s = expresion() {
+              if (it != null) {
+                  if (it.hasNext()) {
+                      param = it.next();
+                    
+                      if (s.getVariable() != Tipo_variable.DESCONOCIDO) {
+                          if (s.getVariable() != param.getVariable()) {
+                              error_semantico(new SimboloNoConcuerdaException(), t);
+                          }
+
+                          if (param.es_referencia() && s.es_valor()) {
+                              error_semantico(new SimboloNoAsignableException(), t.next);
+                          }
+                      }
+                  }
+                  else {
+                      if (!exceso) { 
+                          error_semantico(new ExcesoParametrosException(), t.next);
+                      }
+                      exceso = true;
+                  }
+              }
+          }
         )*
     }
     catch (ParseException e) { // Error sintáctico
@@ -1047,22 +1136,28 @@ void lista_expresiones() :
     }
 }
 
-Tipo_variable expresion() :
+Simbolo expresion() :
 {
     Tipo_variable tipo1 = null, tipo2 = null;
     Token t = null;
+    Simbolo s1 = new Simbolo(), s2 = new Simbolo();
 }
 {
     try { 
-        tipo1 = expresion_simple()
+        s1 = expresion_simple() {
+            tipo1 = s1.getVariable();
+        }
         (
           t = operador_relacional()
-          tipo2 = expresion_simple() {
+          s2 = expresion_simple() {
+              tipo2 = s2.getVariable();
               if (tipo1 != tipo2 && tipo1 != Tipo_variable.DESCONOCIDO && tipo2 != Tipo_variable.DESCONOCIDO) {
                   error_semantico(new SimboloNoConcuerdaException(), t); // TODO: Todos comparables o restringir a enteros?
               }
 
               tipo1 = Tipo_variable.BOOLEANO; // Expresión relacional
+              s1.setVariable(tipo1);
+              s1.setParametro(Clase_parametro.VAL);
           }
         )?
     }
@@ -1071,7 +1166,7 @@ Tipo_variable expresion() :
     }
 
     {
-        return tipo1;
+        return s1;
     }
 }
 
@@ -1097,14 +1192,16 @@ Token operador_relacional() :
     }
 }
 
-Tipo_variable expresion_simple() :
+Simbolo expresion_simple() :
 {
     Tipo_variable tipo1 = null, tipo2 = null;
     Token t = null;
+    Simbolo s1 = new Simbolo(), s2 = new Simbolo();
 }
 {
     try { 
-        tipo1 = termino() {
+        s1 = termino() {
+            tipo1 = s1.getVariable();
             t = token;
         }
         (
@@ -1113,8 +1210,10 @@ Tipo_variable expresion_simple() :
                   error_semantico(new SimboloNoConcuerdaException(), t);
               }
               t = token;
+              s1.setParametro(Clase_parametro.VAL);
           }
-          tipo2 = termino() {
+          s2 = termino() {
+              tipo2 = s2.getVariable();
               if (tipo1 != tipo2 && tipo1 != Tipo_variable.DESCONOCIDO && tipo2 != Tipo_variable.DESCONOCIDO) {
                   error_semantico(new SimboloNoConcuerdaException(), t);
               }
@@ -1126,7 +1225,7 @@ Tipo_variable expresion_simple() :
     }
 
     {
-        return tipo1;
+        return s1;
     }
 }
 
@@ -1151,14 +1250,16 @@ Tipo_variable operador_aditivo() :
     }
 }
 
-Tipo_variable termino() :
+Simbolo termino() :
 {
     Tipo_variable tipo1 = null, tipo2 = null;
     Token t = null;
+    Simbolo s1 = new Simbolo(), s2 = new Simbolo();
 }
 {
     try { 
-        tipo1 = factor() {
+        s1 = factor() {
+            tipo1 = s1.getVariable();
             t = token;
         }
         (
@@ -1167,8 +1268,10 @@ Tipo_variable termino() :
                   error_semantico(new SimboloNoConcuerdaException(), t);
               }
               t = token;
+              s1.setParametro(Clase_parametro.VAL);
           }
-          tipo2 = factor() {
+          s2 = factor() {
+              tipo2 = s2.getVariable();
               if (tipo1 != tipo2 && tipo1 != Tipo_variable.DESCONOCIDO && tipo2 != Tipo_variable.DESCONOCIDO) {
                   error_semantico(new SimboloNoConcuerdaException(), t);
               }
@@ -1180,7 +1283,7 @@ Tipo_variable termino() :
     }
 
     {
-        return tipo1;
+        return s1;
     }
 }
 
@@ -1206,62 +1309,78 @@ Tipo_variable operador_multiplicativo() :
     }
 }
 
-Tipo_variable factor() :
+Simbolo factor() :
 {
     Token t = null;
-    Simbolo s = null;
+    Simbolo s = new Simbolo();
     Tipo_variable tipo = null;
 }
 {
     try { 
           t = <tRESTA>
-          tipo = factor() {
+          s = factor() {
+              tipo = s.getVariable();
               if (tipo != Tipo_variable.ENTERO && tipo != Tipo_variable.DESCONOCIDO) {
                   error_semantico(new SimboloNoConcuerdaException(), t);
               }
           }
 	    | t = <tNOT>
-	      tipo = factor() {
+	      s = factor() {
+	          tipo = s.getVariable();
               if (tipo != Tipo_variable.BOOLEANO && tipo != Tipo_variable.DESCONOCIDO) {
                   error_semantico(new SimboloNoConcuerdaException(), t);
               }
           }
 	    | ap()
-	      tipo = expresion()
+	      s = expresion()
 	      cp()
 	    | <tENTACAR> //TODO
 	      ap()
-	      tipo = expresion()
+	      s = expresion()
 	      cp()
 	    | <tCARAENT> //TODO
 	      ap()
-	      tipo = expresion()
+	      s = expresion()
 	      cp()
 	    | t = identificador() {
 	          try { 
-                  s = tabla_simbolos.buscar_simbolo(t.image);
-                  tipo = s.getVariable();
+                  Simbolo aux = tabla_simbolos.buscar_simbolo(t.image);
+                  s.setVariable(aux.getVariable());
+                  if (aux.es_parametro()) {
+                      s.setParametro(aux.getParametro());
+                  }
+                  else {
+                      s.setParametro(Clase_parametro.REF);
+                  }
               }
               catch (SimboloNoEncontradoException e) {
                   error_semantico(e, t);
                   try { 
-                      s = tabla_simbolos.introducir_variable(t.image, Tipo_variable.DESCONOCIDO, nivel, dir);
-                      tipo = Tipo_variable.DESCONOCIDO;
+                      Simbolo aux = tabla_simbolos.introducir_variable(t.image, Tipo_variable.DESCONOCIDO, nivel, dir);
+                      s.setVariable(aux.getVariable());
                   }
                   catch (SimboloYaExistenteException ignored) { } // Imposible
               }
 	      }
 	    | <tCONSTENTERA> {
 	          tipo = Tipo_variable.ENTERO;
+              s.setVariable(tipo);
+              s.setParametro(Clase_parametro.VAL);
 	      }
 	    | <tCONSTCHAR> {
               tipo = Tipo_variable.CHAR;
+              s.setVariable(tipo);
+              s.setParametro(Clase_parametro.VAL);
           }
 	    | <tTRUE> {
               tipo = Tipo_variable.BOOLEANO;
+              s.setVariable(tipo);
+              s.setParametro(Clase_parametro.VAL);
           }
 	    | <tFALSE> {
               tipo = Tipo_variable.BOOLEANO;
+              s.setVariable(tipo);
+              s.setParametro(Clase_parametro.VAL);
           }
     }
     catch (ParseException e) { // Error sintáctico
@@ -1269,6 +1388,6 @@ Tipo_variable factor() :
     }
 
     {
-        return tipo;
+        return s;
     }
 }

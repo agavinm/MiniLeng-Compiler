@@ -1,7 +1,7 @@
 //*****************************************************************
 // File:   Simbolo.java
 // Author: Andrés Gavín Murillo 716358
-// Date:   22/5/2019
+// Date:   3/6/2019
 // Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V3.1
 //         JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
 //*****************************************************************
@@ -88,11 +88,11 @@ public class Simbolo {
     
     // Clase de parámetro
     public boolean es_valor() {
-        return this.tipo == Tipo_simbolo.PARAMETRO && this.parametro == Clase_parametro.VAL;
+        return this.parametro == Clase_parametro.VAL;
     }
     
     public boolean es_referencia() {
-        return this.tipo == Tipo_simbolo.PARAMETRO && this.parametro == Clase_parametro.REF;
+        return this.parametro == Clase_parametro.REF;
     }
     
     // Tipo de variable

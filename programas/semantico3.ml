@@ -24,6 +24,15 @@ Principio
   j := 5;
   leer(j,c,c);
   accion2(r);
+  accion2(r);
+  accion2(5);
+  accion2(j);
+  accion2(5, 5, 6);
+Fin
+
+accion a3;
+Principio
+  accion1(5);
 Fin
 
 %-------------------------------------------------------------------
@@ -57,4 +66,10 @@ principio
   ww := 5 DIV 6;
   ww := 5 * 6;
   ww := 5 AND 6;
+  ww := 5 + "a";
+  
+  accion1(5);
+  ww(5);
+  accion1(accion1);
+  a3(5);
 fin

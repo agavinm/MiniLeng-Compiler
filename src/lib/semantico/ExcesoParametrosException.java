@@ -1,5 +1,5 @@
 //*****************************************************************
-// File:   SimboloNoConcuerdaException.java
+// File:   SimboloNoAccionException.java
 // Author: Andrés Gavín Murillo 716358
 // Date:   3/6/2019
 // Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V3.0
@@ -8,14 +8,14 @@
 
 package lib.semantico;
 
-public class SimboloNoConcuerdaException extends Exception {
+public class ExcesoParametrosException extends Exception {
     private static final long serialVersionUID = 1L;
     
-    public SimboloNoConcuerdaException() {
+    public ExcesoParametrosException() {
         super();
     }
 
-    public SimboloNoConcuerdaException(String message) {
+    public ExcesoParametrosException(String message) {
         super(message);
     }
 }
