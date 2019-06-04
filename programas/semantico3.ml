@@ -1,28 +1,29 @@
 %-------------------------------------------------------------------
-programa semantico; %2 Comprobar tabla de símbolos
+programa semantico; %3 Comprobar parte 2 (1-6)
 %-------------------------------------------------------------------
+%%
+ .
+ -
+ +*h^
+%%
 
- caracter semantico; % error
- booleano cierto;
- entero dato;
+ entero e;
 
 %-----------------------------------------------------------
-accion dato (ref entero datos); % error
+accion dato (ref entero datos);
 %-----------------------------------------------------------
 
 %-----------------------------------------------------------
-accion datos (ref entero datos);
+accion dato (ref entero datos);
 %-----------------------------------------------------------
 
- caracter datos; % error
- booleano dato, dato; % error
+ entero e1, e2, e3;
+ caracter c1, c2, c3, programa; % error
 
 Principio
-  escribir (entacar (13), entacar (10));
-Fin
-
-Principio
-  escribir (entacar (13), entacar (10));
+  escribir ("Escribe un numero: ");
+  c1 := "a";
+  c2 := "Escribe un número"; % error
 Fin
 
 Principio
@@ -32,5 +33,5 @@ Fin
 %-------------------------------------------------------------------
 principio
 %-------------------------------------------------------------------
-  escribir (entacar (13), entacar (10));
+% Nada % error
 fin

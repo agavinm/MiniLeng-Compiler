@@ -1,8 +1,8 @@
 //*****************************************************************
 // File:   MiniLengCompiler.jj
 // Author: Andrés Gavín Murillo 716358
-// Date:   5/5/2019
-// Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V3.0
+// Date:   4/6/2019
+// Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V3.1
 //         JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
 //*****************************************************************
 options{    static = true;
@@ -13,12 +13,23 @@ package javacc;
 import java.io.FileInputStream;
 import lib.lexico.TablaVeces;
 import lib.semantico.TablaSimbolos;
+import lib.semantico.RegistroExpr;
+import lib.semantico.RegistroExpr.TipoOperador;
 import lib.semantico.Simbolo;
 import lib.semantico.Simbolo.Clase_parametro;
 import lib.semantico.Simbolo.Tipo_variable;
+import lib.semantico.ErrorSemantico;
 import lib.semantico.SimboloNoEncontradoException;
+import lib.semantico.SimboloNoAsignableException;
 import lib.semantico.SimboloYaExistenteException;
+import lib.semantico.SimboloNoConcuerdaException;
+import lib.semantico.SimboloNoAccionException;
+import lib.semantico.ExcesoParametrosException;
+import lib.semantico.DivisionPorCeroException;
+import lib.semantico.NumeroFueraRangoException;
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.ListIterator;
 
 public class MiniLengCompiler {
     static boolean correcto = true;
@@ -30,7 +41,7 @@ public class MiniLengCompiler {
     static boolean tabla_simbolos_print = false;
     
     public static void main(String args []) throws ParseException {
-        System.out.println("Compilador de MiniLengCompiler V3.0 Autor: Andrés Gavín Murillo 716358. Ayuda: ./compilador -h\n");
+        System.out.println("Compilador de MiniLengCompiler V3.1 Autor: Andrés Gavín Murillo 716358. Ayuda: ./compilador -h\n");
         
         Boolean verbose = false;
         MiniLengCompiler compiler;
@@ -83,10 +94,10 @@ public class MiniLengCompiler {
 
             try { 
                 MiniLengCompiler.programa(verbose);
-                if (correcto)
+                if (correcto && ErrorSemantico.getCorrecto())
                     System.out.println("Compilación correcta.");
             }
-            catch (Exception ignored) { }
+            //catch (Exception e) { System.err.println("Error no reconocido"); }
             catch (Error e) { // Error léxico
                 System.out.println("ERROR LÉXICO (<" + SimpleCharStream.getBeginLine() + ", " + 
                     SimpleCharStream.getBeginColumn() + ">) : símbolo no reconocido: <" +
@@ -115,35 +126,19 @@ public class MiniLengCompiler {
     private static void error_sintactico(ParseException e, String msg) {
         correcto = false;
         Token lastRead = MiniLengCompiler.getNextToken();
-        
-        System.out.println("ERROR SINTÁCTICO (<" + lastRead.beginLine + ", " + 
-            lastRead.beginColumn + ">) : <Símbolo obtenido: '" + lastRead.image +
-            "'. " + msg + ">");
+        //Token lastRead = MiniLengCompiler.token.next;
+	    System.out.println("ERROR SINTÁCTICO (<" + lastRead.beginLine + ", " + 
+	        lastRead.beginColumn + ">) : <Símbolo obtenido: '" + lastRead.image +
+	        "'. " + msg + ">");
     }
 
     private static void error_sintactico(ParseException e) {
         error_sintactico(e, "");
     }
-
-    private static void error_semantico(SimboloNoEncontradoException e, Token t) {
-        correcto = false;
-        
-        System.out.println("ERROR SEMÁNTICO (<" + t.beginLine + ", " + 
-            t.beginColumn + ">) : <No existe ningún símbolo con nombre '" +
-            t.image + "'>");
-    }
-    
-    private static void error_semantico(SimboloYaExistenteException e, Token t) {
-        correcto = false;
-        
-        System.out.println("ERROR SEMÁNTICO (<" + t.beginLine + ", " + 
-            t.beginColumn + ">) : <Ya existe un símbolo con nombre '" +
-            t.image + "'>");
-    }
 }
-// Análisis léxico
-PARSER_END(MiniLengCompiler)SKIP :{  " "| "\r"| "\t"| "\n"
-| "%" : COMENTARIO}
+PARSER_END(MiniLengCompiler)SKIP :{  " "| "\r"| "\t"| "\n"
+| < ["%"] ~["%"] > : COMENTARIO
+| < ["%"] ["%"] > : COMENTARIO_DOBLE}
 
 < COMENTARIO > SKIP :
 {
@@ -151,6 +146,16 @@ public class MiniLengCompiler {
 }
 
 < COMENTARIO > MORE :
+{
+  < ~[] >
+}
+
+< COMENTARIO_DOBLE > SKIP :
+{
+  "%%" : DEFAULT
+}
+
+< COMENTARIO_DOBLE > MORE :
 {
   < ~[] >
 }
@@ -392,7 +397,8 @@ Token identificador() :
     try { 
 	    <tPROGRAMA>
 	    t = identificador() {
-	        tabla_simbolos.introducir_programa(t.image, dir);
+	        if (t != null) 
+	            tabla_simbolos.introducir_programa(t.image, dir);
 	    }
 	    punto_y_coma()
 	    declaracion_variables()
@@ -445,15 +451,17 @@ void declaracion() :
         ids = identificadores() {
             for (int i=0; i<ids.size(); i++) {
                 t = ids.get(i);
-                tabla_simbolos.introducir_variable(t.image, tipo, nivel, dir);
+                try { 
+                    tabla_simbolos.introducir_variable(t.image, tipo, nivel, dir);
+                }
+			    catch (SimboloYaExistenteException e) { // Error semántico
+			        ErrorSemantico.error_semantico(e, t);
+			    }
             }
         }
     }
     catch (ParseException e) { // Error sintáctico
         error_sintactico(e);
-    }
-    catch (SimboloYaExistenteException e) { // Error semántico
-        error_semantico(e, t);
     }
 }
 
@@ -490,12 +498,14 @@ ArrayList<Token> identificadores() :
 {
     try { 
         t = identificador() {
-            tokens.add(t);
+            if (t != null) 
+                tokens.add(t);
         }
         (
           <tC>
           t = identificador() {
-              tokens.add(t);
+              if (t != null) 
+                  tokens.add(t);
           }
         )*
     }
@@ -549,16 +559,20 @@ void cabecera_accion() :
     try { 
         <tACCION>
         t = identificador() {
-            tabla_simbolos.introducir_accion(t.image, nivel, dir);
-            nivel++;
+            if (t != null) { 
+	            try { 
+	                tabla_simbolos.introducir_accion(t.image, nivel, dir);
+	            }
+			    catch (SimboloYaExistenteException e) { // Error semántico
+			        ErrorSemantico.error_semantico(e, t);
+			    }
+	            nivel++;
+	        }
         }
         parametros_formales()
     }
     catch (ParseException e) { // Error sintáctico
         error_sintactico(e, "Se esperaba la declaración de una acción");
-    }
-    catch (SimboloYaExistenteException e) { // Error semántico
-        error_semantico(e, t);
     }
 }
 
@@ -629,16 +643,18 @@ void parametros() :
         ids = identificadores() {
             for (int i=0; i<ids.size(); i++) {
                 t = ids.get(i);
-                tabla_simbolos.introducir_parametro(t.image, tipo, clase, nivel, dir);
+                try { 
+                    tabla_simbolos.introducir_parametro(t.image, tipo, clase, nivel, dir);
+                }
+			    catch (SimboloYaExistenteException e) { // Error semántico
+			        ErrorSemantico.error_semantico(e, t);
+			    }
             }
         }
         lista_parametros()
     }
     catch (ParseException e) { // Error sintáctico
         error_sintactico(e);
-    }
-    catch (SimboloYaExistenteException e) { // Error semántico
-        error_semantico(e, t);
     }
 }
 
@@ -718,7 +734,7 @@ void sentencia() :
 	    | mientras_que()
     }
     catch (ParseException e) { // Error sintáctico
-        error_sintactico(e);
+        error_sintactico(e, "Se esperaba una instrucción");
     }
 }
 
@@ -732,15 +748,40 @@ void leer() :
         cp()
     }
     catch (ParseException e) { // Error sintáctico
-        error_sintactico(e);
+        error_sintactico(e, "Se esperaba una operación de lectura");
     }
 }
 
 void lista_asignables() :
-{}
+{
+    ArrayList<Token> ids = null;
+    Token t = null;
+    Simbolo s = null;
+}
 {
     try { 
-        identificadores()
+        ids = identificadores() {
+            for (int i=0; i<ids.size(); i++) {
+                t = ids.get(i);
+	            if (t != null) {
+	                try { 
+	                    s = tabla_simbolos.buscar_simbolo(t.image);
+	                    // Lectura: Debe ser asignable y del tipo entero, carácter o desconocido
+		                if (!(s.es_asignable() &&
+		                      (s.es_entero() || s.es_caracter() || s.es_desconocido()))) {
+		                    ErrorSemantico.error_semantico(new SimboloNoAsignableException(), t);
+		                }
+	                }
+	                catch (SimboloNoEncontradoException e) {
+	                    ErrorSemantico.error_semantico(e, t);
+	                    try { 
+	                        s = tabla_simbolos.introducir_variable(t.image, Tipo_variable.DESCONOCIDO, nivel, dir);
+	                    }
+	                    catch (SimboloYaExistenteException ignored) { } // Imposible
+	                }
+	            }
+            }
+        }
     }
     catch (ParseException e) { // Error sintáctico
         error_sintactico(e);
@@ -757,7 +798,7 @@ void escribir() :
         cp()
     }
     catch (ParseException e) { // Error sintáctico
-        error_sintactico(e);
+        error_sintactico(e, "Se esperaba una operación de escritura");
     }
 }
 
@@ -778,7 +819,7 @@ void lista_escribibles() :
     try { 
         (
             constcad()
-          | expresion()
+          | expresion() // To string cualquier valor menos desconocido
         )
         (
           <tC>
@@ -789,46 +830,87 @@ void lista_escribibles() :
         )*
     }
     catch (ParseException e) { // Error sintáctico
-        error_sintactico(e);
+        error_sintactico(e, "Se esperaba una cadena o una expresión");
     }
 }
 
 void identificacion() :
 {
-    Token t = null;
+    Token t = null, t2 = null;
+    Simbolo s = null;
+    Tipo_variable tipo = null;
+    ArrayList<Simbolo> exp = new ArrayList<Simbolo>();
 }
 {
     try { 
-        t = identificador()
+        t = identificador() {
+            if (t != null) {
+                try { 
+                    s = tabla_simbolos.buscar_simbolo(t.image);
+                }
+                catch (SimboloNoEncontradoException e) {
+                    ErrorSemantico.error_semantico(e, t);
+                    try { 
+                        s = tabla_simbolos.introducir_variable(t.image, Tipo_variable.DESCONOCIDO, nivel, dir);
+                    }
+                    catch (SimboloYaExistenteException ignored) { } // Imposible
+                }
+
+                t2 = token;
+            }
+        }
         (
-            asignacion()
-          | invocacion_accion()
+            tipo = asignacion() {
+                if (t != null) { 
+	                if (!(s.es_variable() || (s.es_parametro() && s.es_referencia()))) {
+	                    ErrorSemantico.error_semantico(new SimboloNoAsignableException(), t);
+	                }
+	                else if (tipo != Tipo_variable.DESCONOCIDO && !s.es_desconocido() &&
+	                           tipo != s.getVariable()) {
+                        ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t2);
+	                }
+                }
+            }
+          | invocacion_accion(s) {
+                if (!s.es_desconocido() && !s.es_accion()) {
+                    ErrorSemantico.error_semantico(new SimboloNoAccionException(), t);
+                }
+            }
         )
     }
     catch (ParseException e) { // Error sintáctico
-        error_sintactico(e);
+        error_sintactico(e, "Se esperaba una asignación o una acción");
     }
 }
 
-void asignacion() :
-{}
+Tipo_variable asignacion() :
+{
+    Tipo_variable tipo = null;
+    RegistroExpr reg;
+}
 {
     try { 
         <tOPAS>
-        expresion()
+        reg = expresion() {
+            tipo = reg.getVariable();
+        }
         punto_y_coma()
     }
     catch (ParseException e) { // Error sintáctico
         error_sintactico(e, "Se esperaba una asignación ':='");
     }
+
+    {
+        return tipo;
+    }
 }
 
-void invocacion_accion() :
+void invocacion_accion(Simbolo s) :
 {}
 {
     try { 
         (
-          argumentos()
+          argumentos(s)
         )?
         punto_y_coma()
     }
@@ -849,16 +931,27 @@ void fmq() :
 }
 
 void mientras_que() :
-{}
+{
+    Tipo_variable tipo = null;
+    Token t = null;
+    RegistroExpr reg;
+}
 {
     try { 
-        <tMQ>
-        expresion()
+        <tMQ> {
+            t = token;
+        }
+        reg = expresion() {
+            tipo = reg.getVariable();
+            if (tipo != Tipo_variable.BOOLEANO) {
+                ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
+            }
+        }
         lista_sentencias()
         fmq()
     }
     catch (ParseException e) { // Error sintáctico
-        error_sintactico(e);
+        error_sintactico(e, "Se esperaba un bloque MQ");
     }
 }
 
@@ -885,11 +978,22 @@ void fsi() :
 }
 
 void seleccion() :
-{}
+{
+    Tipo_variable tipo = null;
+    Token t = null;
+    RegistroExpr reg;
+}
 {
     try { 
-        <tSI>
-        expresion()
+        <tSI> {
+            t = token;
+        }
+        reg = expresion() {
+            tipo = reg.getVariable();
+            if (tipo != Tipo_variable.BOOLEANO) {
+                ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
+            }
+        }
         ent()
         lista_sentencias()
         (
@@ -899,17 +1003,17 @@ void seleccion() :
         fsi()
     }
     catch (ParseException e) { // Error sintáctico
-        error_sintactico(e);
+        error_sintactico(e, "Se esperaba un bloque SI");
     }
 }
 
-void argumentos() :
+void argumentos(Simbolo s) :
 {}
 {
     try { 
         ap()
         (
-          lista_expresiones()
+          lista_expresiones(s)
         )?
         cp()
     }
@@ -918,14 +1022,70 @@ void argumentos() :
     }
 }
 
-void lista_expresiones() :
-{}
+void lista_expresiones(Simbolo simb) :
+{
+    LinkedList<Simbolo> parametros = null;
+    ListIterator<Simbolo> it = null;
+    Simbolo param = null;
+    RegistroExpr exp;
+    Token t = token;
+    boolean exceso = false;
+
+    if (!simb.es_desconocido() && simb.es_accion()) {
+        parametros = simb.getLista_parametros();
+        it = parametros.listIterator();
+    }
+}
 {
     try { 
-        expresion()
+        exp = expresion() {
+            if (it != null) {
+	            if (it.hasNext()) {
+	                param = it.next();
+	                
+	                if (!exp.es_desconocido()) {
+	                    if (exp.getVariable() != param.getVariable()) {
+	                        ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
+	                    }
+
+	                    if (param.es_referencia() && exp.es_valor()) {
+                            ErrorSemantico.error_semantico(new SimboloNoAsignableException(), t.next);
+                        }
+	                }
+	            }
+	            else {
+	                ErrorSemantico.error_semantico(new ExcesoParametrosException(), t.next);
+                    exceso = true;
+	            }
+	        }
+        }
         (
-          <tC>
-          expresion()
+          <tC> {
+              t = token;
+          }
+          exp = expresion() {
+              if (it != null) {
+                  if (it.hasNext()) {
+                      param = it.next();
+                    
+                      if (!exp.es_desconocido()) {
+                          if (exp.getVariable() != param.getVariable()) {
+                              ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
+                          }
+
+                          if (param.es_referencia() && exp.es_valor()) {
+                              ErrorSemantico.error_semantico(new SimboloNoAsignableException(), t.next);
+                          }
+                      }
+                  }
+                  else {
+                      if (!exceso) { 
+                          ErrorSemantico.error_semantico(new ExcesoParametrosException(), t.next);
+                      }
+                      exceso = true;
+                  }
+              }
+          }
         )*
     }
     catch (ParseException e) { // Error sintáctico
@@ -933,22 +1093,37 @@ void lista_expresiones() :
     }
 }
 
-void expresion() :
-{}
+RegistroExpr expresion() :
+{
+    TipoOperador op = null;
+    Token t = null;
+    RegistroExpr exp1 = new RegistroExpr(), exp2 = new RegistroExpr();
+}
 {
     try { 
-        expresion_simple()
+        exp1 = expresion_simple() {
+            t = token;
+        }
         (
-          operador_relacional()
-          expresion_simple()
+          op = operador_relacional()
+          exp2 = expresion_simple() {
+              if (exp1.getVariable() != exp2.getVariable() &&
+                    !exp1.es_desconocido() && !exp2.es_desconocido()) {
+                  ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
+              }
+          }
         )?
     }
     catch (ParseException e) { // Error sintáctico
         error_sintactico(e);
     }
+
+    {
+        return new RegistroExpr(exp1, exp2, op);
+    }
 }
 
-void operador_relacional() :
+TipoOperador operador_relacional() :
 {}
 {
     try { 
@@ -962,83 +1137,277 @@ void operador_relacional() :
     catch (ParseException e) { // Error sintáctico
         error_sintactico(e, "Se esperaba un operador relacional");
     }
+
+    {
+        return TipoOperador.REL;
+    }
 }
 
-void expresion_simple() :
-{}
+RegistroExpr expresion_simple() :
+{
+    TipoOperador op = null;
+    Token t = null;
+    RegistroExpr exp1 = new RegistroExpr(), exp2 = new RegistroExpr();
+}
 {
     try { 
-        termino()
+        exp1 = termino() {
+            t = token;
+        }
         (
-          operador_aditivo()
-          termino()
+          op = operador_aditivo() {
+              if (op == TipoOperador.OR && !exp1.es_booleano()) {
+                  ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
+              }
+              else if (op != TipoOperador.OR && !exp1.es_entero()) {
+                  ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
+              }
+              t = token;
+          }
+          exp2 = termino() {
+              if (exp1.getVariable() != exp2.getVariable() && !exp1.es_desconocido() &&
+                    !exp2.es_desconocido()) {
+                  ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
+              }
+              else {
+                  exp1 = new RegistroExpr(exp1, exp2, op);
+              }
+          }
         )*
     }
     catch (ParseException e) { // Error sintáctico
         error_sintactico(e);
     }
+
+    {
+        return exp1;
+    }
 }
 
-void operador_aditivo() :
-{}
+TipoOperador operador_aditivo() :
+{
+    TipoOperador tipo = null;
+}
 {
     try { 
-          <tSUMA>
-        | <tRESTA>
-        | <tOR>
+          <tSUMA> {
+              tipo = TipoOperador.SUM;
+          }
+        | <tRESTA> {
+              tipo = TipoOperador.RES;
+          }
+        | <tOR> {
+              tipo = TipoOperador.OR;
+          }
     }
     catch (ParseException e) { // Error sintáctico
         error_sintactico(e, "Se esperaba un operador aditivo");
     }
+
+    {
+        return tipo;
+    }
 }
 
-void termino() :
-{}
+RegistroExpr termino() :
+{
+    TipoOperador op = null;
+    Token t = null;
+    RegistroExpr exp1 = new RegistroExpr(), exp2 = new RegistroExpr();
+}
 {
     try { 
-        factor()
+        exp1 = factor() {
+            t = token;
+        }
         (
-          operador_multiplicativo()
-          factor()
+          op = operador_multiplicativo() {
+              if (op == TipoOperador.AND && !exp1.es_booleano()) {
+                  ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
+              }
+              else if (op != TipoOperador.AND && !exp1.es_entero()) {
+                  ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
+              }
+              t = token;
+          }
+          exp2 = factor() {
+              if (exp1.getVariable() != exp2.getVariable() && !exp1.es_desconocido() &&
+                    !exp2.es_desconocido()) {
+                  ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
+              }
+              else {
+                  if ((op == TipoOperador.DIV || op == TipoOperador.MOD) &&
+                        exp2.getValorEnt() != null && exp2.getValorEnt().equals(0)) {
+                      ErrorSemantico.error_semantico(new DivisionPorCeroException(), t);
+                  }
+                  exp1 = new RegistroExpr(exp1, exp2, op);
+              }
+          }
         )*
     }
     catch (ParseException e) { // Error sintáctico
         error_sintactico(e);
     }
+
+    {
+        return exp1;
+    }
 }
 
-void operador_multiplicativo() :
-{}
+TipoOperador operador_multiplicativo() :
+{
+    TipoOperador tipo = null;
+}
 {
     try { 
-          <tMOD>
-        | <tDIV>
-        | <tMULTIPLICA>
-        | <tAND>
+          <tMOD> {
+              tipo = TipoOperador.MOD;
+          }
+        | <tDIV> {
+              tipo = TipoOperador.DIV;
+          }
+        | <tMULTIPLICA> {
+              tipo = TipoOperador.MUL;
+          }
+        | <tAND> {
+              tipo = TipoOperador.AND;
+          }
     }
     catch (ParseException e) { // Error sintáctico
         error_sintactico(e, "Se esperaba un operador multiplicativo");
     }
+
+    {
+        return tipo;
+    }
 }
 
-void factor() :
+RegistroExpr factor() :
 {
     Token t = null;
+    RegistroExpr exp = new RegistroExpr();
 }
 {
     try { 
-          <tRESTA> factor()
-	    | <tNOT> factor()
-	    | ap() expresion() cp()
-	    | <tENTACAR> ap() expresion() cp()
-	    | <tCARAENT> ap() expresion() cp()
-	    | t = identificador()
-	    | <tCONSTENTERA>
-	    | <tCONSTCHAR>
-	    | <tTRUE>
-	    | <tFALSE>
+          t = <tRESTA>
+          exp = factor() {
+              if (!exp.es_entero() && !exp.es_desconocido()) {
+                  ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
+              }
+              else if (exp.getValorEnt() != null) {
+                  exp = new RegistroExpr(exp);
+                  exp.set_valor();
+                  exp.setValorEnt(-1 * exp.getValorEnt());
+              }
+          }
+	    | t = <tNOT>
+	      exp = factor() {
+              if (!exp.es_booleano() && !exp.es_desconocido()) {
+                  ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
+              }
+              else if (exp.getValorBool() != null) {
+                  exp = new RegistroExpr(exp);
+                  exp.set_valor();
+                  exp.setValorBool(!exp.getValorBool());
+              }
+          }
+	    | ap()
+	      exp = expresion()
+	      cp()
+	    | <tENTACAR> // Entero a caracter
+	      ap() {
+              t = token;
+          }
+	      exp = expresion() {
+	          Character c = null;
+	          
+	          if (!exp.es_entero()) {
+	              ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
+	          }
+	          else if (exp.getValorEnt() != null) { 
+	              if (exp.getValorEnt() < 0 || exp.getValorEnt() > 255) {
+                      ErrorSemantico.error_semantico(new NumeroFueraRangoException(), t.next);
+                  }
+                  else {
+                      c = (char) exp.getValorEnt().intValue();
+                  }
+	          }
+
+              exp = new RegistroExpr();
+              exp.set_valor();
+              exp.set_caracter();
+              if (c != null) {
+                  exp.setValorChar(c);
+              }
+	      }
+	      cp()
+	    | <tCARAENT> // Caracter a entero
+	      ap() {
+              t = token;
+          }
+	      exp = expresion() {
+              Integer i = null;
+              
+              if (!exp.es_caracter()) {
+                  ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
+              }
+              else if (exp.getValorEnt() != null) { 
+                  i = (int) exp.getValorChar().charValue();
+              }
+
+              exp = new RegistroExpr();
+              exp.set_valor();
+              exp.set_entero();
+              if (i != null) {
+                  exp.setValorEnt(i);
+              }
+          }
+	      cp()
+	    | t = identificador() {
+	          try { 
+                  Simbolo aux = tabla_simbolos.buscar_simbolo(t.image);
+                  exp = new RegistroExpr(aux);
+              }
+              catch (SimboloNoEncontradoException e) {
+                  ErrorSemantico.error_semantico(e, t);
+                  try { 
+                      Simbolo aux = tabla_simbolos.introducir_variable(t.image,
+                            Tipo_variable.DESCONOCIDO, nivel, dir);
+                      exp = new RegistroExpr(aux);
+                  }
+                  catch (SimboloYaExistenteException ignored) { } // Imposible
+              }
+	      }
+	    | <tCONSTENTERA> {
+	          exp = new RegistroExpr();
+	          exp.set_entero();
+              exp.set_valor();
+              exp.setValorEnt(Integer.parseInt(token.image));
+	      }
+	    | <tCONSTCHAR> {
+              exp = new RegistroExpr();
+              exp.set_caracter();
+              exp.set_valor();
+              exp.setValorChar(token.image.charAt(1));
+          }
+	    | <tTRUE> {
+              exp = new RegistroExpr();
+              exp.set_booleano();
+              exp.set_valor();
+              exp.setValorBool(true);
+          }
+	    | <tFALSE> {
+              exp = new RegistroExpr();
+              exp.set_booleano();
+              exp.set_valor();
+              exp.setValorBool(false);
+          }
     }
     catch (ParseException e) { // Error sintáctico
         error_sintactico(e, "Se esperaba un factor");
+    }
+
+    {
+        return exp;
     }
 }

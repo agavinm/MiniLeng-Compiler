@@ -1,8 +1,8 @@
 //*****************************************************************
 // File:   Simbolo.java
 // Author: Andrés Gavín Murillo 716358
-// Date:   5/5/2019
-// Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V3.0
+// Date:   4/6/2019
+// Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V3.1
 //         JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
 //*****************************************************************
 
@@ -73,6 +73,7 @@ public class Simbolo {
         this.dir = dir;
     }
     
+    // Tipo de símbolo
     public boolean es_variable() {
         return this.tipo == Tipo_simbolo.VARIABLE;
     }
@@ -85,12 +86,35 @@ public class Simbolo {
         return this.tipo == Tipo_simbolo.ACCION;
     }
     
+    // Clase de parámetro
     public boolean es_valor() {
-        return this.tipo == Tipo_simbolo.PARAMETRO && this.parametro == Clase_parametro.VAL;
+        return this.parametro == Clase_parametro.VAL;
     }
     
     public boolean es_referencia() {
-        return this.tipo == Tipo_simbolo.PARAMETRO && this.parametro == Clase_parametro.REF;
+        return this.parametro == Clase_parametro.REF;
+    }
+    
+    // Tipo de variable
+    public boolean es_desconocido() {
+        return this.variable == Tipo_variable.DESCONOCIDO;
+    }
+    
+    public boolean es_entero() {
+        return this.variable == Tipo_variable.ENTERO;
+    }
+    
+    public boolean es_booleano() {
+        return this.variable == Tipo_variable.BOOLEANO;
+    }
+    
+    public boolean es_caracter() {
+        return this.variable == Tipo_variable.CHAR;
+    }
+    
+    // Para que un símbolo sea asignable debe ser variable o parámetro referencia
+    public boolean es_asignable() {
+        return this.es_variable() || (this.es_parametro() && this.es_referencia());
     }
     
     /* Constructores */

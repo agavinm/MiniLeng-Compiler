@@ -83,7 +83,9 @@ public class TablaSimbolos {
         s.introducir_parametro(nombre, variable, parametro, nivel, dir);
         tabla.introducir_simbolo(s);
         
-        ultima_accion.setParametro(s);
+        if (ultima_accion != null) {
+            ultima_accion.setParametro(s);
+        }
         
         return s;
     }
