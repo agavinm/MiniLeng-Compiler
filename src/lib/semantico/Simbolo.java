@@ -1,7 +1,7 @@
 //*****************************************************************
 // File:   Simbolo.java
 // Author: Andrés Gavín Murillo 716358
-// Date:   3/6/2019
+// Date:   4/6/2019
 // Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V3.1
 //         JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
 //*****************************************************************
@@ -97,23 +97,19 @@ public class Simbolo {
     
     // Tipo de variable
     public boolean es_desconocido() {
-        return (this.tipo == Tipo_simbolo.PARAMETRO || this.tipo == Tipo_simbolo.VARIABLE) 
-                && this.variable == Tipo_variable.DESCONOCIDO;
+        return this.variable == Tipo_variable.DESCONOCIDO;
     }
     
     public boolean es_entero() {
-        return (this.tipo == Tipo_simbolo.PARAMETRO || this.tipo == Tipo_simbolo.VARIABLE) 
-                && this.variable == Tipo_variable.ENTERO;
+        return this.variable == Tipo_variable.ENTERO;
     }
     
     public boolean es_booleano() {
-        return (this.tipo == Tipo_simbolo.PARAMETRO || this.tipo == Tipo_simbolo.VARIABLE) 
-                && this.variable == Tipo_variable.BOOLEANO;
+        return this.variable == Tipo_variable.BOOLEANO;
     }
     
     public boolean es_caracter() {
-        return (this.tipo == Tipo_simbolo.PARAMETRO || this.tipo == Tipo_simbolo.VARIABLE) 
-                && this.variable == Tipo_variable.CHAR;
+        return this.variable == Tipo_variable.CHAR;
     }
     
     // Para que un símbolo sea asignable debe ser variable o parámetro referencia

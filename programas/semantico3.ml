@@ -68,6 +68,9 @@ principio
   ww := 5 AND 6;
   ww := 5 + "a";
   
+  ww := 5 / (1 - 1 * 6 + 5);
+  ww := 5 mod 0;
+  
   accion1(5);
   ww(5);
   accion1(accion1);
