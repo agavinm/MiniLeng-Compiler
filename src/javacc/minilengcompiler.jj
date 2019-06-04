@@ -1,7 +1,7 @@
 //*****************************************************************
 // File:   MiniLengCompiler.jj
 // Author: Andrés Gavín Murillo 716358
-// Date:   22/5/2019
+// Date:   4/6/2019
 // Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V3.1
 //         JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
 //*****************************************************************
@@ -26,6 +26,7 @@ import lib.semantico.SimboloNoConcuerdaException;
 import lib.semantico.SimboloNoAccionException;
 import lib.semantico.ExcesoParametrosException;
 import lib.semantico.DivisionPorCeroException;
+import lib.semantico.NumeroFueraRangoException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.ListIterator;
@@ -1278,7 +1279,7 @@ TipoOperador operador_multiplicativo() :
 RegistroExpr factor() :
 {
     Token t = null;
-    RegistroExpr exp = new RegistroExpr();
+    RegistroExpr exp = null;
 }
 {
     try { 
@@ -1288,6 +1289,8 @@ RegistroExpr factor() :
                   ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
               }
               else if (exp.getValorEnt() != null) {
+                  exp = new RegistroExpr(exp);
+                  exp.set_valor();
                   exp.setValorEnt(-1 * exp.getValorEnt());
               }
           }
@@ -1297,19 +1300,62 @@ RegistroExpr factor() :
                   ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
               }
               else if (exp.getValorBool() != null) {
+                  exp = new RegistroExpr(exp);
+                  exp.set_valor();
                   exp.setValorBool(!exp.getValorBool());
               }
           }
 	    | ap()
 	      exp = expresion()
 	      cp()
-	    | <tENTACAR> //TODO
-	      ap()
-	      exp = expresion()
+	    | <tENTACAR> // Entero a caracter
+	      ap() {
+              t = token;
+          }
+	      exp = expresion() {
+	          Character c = null;
+	          
+	          if (!exp.es_entero()) {
+	              ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
+	          }
+	          else if (exp.getValorEnt() != null) { 
+	              if (exp.getValorEnt() < 0 || exp.getValorEnt() > 255) {
+                      ErrorSemantico.error_semantico(new NumeroFueraRangoException(), t.next);
+                  }
+                  else {
+                      c = (char) exp.getValorEnt().intValue();
+                  }
+	          }
+
+              exp = new RegistroExpr();
+              exp.set_valor();
+              exp.set_caracter();
+              if (c != null) {
+                  exp.setValorChar(c);
+              }
+	      }
 	      cp()
-	    | <tCARAENT> //TODO
-	      ap()
-	      exp = expresion()
+	    | <tCARAENT> // Caracter a entero
+	      ap() {
+              t = token;
+          }
+	      exp = expresion() {
+              Integer i = null;
+              
+              if (!exp.es_caracter()) {
+                  ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
+              }
+              else if (exp.getValorEnt() != null) { 
+                  i = (int) exp.getValorChar().charValue();
+              }
+
+              exp = new RegistroExpr();
+              exp.set_valor();
+              exp.set_entero();
+              if (i != null) {
+                  exp.setValorEnt(i);
+              }
+          }
 	      cp()
 	    | t = identificador() {
 	          try { 
@@ -1327,21 +1373,25 @@ RegistroExpr factor() :
               }
 	      }
 	    | <tCONSTENTERA> {
+	          exp = new RegistroExpr();
 	          exp.set_entero();
               exp.set_valor();
               exp.setValorEnt(Integer.parseInt(token.image));
 	      }
 	    | <tCONSTCHAR> {
+              exp = new RegistroExpr();
               exp.set_caracter();
               exp.set_valor();
               exp.setValorChar(token.image.charAt(1));
           }
 	    | <tTRUE> {
+              exp = new RegistroExpr();
               exp.set_booleano();
               exp.set_valor();
               exp.setValorBool(true);
           }
 	    | <tFALSE> {
+              exp = new RegistroExpr();
               exp.set_booleano();
               exp.set_valor();
               exp.setValorBool(false);

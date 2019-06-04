@@ -71,6 +71,14 @@ principio
   ww := 5 / (1 - 1 * 6 + 5);
   ww := 5 mod 0;
   
+  ww := caraent("a");
+  ww := entacar(350);
+  ww := caraent(350);
+  ww := entacar("a");
+  
+  a := caraent("a");
+  a := entacar(5);
+  
   accion1(5);
   ww(5);
   accion1(accion1);

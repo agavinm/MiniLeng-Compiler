@@ -1,3 +1,11 @@
+//*****************************************************************
+// File:   ErrorSemantico.java
+// Author: Andrés Gavín Murillo 716358
+// Date:   4/6/2019
+// Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V3.1
+//         JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
+//*****************************************************************
+
 package lib.semantico;
 
 import javacc.Token;
@@ -60,5 +68,12 @@ public abstract class ErrorSemantico {
         
         System.out.println("ERROR SEMÁNTICO (<" + t.beginLine + ", " + 
             t.beginColumn + ">) : <División por cero>");
+    }
+
+    public static void error_semantico(NumeroFueraRangoException e, Token t) {
+        correcto = false;
+        
+        System.out.println("ERROR SEMÁNTICO (<" + t.beginLine + ", " + 
+            t.beginColumn + ">) : <Número fuera de rango>");
     }
 }
