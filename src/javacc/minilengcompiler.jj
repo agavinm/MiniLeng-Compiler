@@ -1097,7 +1097,7 @@ RegistroExpr expresion() :
 {
     TipoOperador op = null;
     Token t = null;
-    RegistroExpr exp1 = null, exp2 = null;
+    RegistroExpr exp1 = new RegistroExpr(), exp2 = new RegistroExpr();
 }
 {
     try { 
@@ -1147,7 +1147,7 @@ RegistroExpr expresion_simple() :
 {
     TipoOperador op = null;
     Token t = null;
-    RegistroExpr exp1 = null, exp2 = null;
+    RegistroExpr exp1 = new RegistroExpr(), exp2 = new RegistroExpr();
 }
 {
     try { 
@@ -1157,6 +1157,9 @@ RegistroExpr expresion_simple() :
         (
           op = operador_aditivo() {
               if (op == TipoOperador.OR && !exp1.es_booleano()) {
+                  ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
+              }
+              else if (op != TipoOperador.OR && !exp1.es_entero()) {
                   ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
               }
               t = token;
@@ -1210,7 +1213,7 @@ RegistroExpr termino() :
 {
     TipoOperador op = null;
     Token t = null;
-    RegistroExpr exp1 = null, exp2 = null;
+    RegistroExpr exp1 = new RegistroExpr(), exp2 = new RegistroExpr();
 }
 {
     try { 
@@ -1220,6 +1223,9 @@ RegistroExpr termino() :
         (
           op = operador_multiplicativo() {
               if (op == TipoOperador.AND && !exp1.es_booleano()) {
+                  ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
+              }
+              else if (op != TipoOperador.AND && !exp1.es_entero()) {
                   ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
               }
               t = token;
@@ -1279,7 +1285,7 @@ TipoOperador operador_multiplicativo() :
 RegistroExpr factor() :
 {
     Token t = null;
-    RegistroExpr exp = null;
+    RegistroExpr exp = new RegistroExpr();
 }
 {
     try { 

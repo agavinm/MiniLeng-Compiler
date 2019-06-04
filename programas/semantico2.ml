@@ -1,5 +1,5 @@
 %-------------------------------------------------------------------
-programa semantico; %2
+programa semantico; %2 Comprobar tabla de símbolos
 %-------------------------------------------------------------------
 
  caracter semantico; % error
