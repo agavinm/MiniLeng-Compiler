@@ -7,6 +7,7 @@ programa semantico; %4 Comprobar parte 2 (7-10)
 %-----------------------------------------------------------
 accion dato (val entero datos);
 %-----------------------------------------------------------
+ entero b;
  
 %-----------------------------------------------------------
 accion dato (ref entero datos);
@@ -22,6 +23,7 @@ Fin
 
 Principio %dato ref
   dato(datos);
+  dato(b);
   datos := 5;
   leer(datos);
   leer(5); % error
