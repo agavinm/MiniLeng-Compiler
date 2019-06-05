@@ -104,7 +104,7 @@ public class MiniLengCompiler {
 
             try { 
                 MiniLengCompiler.programa(verbose);
-                if (correcto && ErrorSemantico.getCorrecto())
+                if (correcto)
                     System.out.println("Compilación correcta.");
             }
             //catch (Exception e) { System.err.println("Error no reconocido"); }
@@ -424,6 +424,8 @@ Token identificador() :
 	    bloque_sentencias()
 	    ( <EOF> )?
 	        {
+	            correcto = correcto && ErrorSemantico.getCorrecto();
+	            
 	            // Generación de código
 	            if (t != null) {
 	                genCod.escribir("; Fin de " + t.image);
@@ -564,10 +566,16 @@ void declaracion_acciones() :
 }
 
 void declaracion_accion() :
-{}
+{
+    Token t = null;
+}
 {
     try { 
-        cabecera_accion()
+        t = cabecera_accion() {
+            // Generación de código
+            genCod.escribir("; Comienzo de " + t.image);
+            genCod.escribir(genCod.cerrar_etiqueta() + ":");
+        }
         punto_y_coma()
         declaracion_variables()
         declaracion_acciones()
@@ -576,6 +584,9 @@ void declaracion_accion() :
             tabla_simbolos.eliminar_acciones(nivel);
             tabla_simbolos.ocultar_parametros(nivel);
             nivel--;
+            
+            // Generación de código
+            genCod.escribir("; Fin de " + t.image);
         }
     }
     catch (ParseException e) { // Error sintáctico
@@ -583,7 +594,7 @@ void declaracion_accion() :
     }
 }
 
-void cabecera_accion() :
+Token cabecera_accion() :
 {
     Token t = null;
 }
@@ -605,6 +616,10 @@ void cabecera_accion() :
     }
     catch (ParseException e) { // Error sintáctico
         error_sintactico(e, "Se esperaba la declaración de una acción");
+    }
+
+    {
+        return t;
     }
 }
 
