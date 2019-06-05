@@ -1,8 +1,8 @@
 //*****************************************************************
 // File:   MiniLengCompiler.jj
 // Author: Andrés Gavín Murillo 716358
-// Date:   4/6/2019
-// Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V3.1
+// Date:   5/6/2019
+// Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V4.0
 //         JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
 //*****************************************************************
 options{    static = true;
@@ -30,6 +30,9 @@ import lib.semantico.NumeroFueraRangoException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.ListIterator;
+import lib.genCodigo.GeneracionCodigo;
+import lib.genCodigo.FicheroFormatoException;
+import lib.genCodigo.FicheroEscribirException;
 
 public class MiniLengCompiler {
     static boolean correcto = true;
@@ -39,6 +42,8 @@ public class MiniLengCompiler {
     static Long dir = new Long(0);
     static int nivel = 0;
     static boolean tabla_simbolos_print = false;
+
+    static GeneracionCodigo genCod;
     
     public static void main(String args []) throws ParseException {
         System.out.println("Compilador de MiniLengCompiler V3.1 Autor: Andrés Gavín Murillo 716358. Ayuda: ./compilador -h\n");
@@ -80,11 +85,16 @@ public class MiniLengCompiler {
                 if (file_name != null) { 
 	               try {
 	                   compiler = new MiniLengCompiler(new FileInputStream(file_name));
+	                   genCod = new GeneracionCodigo(file_name);
 	               }
 	               catch (java.io.FileNotFoundException e) {
 	                   System.out.println("Fichero " + file_name + " no encontrado.");
 	                   return ;
 	               }
+                   catch (FicheroFormatoException e) {
+                       System.out.println("El fichero " + file_name + " tiene que tener formato '.ml'.");
+                       return ;
+                   }
                 }
 	            else {
 	               System.out.println("Fichero no encontrado.");
@@ -392,13 +402,21 @@ Token identificador() :
 void programa(Boolean verbose) :
 {
     Token t = null;
+
+    // Generación de código
+    genCod.inicializar();
 }
 {
     try { 
 	    <tPROGRAMA>
 	    t = identificador() {
-	        if (t != null) 
+	        if (t != null) {
 	            tabla_simbolos.introducir_programa(t.image, dir);
+
+	            // Generación de código
+		        genCod.escribir("; Programa " + t.image);
+		    }
+            genCod.escribir("ENP " + genCod.nueva_etiqueta());
 	    }
 	    punto_y_coma()
 	    declaracion_variables()
@@ -406,6 +424,20 @@ Token identificador() :
 	    bloque_sentencias()
 	    ( <EOF> )?
 	        {
+	            // Generación de código
+	            if (t != null) {
+	                genCod.escribir("; Fin de " + t.image);
+	            }
+	            genCod.escribir("LVP");
+	            
+                try {
+                    genCod.finalizar(correcto);
+                }
+                catch (FicheroEscribirException e) {
+                   System.out.println("No se ha podido generar el fichero, revise los permisos.");
+                   correcto = false;
+                }
+
 	            if (correcto) {
                     tabla_simbolos.eliminar_variables(nivel);
                     tabla_simbolos.eliminar_acciones(nivel);
