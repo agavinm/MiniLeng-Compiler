@@ -18,6 +18,7 @@ public class GeneracionCodigo {
     private String buffer;
     
     private Integer num_etiqueta;
+    private Long num_instruc;
     
     public GeneracionCodigo(String file) throws FicheroFormatoException {
         String[] splited = file.split("\\.");
@@ -28,10 +29,12 @@ public class GeneracionCodigo {
         fout_name = splited[0] + ".code";
         buffer = null;
         num_etiqueta = null;
+        num_instruc = null;
     }
     
     public void inicializar() {
         num_etiqueta = -1; // Inicializar en uno menos al primero
+        num_instruc = new Long(0); // Siguiente dirección
         buffer = "";
     }
     
@@ -46,67 +49,72 @@ public class GeneracionCodigo {
     
     public void instruccion(String instr) {
         buffer += "    " + instr + "\n";
+        num_instruc++;
     }
     
     public void operacion(TipoOperador op) {
         if (op != null) {
             switch (op) {
             case SUM :
-                buffer += "    PLUS\n";
+                instruccion("PLUS");
                 break;
 
             case RES :
-                buffer += "    SBT\n";
+                instruccion("SBT");
                 break;
 
             case OR :
-                buffer += "    OR\n";
+                instruccion("OR");
                 break;
 
             case MOD :
-                buffer += "    MOD\n";
+                instruccion("MOD");
                 break;
 
             case DIV :
-                buffer += "    DIV\n";
+                instruccion("DIV");
                 break;
 
             case MUL :
-                buffer += "    TMS\n";
+                instruccion("TMS");
                 break;
 
             case AND :
-                buffer += "    AND\n";
+                instruccion("AND");
                 break;
 
             case MAY :
-                buffer += "    GT\n";
+                instruccion("GT");
                 break;
 
             case MEN :
-                buffer += "    LT\n";
+                instruccion("LT");
                 break;
 
             case IGU :
-                buffer += "    EQ\n";
+                instruccion("EQ");
                 break;
 
             case MAI :
-                buffer += "    GTE\n";
+                instruccion("GTE");
                 break;
 
             case MEI :
-                buffer += "    LTE\n";
+                instruccion("LTE");
                 break;
 
             case NI :
-                buffer += "    NEQ\n";
+                instruccion("NEQ");
                 break;
 
             default :
                 break;
             }
         }
+    }
+    
+    public Long siguiente_dir() {
+        return num_instruc;
     }
     
     public void finalizar(boolean guardar) throws FicheroEscribirException {

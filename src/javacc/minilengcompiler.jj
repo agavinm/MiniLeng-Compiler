@@ -29,17 +29,18 @@ import lib.semantico.DivisionPorCeroException;
 import lib.semantico.NumeroFueraRangoException;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.ListIterator;
 import lib.genCodigo.GeneracionCodigo;
 import lib.genCodigo.FicheroFormatoException;
 import lib.genCodigo.FicheroEscribirException;
+import java.util.Iterator;
 
 public class MiniLengCompiler {
     static boolean correcto = true;
     static boolean panic_mode = false;
     
     static TablaSimbolos tabla_simbolos = new TablaSimbolos();
-    static Long dir = new Long(3);
+    static Long dir;
+    static final long DIR_INICIAL = 3;
     static int nivel = 0;
     static boolean tabla_simbolos_print = false;
 
@@ -406,6 +407,7 @@ Token identificador() :
     // Generación de código
     genCod.inicializar();
     String etiq;
+    dir = DIR_INICIAL;
 }
 {
     try { 
@@ -585,14 +587,16 @@ void declaracion_accion() :
 {
     try { 
         t = cabecera_accion() {
+            // Generación de código
             etiq = genCod.nueva_etiqueta();
+            genCod.instruccion("JMP " + etiq);
         }
         punto_y_coma()
         declaracion_variables()
         declaracion_acciones() {
             // Generación de código
-            genCod.escribir("; Comienzo de " + t.image);
             genCod.escribir(etiq + ":");
+            genCod.escribir("; Codigo de " + t.image);
         }
         bloque_sentencias() {
             tabla_simbolos.eliminar_variables(nivel);
@@ -602,6 +606,7 @@ void declaracion_accion() :
             
             // Generación de código
             genCod.escribir("; Fin de " + t.image);
+            genCod.instruccion("CSF");
         }
     }
     catch (ParseException e) { // Error sintáctico
@@ -619,15 +624,28 @@ Token cabecera_accion() :
         t = identificador() {
             if (t != null) { 
 	            try { 
-	                tabla_simbolos.introducir_accion(t.image, nivel, null);
+	                tabla_simbolos.introducir_accion(t.image, nivel, genCod.siguiente_dir());
 	            }
 			    catch (SimboloYaExistenteException e) { // Error semántico
 			        ErrorSemantico.error_semantico(e, t);
 			    }
 	            nivel++;
+	            dir = DIR_INICIAL;
 	        }
         }
-        parametros_formales()
+        parametros_formales() {
+            // Generación de código
+            genCod.escribir("; Accion " + t.image);
+            genCod.escribir("; Recuperar args " + t.image);
+            try {
+                Iterator<Simbolo> it =
+                    tabla_simbolos.buscar_simbolo(t.image).getLista_parametros().descendingIterator();
+                while (it.hasNext()) {
+                    genCod.instruccion("SRF 0 " + it.next().strDir());
+                    genCod.instruccion("ASGI");
+                }
+            } catch (Exception ignored) { }
+        }
     }
     catch (ParseException e) { // Error sintáctico
         error_sintactico(e, "Se esperaba la declaración de una acción");
@@ -1001,6 +1019,11 @@ void identificacion() :
                 if (!s.es_desconocido() && !s.es_accion()) {
                     ErrorSemantico.error_semantico(new SimboloNoAccionException(), t);
                 }
+                else {
+                    // Generación de código
+		            genCod.escribir("; Invocar accion " + s.getNombre());
+		            genCod.instruccion("OSF " + dir + " " + nivel + " " + s.strDir());
+		        }
             }
         )
     }
@@ -1570,6 +1593,9 @@ RegistroExpr factor(Clase_parametro clase) :
                       // Generación de código
                       genCod.escribir("; Acceso a variable " + aux.getNombre());
                       genCod.instruccion("SRF 0 " + aux.strDir()); // Almacena en stack la @
+                      if (aux.es_parametro() && aux.es_referencia()) {
+                          genCod.instruccion("DRF"); // Almacena en stack la @ original
+                      }
                       if (clase == Clase_parametro.VAL) {
                           genCod.instruccion("DRF"); // Almacena en stack el valor
                       }
