@@ -1108,25 +1108,41 @@ void seleccion() :
     Tipo_variable tipo = null;
     Token t = null;
     RegistroExpr reg;
+    String etiqSINO, etiqFIN;
 }
 {
     try { 
         <tSI> {
             t = token;
+            genCod.escribir("; SI");
         }
         reg = expresion(Clase_parametro.VAL) {
             tipo = reg.getVariable();
             if (tipo != Tipo_variable.BOOLEANO) {
                 ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
             }
+
+            // Generación de código
+            etiqSINO = genCod.nueva_etiqueta();
+            genCod.instruccion("JMF " + etiqSINO);
+            genCod.escribir("; ENT");
         }
         ent()
-        lista_sentencias()
+        lista_sentencias() {
+            // Generación de código
+            etiqFIN = genCod.nueva_etiqueta();
+            genCod.instruccion("JMP " + etiqFIN);
+            genCod.escribir("; SI_NO");
+            genCod.escribir(etiqSINO + ":");
+        }
         (
           <tSI_NO>
           lista_sentencias()
         )?
-        fsi()
+        fsi() {
+            genCod.escribir("; Fin SI");
+            genCod.escribir(etiqFIN + ":");
+        }
     }
     catch (ParseException e) { // Error sintáctico
         error_sintactico(e, "Se esperaba un bloque SI");
