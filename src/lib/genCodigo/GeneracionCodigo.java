@@ -17,9 +17,9 @@ public class GeneracionCodigo {
     private String fout_name;
     private String buffer;
     
-    private Integer num_etiqueta;
-    private Long num_instruc;
+    private Long num_etiqueta;
     
+    // Constructor dado el nombre del fichero de entrada
     public GeneracionCodigo(String file) throws FicheroFormatoException {
         String[] splited = file.split("\\.");
         if (splited.length != 2 || !splited[1].equals("ml")) {
@@ -29,29 +29,31 @@ public class GeneracionCodigo {
         fout_name = splited[0] + ".code";
         buffer = null;
         num_etiqueta = null;
-        num_instruc = null;
     }
     
+    // Inicializa la clase
     public void inicializar() {
-        num_etiqueta = -1; // Inicializar en uno menos al primero
-        num_instruc = new Long(0); // Siguiente dirección
+        num_etiqueta = new Long(-1); // Inicializar en uno menos al primero
         buffer = "";
     }
     
+    // Genera una nueva etiqueta Lx
     public String nueva_etiqueta() {
         num_etiqueta++;
         return "L" + num_etiqueta;
     }
     
+    // Escribe una línea
     public void escribir(String linea) {
         buffer += linea + "\n";
     }
     
+    // Escribe una instrucción
     public void instruccion(String instr) {
         buffer += "    " + instr + "\n";
-        num_instruc++;
     }
     
+    // Escribe una instrucción de operación
     public void operacion(TipoOperador op) {
         if (op != null) {
             switch (op) {
@@ -113,10 +115,12 @@ public class GeneracionCodigo {
         }
     }
     
-    public Long siguiente_dir() {
-        return num_instruc;
+    // Devuelve la siguiente dirección
+    public Long getDir() {
+        return num_etiqueta;
     }
     
+    // Si guardar es cierto genera el fichero con el buffer, sino no se genera el fichero
     public void finalizar(boolean guardar) throws FicheroEscribirException {
         if (guardar) {
             try {

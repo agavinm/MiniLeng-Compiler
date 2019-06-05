@@ -108,7 +108,7 @@ public class MiniLengCompiler {
                 if (correcto)
                     System.out.println("Compilación correcta.");
             }
-            //catch (Exception e) { System.err.println("Error no reconocido"); }
+            catch (Exception e) { System.err.println("Error no reconocido"); }
             catch (Error e) { // Error léxico
                 System.out.println("ERROR LÉXICO (<" + SimpleCharStream.getBeginLine() + ", " + 
                     SimpleCharStream.getBeginColumn() + ">) : símbolo no reconocido: <" +
@@ -119,6 +119,7 @@ public class MiniLengCompiler {
         }
     }
 
+    // Panic mode hasta encontrar un token del tipo kind o EOF
     private static void panic(ParseException e, String msg, int kind) {
         Token lastRead = MiniLengCompiler.getNextToken();
 
@@ -137,7 +138,6 @@ public class MiniLengCompiler {
     private static void error_sintactico(ParseException e, String msg) {
         correcto = false;
         Token lastRead = MiniLengCompiler.getNextToken();
-        //Token lastRead = MiniLengCompiler.token.next;
 	    System.out.println("ERROR SINTÁCTICO (<" + lastRead.beginLine + ", " + 
 	        lastRead.beginColumn + ">) : <Símbolo obtenido: '" + lastRead.image +
 	        "'. " + msg + ">");
@@ -451,7 +451,6 @@ Token identificador() :
 	            if (correcto) {
                     tabla_simbolos.eliminar_variables(nivel);
                     tabla_simbolos.eliminar_acciones(nivel);
-                    //tabla_simbolos.eliminar_parametros_ocultos(nivel+1); // Si todas acciones tienen param 
                     tabla_simbolos.eliminar_programa();
                     
                     if (tabla_simbolos_print)
@@ -582,13 +581,12 @@ void declaracion_acciones() :
 void declaracion_accion() :
 {
     Token t = null;
-    String etiq;
+    String etiq = genCod.nueva_etiqueta();
 }
 {
     try { 
         t = cabecera_accion() {
             // Generación de código
-            etiq = genCod.nueva_etiqueta();
             genCod.instruccion("JMP " + etiq);
         }
         punto_y_coma()
@@ -596,7 +594,8 @@ void declaracion_accion() :
         declaracion_acciones() {
             // Generación de código
             genCod.escribir(etiq + ":");
-            genCod.escribir("; Codigo de " + t.image);
+            if (t != null)
+                genCod.escribir("; Codigo de " + t.image);
         }
         bloque_sentencias() {
             tabla_simbolos.eliminar_variables(nivel);
@@ -605,7 +604,8 @@ void declaracion_accion() :
             nivel--;
             
             // Generación de código
-            genCod.escribir("; Fin de " + t.image);
+            if (t != null)
+                genCod.escribir("; Fin de " + t.image);
             genCod.instruccion("CSF");
         }
     }
@@ -617,6 +617,7 @@ void declaracion_accion() :
 Token cabecera_accion() :
 {
     Token t = null;
+    Simbolo s;
 }
 {
     try { 
@@ -624,7 +625,7 @@ Token cabecera_accion() :
         t = identificador() {
             if (t != null) { 
 	            try { 
-	                tabla_simbolos.introducir_accion(t.image, nivel, genCod.siguiente_dir());
+	                tabla_simbolos.introducir_accion(t.image, nivel, genCod.getDir());
 	            }
 			    catch (SimboloYaExistenteException e) { // Error semántico
 			        ErrorSemantico.error_semantico(e, t);
@@ -635,16 +636,21 @@ Token cabecera_accion() :
         }
         parametros_formales() {
             // Generación de código
-            genCod.escribir("; Accion " + t.image);
-            genCod.escribir("; Recuperar args " + t.image);
-            try {
-                Iterator<Simbolo> it =
-                    tabla_simbolos.buscar_simbolo(t.image).getLista_parametros().descendingIterator();
-                while (it.hasNext()) {
-                    genCod.instruccion("SRF 0 " + it.next().strDir());
-                    genCod.instruccion("ASGI");
-                }
-            } catch (Exception ignored) { }
+            if (t != null) { 
+	            genCod.escribir("; Accion " + t.image);
+	            try {
+	                Iterator<Simbolo> it =
+	                    tabla_simbolos.buscar_simbolo(t.image).getLista_parametros().descendingIterator();
+	                if (it.hasNext()) {
+	                    genCod.escribir("; Recuperar args " + t.image);
+	                }
+	                while (it.hasNext()) {
+	                    s = it.next();
+	                    genCod.instruccion("SRF " + (nivel - s.getNivel()) + " " + s.strDir());
+	                    genCod.instruccion("ASGI");
+	                }
+	            } catch (Exception ignored) { }
+            }
         }
     }
     catch (ParseException e) { // Error sintáctico
@@ -861,7 +867,7 @@ void lista_asignables() :
 		                    // Generación de código
 		                    genCod.escribir("; Leer");
                             genCod.escribir("; Direccion de variable " + s.getNombre());
-		                    genCod.instruccion("SRF 0 " + s.strDir());
+		                    genCod.instruccion("SRF " + (nivel - s.getNivel()) + " " + s.strDir());
 		                    if (s.es_caracter()) {
 		                        genCod.instruccion("RD 0");
 		                    }
@@ -932,7 +938,8 @@ void lista_escribibles() :
     try { 
         (
             s = constcad() {
-                for (int i=0; i<s.length(); i++) {
+                genCod.escribir("; Cadena " + s);
+                for (int i=1; i<s.length()-1; i++) {
                     genCod.instruccion("STC " + (int) s.charAt(i));
                     genCod.instruccion("WRT 0");
                 }
@@ -945,7 +952,7 @@ void lista_escribibles() :
                     genCod.instruccion("WRT 0");
                 }
                 else if (reg.es_booleano()) {
-                    genCod.instruccion("WRT 1"); // TODO: Escribir Verdadero o Falso
+                    genCod.instruccion("WRT 1"); // Verdadero = 1, Falso = 0
                 }
             }
         )
@@ -953,10 +960,11 @@ void lista_escribibles() :
           <tC>
           (
               s = constcad() {
-                  for (int i=0; i<s.length(); i++) {
-                      genCod.instruccion("STC " + (int) s.charAt(i));
-                      genCod.instruccion("WRT 0");
-                  }
+                  genCod.escribir("; Cadena " + s);
+	              for (int i=1; i<s.length()-1; i++) {
+	                  genCod.instruccion("STC " + (int) s.charAt(i));
+	                  genCod.instruccion("WRT 0");
+	              }
               }
             | reg = expresion(Clase_parametro.VAL) { // En stack está el resultado de la expresión
                   if (reg.es_entero()) {
@@ -966,7 +974,7 @@ void lista_escribibles() :
                       genCod.instruccion("WRT 0");
                   }
                   else if (reg.es_booleano()) {
-                      genCod.instruccion("WRT 1"); // TODO: Escribir Verdadero o Falso
+                      genCod.instruccion("WRT 1"); // Verdadero = 1, Falso = 0
                   }
               }
           )
@@ -1016,7 +1024,7 @@ void identificacion() :
                 }
             }
           | invocacion_accion(s) {
-                if (!s.es_desconocido() && !s.es_accion()) {
+                if (t != null && !s.es_desconocido() && !s.es_accion()) {
                     ErrorSemantico.error_semantico(new SimboloNoAccionException(), t);
                 }
             }
@@ -1033,19 +1041,24 @@ Tipo_variable asignacion(Simbolo s) :
     RegistroExpr reg;
 
     // Generación de código
-    genCod.escribir("; Asignacion de " + s.getNombre());
-    genCod.instruccion("SRF 0 " + s.strDir()); // Almacena en stack la @
-    if (s.es_parametro() && s.es_referencia()) {
-        genCod.instruccion("DRF"); // Almacena en stack la @ original
+    if (s != null) { 
+	    genCod.escribir("; Direccion de " + s.getNombre());
+	    genCod.instruccion("SRF " + (nivel - s.getNivel()) + " " + s.strDir()); // Almacena en stack la @
+	    if (s.es_parametro() && s.es_referencia()) {
+	        genCod.instruccion("DRF"); // Almacena en stack la @ original
+	    }
     }
 }
 {
     try { 
         <tOPAS>
         reg = expresion(Clase_parametro.VAL) {
-            tipo = reg.getVariable();
+            if (reg != null)
+                tipo = reg.getVariable();
 
             // Generación de código
+            if (s != null)
+                genCod.escribir("; Asignacion de " + s.getNombre());
             genCod.instruccion("ASG");
         }
         punto_y_coma()
@@ -1062,20 +1075,24 @@ Tipo_variable asignacion(Simbolo s) :
 void invocacion_accion(Simbolo s) :
 {
     // Generación de código
-    genCod.escribir("; Invocar accion " + s.getNombre());
+    if (s != null)
+        genCod.escribir("; Invocar accion " + s.getNombre());
 }
 {
     try { 
         (
-          argumentos(s) {
-              // Generación de código
-              genCod.instruccion("OSF " + dir + " " + nivel + " " + s.strDir());
-          }
+          argumentos(s)
         )?
         punto_y_coma()
     }
     catch (ParseException e) { // Error sintáctico
         error_sintactico(e);
+    }
+
+    {
+        // Generación de código
+        if (s != null)
+            genCod.instruccion("OSF " + dir + " " + (nivel - s.getNivel()) + " L" + s.strDir());
     }
 }
 
@@ -1103,27 +1120,29 @@ void mientras_que() :
             t = token;
 
             // Generación de código
-            genCod.escribir("; MQ");
             etiqMQ = genCod.nueva_etiqueta();
             genCod.escribir(etiqMQ + ":");
+            genCod.escribir("; MQ");
         }
         reg = expresion(Clase_parametro.VAL) {
-            tipo = reg.getVariable();
+            if (reg != null)
+                tipo = reg.getVariable();
             if (tipo != Tipo_variable.BOOLEANO) {
                 ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
             }
 
             // Generación de código
             etiqFIN = genCod.nueva_etiqueta();
+            genCod.escribir("; Salir del bucle si la guarda se evalua a falso");
             genCod.instruccion("JMF " + etiqFIN);
-            genCod.escribir("; ENT");
         }
         lista_sentencias()
         fmq() {
             // Generación de código
+            genCod.escribir("; Fin de la iteracion. Saltar a la cabecera del bucle");
             genCod.instruccion("JMP " + etiqMQ);
-            genCod.escribir("; Fin MQ");
             genCod.escribir(etiqFIN + ":");
+            genCod.escribir("; Fin MQ");
         }
     }
     catch (ParseException e) { // Error sintáctico
@@ -1167,7 +1186,8 @@ void seleccion() :
             genCod.escribir("; SI");
         }
         reg = expresion(Clase_parametro.VAL) {
-            tipo = reg.getVariable();
+            if (reg != null)
+                tipo = reg.getVariable();
             if (tipo != Tipo_variable.BOOLEANO) {
                 ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
             }
@@ -1182,8 +1202,8 @@ void seleccion() :
             // Generación de código
             etiqFIN = genCod.nueva_etiqueta();
             genCod.instruccion("JMP " + etiqFIN);
-            genCod.escribir("; SI_NO");
             genCod.escribir(etiqSINO + ":");
+            genCod.escribir("; SI_NO");
         }
         (
           <tSI_NO>
@@ -1191,8 +1211,8 @@ void seleccion() :
         )?
         fsi() {
             // Generación de código
-            genCod.escribir("; Fin SI");
             genCod.escribir(etiqFIN + ":");
+            genCod.escribir("; Fin SI");
         }
     }
     catch (ParseException e) { // Error sintáctico
@@ -1225,7 +1245,7 @@ void lista_expresiones(Simbolo simb) :
     Token t = token;
     boolean exceso = false;
 
-    if (!simb.es_desconocido() && simb.es_accion()) {
+    if (simb != null && !simb.es_desconocido() && simb.es_accion()) {
         parametros = simb.getLista_parametros();
         if (i < parametros.size()) {
             clase = parametros.get(i).getParametro();
@@ -1235,14 +1255,14 @@ void lista_expresiones(Simbolo simb) :
 {
     try { 
         exp = expresion(clase) {
-            if (i < parametros.size()) {
+            if (parametros != null && i < parametros.size()) {
                 param = parametros.get(i);
                 i++;
                 if (i < parametros.size()) {
                     clase = parametros.get(i).getParametro();
                 }
                     
-                if (!exp.es_desconocido()) {
+                if (exp != null && param != null && !exp.es_desconocido()) {
                     if (exp.getVariable() != param.getVariable()) {
                         ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
                     }
@@ -1262,14 +1282,14 @@ void lista_expresiones(Simbolo simb) :
               t = token;
           }
           exp = expresion(clase) {
-              if (i < parametros.size()) {
+              if (parametros != null && i < parametros.size()) {
                   param = parametros.get(i);
                   i++;
                   if (i < parametros.size()) {
                       clase = parametros.get(i).getParametro();
                   }
                     
-                  if (!exp.es_desconocido()) {
+                  if (exp != null && param != null && !exp.es_desconocido()) {
                       if (exp.getVariable() != param.getVariable()) {
                           ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
                       }
@@ -1603,7 +1623,7 @@ RegistroExpr factor(Clase_parametro clase) :
                   if (!aux.es_desconocido()) {
                       // Generación de código
                       genCod.escribir("; Acceso a variable " + aux.getNombre());
-                      genCod.instruccion("SRF 0 " + aux.strDir()); // Almacena en stack la @
+                      genCod.instruccion("SRF " + (nivel - aux.getNivel()) + " " + aux.strDir()); // Almacena en stack la @
                       if (aux.es_parametro() && aux.es_referencia()) {
                           genCod.instruccion("DRF"); // Almacena en stack la @ original
                       }
@@ -1639,6 +1659,7 @@ RegistroExpr factor(Clase_parametro clase) :
               exp.setValorChar(token.image.charAt(1));
 
               // Generación de código
+              genCod.escribir("; Constante " + exp.getValorChar());
               genCod.instruccion("STC " + (int) exp.getValorChar());
           }
 	    | <tTRUE> {
@@ -1648,6 +1669,7 @@ RegistroExpr factor(Clase_parametro clase) :
               exp.setValorBool(true);
 
               // Generación de código
+              genCod.escribir("; Constante Verdadero");
               genCod.instruccion("STC 1");
           }
 	    | <tFALSE> {
@@ -1657,6 +1679,7 @@ RegistroExpr factor(Clase_parametro clase) :
               exp.setValorBool(false);
 
               // Generación de código
+              genCod.escribir("; Constante Falso");
               genCod.instruccion("STC 0");
           }
     }

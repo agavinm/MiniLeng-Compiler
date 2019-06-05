@@ -13,6 +13,7 @@ import javacc.Token;
 public abstract class ErrorSemantico {
     private static boolean correcto = true;
     
+    // Devuelve true si no se ha generado ningún error semántico, devuelve false en caso contrario
     public static boolean getCorrecto() {
         return correcto;
     }

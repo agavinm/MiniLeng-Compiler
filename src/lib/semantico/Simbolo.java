@@ -24,6 +24,7 @@ public class Simbolo {
     private LinkedList<Simbolo> lista_parametros;
     private Long dir;
     
+    // Restablece el símbolo
     private void reset() {
         this.nombre = null;
         this.nivel = null;
@@ -35,6 +36,7 @@ public class Simbolo {
         this.dir = null;
     }
     
+    // Genera un símbolo programa
     public void introducir_programa(String nombre, Long dir) {
         reset();
         this.nombre = nombre;
@@ -42,7 +44,8 @@ public class Simbolo {
         this.tipo = Tipo_simbolo.PROGRAMA;
         this.dir = dir;
     }
-    
+
+    // Genera un símbolo variable
     public void introducir_variable(String nombre, Tipo_variable variable, Integer nivel, 
             Long dir) {
         reset();
@@ -52,7 +55,8 @@ public class Simbolo {
         this.variable = variable;
         this.dir = dir;
     }
-    
+
+    // Genera un símbolo acción
     public void introducir_accion(String nombre, Integer nivel, Long dir) {
         reset();
         this.nombre = nombre;
@@ -61,7 +65,8 @@ public class Simbolo {
         this.lista_parametros = new LinkedList<Simbolo>();
         this.dir = dir;
     }
-    
+
+    // Genera un símbolo parámetro
     public void introducir_parametro(String nombre, Tipo_variable tipo_var, 
             Clase_parametro clase_param, Integer nivel, Long dir) {
         reset();

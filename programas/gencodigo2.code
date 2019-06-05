@@ -16,6 +16,7 @@ L1:
 ; Asignacion de m
     SRF 0 3
     DRF
+; Constante 0
     STC 0
     ASG
 ; Fin de q
@@ -42,6 +43,7 @@ L2:
 ; Asignacion de l
     SRF 0 5
     DRF
+; Constante 0
     STC 0
     ASG
 ; Invocar accion q

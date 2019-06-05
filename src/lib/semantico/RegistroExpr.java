@@ -21,7 +21,7 @@ public class RegistroExpr {
     private Boolean valorBool;
     private Character valorChar;
     
-    // Constructores
+    // Restablece el registro
     private void reset() {
         this.variable = null;
         this.parametro = null;
@@ -30,10 +30,12 @@ public class RegistroExpr {
         this.valorChar = null;
     }
     
+    // Constructor por defecto
     public RegistroExpr() {
         reset();
     }
     
+    // Constructor por parámetros
     public RegistroExpr(Tipo_variable variable, Clase_parametro parametro, Integer valorEnt, 
             Boolean valorBool, Character valorChar) {
         this.variable = variable;
@@ -43,6 +45,7 @@ public class RegistroExpr {
         this.valorChar = valorChar;
     }
     
+    // Constructor a partir de un símbolo
     public RegistroExpr(Simbolo s) {
         this.variable = s.getVariable();
         
@@ -63,6 +66,7 @@ public class RegistroExpr {
         this.valorChar = null;
     }
     
+    // Copia exp al registro actual
     private void copy(RegistroExpr exp) {
         this.variable = exp.variable;
         this.parametro = exp.parametro;
@@ -71,10 +75,12 @@ public class RegistroExpr {
         this.valorChar = exp.valorChar;
     }
     
+    // Constructor por copia
     public RegistroExpr(RegistroExpr exp) {
         copy(exp);
     }
     
+    // Constructor por operación. Asigna un resultado si se puede calcular de manera inmediata
     public RegistroExpr(RegistroExpr exp1, RegistroExpr exp2, TipoOperador op) {
         if (exp1 == null && exp2 == null) {
             reset();
@@ -146,19 +152,22 @@ public class RegistroExpr {
         }        
     }
     
-    // Clase de parámetro
+    // Devuelve true si es valor
     public boolean es_valor() {
         return this.parametro == Clase_parametro.VAL;
     }
-    
+
+    // Devuelve true si es referencia
     public boolean es_referencia() {
         return this.parametro == Clase_parametro.REF;
     }
 
+    // Establece el registro como valor
     public void set_valor() {
         this.parametro = Clase_parametro.VAL;
     }
-    
+
+    // Establece el registro como referencia
     public void set_referencia() {
         this.parametro = Clase_parametro.REF;
     }

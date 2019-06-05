@@ -1,0 +1,143 @@
+; Programa nprimos
+    ENP L0
+; Accion es_primo
+    JMP L1
+L1:
+; Codigo de es_primo
+; Direccion de j
+    SRF 0 3
+    STC 2
+; Asignacion de j
+    ASG
+; Direccion de divisible
+    SRF 0 5
+; Constante Falso
+    STC 0
+; Asignacion de divisible
+    ASG
+L2:
+; MQ
+; Acceso a variable j
+    SRF 0 3
+    DRF
+; Acceso a variable i
+    SRF 1 5
+    DRF
+    STC 2
+    DIV
+    LT
+; Acceso a variable divisible
+    SRF 0 5
+    DRF
+    NGB
+    AND
+; Salir del bucle si la guarda se evalua a falso
+    JMF L3
+; Direccion de divisible
+    SRF 0 5
+; Acceso a variable i
+    SRF 1 5
+    DRF
+; Acceso a variable j
+    SRF 0 3
+    DRF
+    MOD
+    STC 0
+    EQ
+; Asignacion de divisible
+    ASG
+; Direccion de j
+    SRF 0 3
+; Acceso a variable j
+    SRF 0 3
+    DRF
+    STC 1
+    PLUS
+; Asignacion de j
+    ASG
+; Fin de la iteracion. Saltar a la cabecera del bucle
+    JMP L2
+L3:
+; Fin MQ
+; SI
+; Acceso a variable divisible
+    SRF 0 5
+    DRF
+    NGB
+    JMF L4
+; ENT
+; Escribir
+; Acceso a variable i
+    SRF 1 5
+    DRF
+    WRT 1
+; Cadena "es primo."
+    STC 101
+    WRT 0
+    STC 115
+    WRT 0
+    STC 32
+    WRT 0
+    STC 112
+    WRT 0
+    STC 114
+    WRT 0
+    STC 105
+    WRT 0
+    STC 109
+    WRT 0
+    STC 111
+    WRT 0
+    STC 46
+    WRT 0
+    STC 13
+    WRT 0
+    STC 10
+    WRT 0
+    JMP L5
+L4:
+; SI_NO
+L5:
+; Fin SI
+; Fin de es_primo
+    CSF
+; Comienzo del programa nprimos
+L0:
+; Direccion de n
+    SRF 0 3
+    STC 100
+; Asignacion de n
+    ASG
+; Direccion de i
+    SRF 0 5
+    STC 2
+; Asignacion de i
+    ASG
+L6:
+; MQ
+; Acceso a variable i
+    SRF 0 5
+    DRF
+; Acceso a variable n
+    SRF 0 3
+    DRF
+    LTE
+; Salir del bucle si la guarda se evalua a falso
+    JMF L7
+; Invocar accion es_primo
+    OSF 6 0 1
+; Direccion de i
+    SRF 0 5
+; Acceso a variable i
+    SRF 0 5
+    DRF
+    STC 1
+    PLUS
+; Asignacion de i
+    ASG
+; Fin de la iteracion. Saltar a la cabecera del bucle
+    JMP L6
+L7:
+; Fin MQ
+; Fin de nprimos
+    LVP

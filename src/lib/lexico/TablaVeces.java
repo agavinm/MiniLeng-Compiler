@@ -35,16 +35,19 @@ public class TablaVeces {
             ")", "Constantes enteras", "Caracteres", "Cadenas", "Identificadores"
         };
     
+    // Constructor por defecto que iniciliza la tabla
     public TablaVeces() {
         for (int i=0; i<N; i++) {
             tabla[i] = 0;
         }
     }
     
+    // Estadísticos
     public static void incrementarValor(tipo_token token) {
         tabla[token.ordinal()]++;
     }
     
+    // Muestra los estadísticos
     public static void print() {
         String s = " Opción verbose: Número de apariciones de:\n";
         
