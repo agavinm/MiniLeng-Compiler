@@ -127,6 +127,7 @@ public class GeneracionCodigo {
                 PrintWriter fout = new PrintWriter(fout_name);
                 fout.print(buffer);
                 fout.close();
+                System.out.println("Compilación finalizada. Se ha generado el fichero " + fout_name);
             }
             catch (FileNotFoundException e) {
                 throw new FicheroEscribirException();

@@ -105,8 +105,6 @@ public class MiniLengCompiler {
 
             try { 
                 MiniLengCompiler.programa(verbose);
-                if (correcto)
-                    System.out.println("Compilación correcta.");
             }
             catch (Exception e) { System.err.println("Error no reconocido"); }
             catch (Error e) { // Error léxico
