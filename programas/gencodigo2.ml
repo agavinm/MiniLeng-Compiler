@@ -11,7 +11,7 @@ programa gencodigo2;
   principio
     escribir(k,l);
     l := 0;
-    q(k);
+    q(l);
     q(l);
   fin
 

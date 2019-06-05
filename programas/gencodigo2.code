@@ -1,0 +1,12 @@
+; Programa gencodigo2
+    ENP L0
+; Comienzo de q
+L1:
+; Fin de q
+; Comienzo de r
+L2:
+; Fin de r
+; Comienzo de gencodigo2
+L0:
+; Fin de gencodigo2
+    LVP

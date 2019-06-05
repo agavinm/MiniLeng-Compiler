@@ -405,6 +405,7 @@ Token identificador() :
 
     // Generación de código
     genCod.inicializar();
+    String etiq;
 }
 {
     try { 
@@ -416,11 +417,16 @@ Token identificador() :
 	            // Generación de código
 		        genCod.escribir("; Programa " + t.image);
 		    }
-            genCod.escribir("ENP " + genCod.nueva_etiqueta());
+		    etiq = genCod.nueva_etiqueta();
+            genCod.escribir("    ENP " + etiq);
 	    }
 	    punto_y_coma()
 	    declaracion_variables()
-	    declaracion_acciones()
+	    declaracion_acciones() {
+            // Generación de código
+            genCod.escribir("; Comienzo de " + t.image);
+            genCod.escribir(etiq + ":");
+        }
 	    bloque_sentencias()
 	    ( <EOF> )?
 	        {
@@ -430,7 +436,7 @@ Token identificador() :
 	            if (t != null) {
 	                genCod.escribir("; Fin de " + t.image);
 	            }
-	            genCod.escribir("LVP");
+	            genCod.escribir("    LVP");
 	            
                 try {
                     genCod.finalizar(correcto);
@@ -568,17 +574,20 @@ void declaracion_acciones() :
 void declaracion_accion() :
 {
     Token t = null;
+    String etiq;
 }
 {
     try { 
         t = cabecera_accion() {
-            // Generación de código
-            genCod.escribir("; Comienzo de " + t.image);
-            genCod.escribir(genCod.cerrar_etiqueta() + ":");
+            etiq = genCod.nueva_etiqueta();
         }
         punto_y_coma()
         declaracion_variables()
-        declaracion_acciones()
+        declaracion_acciones() {
+            // Generación de código
+            genCod.escribir("; Comienzo de " + t.image);
+            genCod.escribir(etiq + ":");
+        }
         bloque_sentencias() {
             tabla_simbolos.eliminar_variables(nivel);
             tabla_simbolos.eliminar_acciones(nivel);
