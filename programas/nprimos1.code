@@ -125,7 +125,7 @@ L6:
 ; Salir del bucle si la guarda se evalua a falso
     JMF L7
 ; Invocar accion es_primo
-    OSF 6 0 1
+    OSF 6 0 L1
 ; Direccion de i
     SRF 0 5
 ; Acceso a variable i

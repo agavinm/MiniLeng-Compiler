@@ -1,0 +1,726 @@
+; Programa calendario
+    ENP L0
+; Accion primer_dia_anho
+    JMP L1
+L1:
+; Codigo de primer_dia_anho
+; Direccion de anho
+    SRF 1 5
+; Acceso a variable anho
+    SRF 1 5
+    DRF
+    STC 1900
+    SBT
+; Asignacion de anho
+    ASG
+; Direccion de cuatro
+    SRF 0 7
+; Acceso a variable anho
+    SRF 1 5
+    DRF
+    STC 4
+    MOD
+    STC 0
+    EQ
+; Acceso a variable anho
+    SRF 1 5
+    DRF
+    STC 100
+    MOD
+    STC 0
+    NEQ
+    AND
+; Asignacion de cuatro
+    ASG
+; Direccion de cien
+    SRF 0 6
+; Acceso a variable anho
+    SRF 1 5
+    DRF
+    STC 400
+    MOD
+    STC 0
+    EQ
+; Asignacion de cien
+    ASG
+; Direccion de bisiestos_validos
+    SRF 0 5
+; Acceso a variable cuatro
+    SRF 0 7
+    DRF
+; Acceso a variable cien
+    SRF 0 6
+    DRF
+    OR
+; Asignacion de bisiestos_validos
+    ASG
+; Direccion de bisiestos
+    SRF 0 3
+; Acceso a variable anho
+    SRF 1 5
+    DRF
+    STC 4
+    DIV
+; Asignacion de bisiestos
+    ASG
+; SI
+; Acceso a variable bisiestos_validos
+    SRF 0 5
+    DRF
+    JMF L2
+; ENT
+; Direccion de dia1anho
+    SRF 1 7
+; Acceso a variable anho
+    SRF 1 5
+    DRF
+    STC 1
+    SBT
+; Acceso a variable bisiestos
+    SRF 0 3
+    DRF
+    PLUS
+    STC 7
+    MOD
+; Asignacion de dia1anho
+    ASG
+    JMP L3
+L2:
+; SI_NO
+; Direccion de dia1anho
+    SRF 1 7
+; Acceso a variable anho
+    SRF 1 5
+    DRF
+; Acceso a variable bisiestos
+    SRF 0 3
+    DRF
+    PLUS
+    STC 7
+    MOD
+; Asignacion de dia1anho
+    ASG
+L3:
+; Fin SI
+; Fin de primer_dia_anho
+    CSF
+; Accion primer_dia_mes
+    JMP L4
+L4:
+; Codigo de primer_dia_mes
+; Direccion de anho
+    SRF 1 5
+; Acceso a variable anho
+    SRF 1 5
+    DRF
+    STC 1900
+    SBT
+; Asignacion de anho
+    ASG
+; Direccion de cien
+    SRF 0 4
+; Acceso a variable anho
+    SRF 1 5
+    DRF
+    STC 4
+    MOD
+    STC 0
+    EQ
+; Acceso a variable anho
+    SRF 1 5
+    DRF
+    STC 100
+    MOD
+    STC 0
+    NEQ
+    AND
+; Asignacion de cien
+    ASG
+; Direccion de cuatro
+    SRF 0 5
+; Acceso a variable anho
+    SRF 1 5
+    DRF
+    STC 400
+    MOD
+    STC 0
+    EQ
+; Asignacion de cuatro
+    ASG
+; Direccion de bisiestos_validos
+    SRF 0 3
+; Acceso a variable cien
+    SRF 0 4
+    DRF
+; Acceso a variable cuatro
+    SRF 0 5
+    DRF
+    OR
+; Asignacion de bisiestos_validos
+    ASG
+; SI
+; Acceso a variable bisiestos_validos
+    SRF 0 3
+    DRF
+    JMF L5
+; ENT
+; Direccion de anhade
+    SRF 1 11
+    STC 1
+; Asignacion de anhade
+    ASG
+    JMP L6
+L5:
+; SI_NO
+; Direccion de anhade
+    SRF 1 11
+    STC 0
+; Asignacion de anhade
+    ASG
+L6:
+; Fin SI
+; SI
+; Acceso a variable mes
+    SRF 1 3
+    DRF
+    STC 1
+    EQ
+    JMF L7
+; ENT
+; Direccion de dia1mes
+    SRF 1 9
+; Acceso a variable dia1anho
+    SRF 1 7
+    DRF
+; Asignacion de dia1mes
+    ASG
+    JMP L8
+L7:
+; SI_NO
+; SI
+; Acceso a variable mes
+    SRF 1 3
+    DRF
+    STC 2
+    EQ
+    JMF L9
+; ENT
+; Direccion de dia1mes
+    SRF 1 9
+; Acceso a variable dia1anho
+    SRF 1 7
+    DRF
+    STC 31
+    PLUS
+    STC 7
+    MOD
+; Asignacion de dia1mes
+    ASG
+    JMP L10
+L9:
+; SI_NO
+; SI
+; Acceso a variable mes
+    SRF 1 3
+    DRF
+    STC 3
+    EQ
+    JMF L11
+; ENT
+; Direccion de dia1mes
+    SRF 1 9
+; Acceso a variable dia1anho
+    SRF 1 7
+    DRF
+    STC 59
+    PLUS
+; Acceso a variable anhade
+    SRF 1 11
+    DRF
+    PLUS
+    STC 7
+    MOD
+; Asignacion de dia1mes
+    ASG
+    JMP L12
+L11:
+; SI_NO
+; SI
+; Acceso a variable mes
+    SRF 1 3
+    DRF
+    STC 4
+    EQ
+    JMF L13
+; ENT
+; Direccion de dia1mes
+    SRF 1 9
+; Acceso a variable dia1anho
+    SRF 1 7
+    DRF
+    STC 90
+    PLUS
+; Acceso a variable anhade
+    SRF 1 11
+    DRF
+    PLUS
+    STC 7
+    MOD
+; Asignacion de dia1mes
+    ASG
+    JMP L14
+L13:
+; SI_NO
+; SI
+; Acceso a variable mes
+    SRF 1 3
+    DRF
+    STC 5
+    EQ
+    JMF L15
+; ENT
+; Direccion de dia1mes
+    SRF 1 9
+; Acceso a variable dia1anho
+    SRF 1 7
+    DRF
+    STC 120
+    PLUS
+; Acceso a variable anhade
+    SRF 1 11
+    DRF
+    PLUS
+    STC 7
+    MOD
+; Asignacion de dia1mes
+    ASG
+    JMP L16
+L15:
+; SI_NO
+; SI
+; Acceso a variable mes
+    SRF 1 3
+    DRF
+    STC 6
+    EQ
+    JMF L17
+; ENT
+; Direccion de dia1mes
+    SRF 1 9
+; Acceso a variable dia1anho
+    SRF 1 7
+    DRF
+    STC 151
+    PLUS
+; Acceso a variable anhade
+    SRF 1 11
+    DRF
+    PLUS
+    STC 7
+    MOD
+; Asignacion de dia1mes
+    ASG
+    JMP L18
+L17:
+; SI_NO
+; SI
+; Acceso a variable mes
+    SRF 1 3
+    DRF
+    STC 7
+    EQ
+    JMF L19
+; ENT
+; Direccion de dia1mes
+    SRF 1 9
+; Acceso a variable dia1anho
+    SRF 1 7
+    DRF
+    STC 181
+    PLUS
+; Acceso a variable anhade
+    SRF 1 11
+    DRF
+    PLUS
+    STC 7
+    MOD
+; Asignacion de dia1mes
+    ASG
+    JMP L20
+L19:
+; SI_NO
+; SI
+; Acceso a variable mes
+    SRF 1 3
+    DRF
+    STC 8
+    EQ
+    JMF L21
+; ENT
+; Direccion de dia1mes
+    SRF 1 9
+; Acceso a variable dia1anho
+    SRF 1 7
+    DRF
+    STC 212
+    PLUS
+; Acceso a variable anhade
+    SRF 1 11
+    DRF
+    PLUS
+    STC 7
+    MOD
+; Asignacion de dia1mes
+    ASG
+    JMP L22
+L21:
+; SI_NO
+; SI
+; Acceso a variable mes
+    SRF 1 3
+    DRF
+    STC 9
+    EQ
+    JMF L23
+; ENT
+; Direccion de dia1mes
+    SRF 1 9
+; Acceso a variable dia1anho
+    SRF 1 7
+    DRF
+    STC 243
+    PLUS
+; Acceso a variable anhade
+    SRF 1 11
+    DRF
+    PLUS
+    STC 7
+    MOD
+; Asignacion de dia1mes
+    ASG
+    JMP L24
+L23:
+; SI_NO
+; SI
+; Acceso a variable mes
+    SRF 1 3
+    DRF
+    STC 10
+    EQ
+    JMF L25
+; ENT
+; Direccion de dia1mes
+    SRF 1 9
+; Acceso a variable dia1anho
+    SRF 1 7
+    DRF
+    STC 273
+    PLUS
+; Acceso a variable anhade
+    SRF 1 11
+    DRF
+    PLUS
+    STC 7
+    MOD
+; Asignacion de dia1mes
+    ASG
+    JMP L26
+L25:
+; SI_NO
+; SI
+; Acceso a variable mes
+    SRF 1 3
+    DRF
+    STC 11
+    EQ
+    JMF L27
+; ENT
+; Direccion de dia1mes
+    SRF 1 9
+; Acceso a variable dia1anho
+    SRF 1 7
+    DRF
+    STC 304
+    PLUS
+; Acceso a variable anhade
+    SRF 1 11
+    DRF
+    PLUS
+    STC 7
+    MOD
+; Asignacion de dia1mes
+    ASG
+    JMP L28
+L27:
+; SI_NO
+; SI
+; Acceso a variable mes
+    SRF 1 3
+    DRF
+    STC 12
+    EQ
+    JMF L29
+; ENT
+; Direccion de dia1mes
+    SRF 1 9
+; Acceso a variable dia1anho
+    SRF 1 7
+    DRF
+    STC 334
+    PLUS
+; Acceso a variable anhade
+    SRF 1 11
+    DRF
+    PLUS
+    STC 7
+    MOD
+; Asignacion de dia1mes
+    ASG
+    JMP L30
+L29:
+; SI_NO
+; Escribir
+; Cadena "Has introducido el mes mal"
+    STC 72
+    WRT 0
+    STC 97
+    WRT 0
+    STC 115
+    WRT 0
+    STC 32
+    WRT 0
+    STC 105
+    WRT 0
+    STC 110
+    WRT 0
+    STC 116
+    WRT 0
+    STC 114
+    WRT 0
+    STC 111
+    WRT 0
+    STC 100
+    WRT 0
+    STC 117
+    WRT 0
+    STC 99
+    WRT 0
+    STC 105
+    WRT 0
+    STC 100
+    WRT 0
+    STC 111
+    WRT 0
+    STC 32
+    WRT 0
+    STC 101
+    WRT 0
+    STC 108
+    WRT 0
+    STC 32
+    WRT 0
+    STC 109
+    WRT 0
+    STC 101
+    WRT 0
+    STC 115
+    WRT 0
+    STC 32
+    WRT 0
+    STC 109
+    WRT 0
+    STC 97
+    WRT 0
+    STC 108
+    WRT 0
+L30:
+; Fin SI
+L28:
+; Fin SI
+L26:
+; Fin SI
+L24:
+; Fin SI
+L22:
+; Fin SI
+L20:
+; Fin SI
+L18:
+; Fin SI
+L16:
+; Fin SI
+L14:
+; Fin SI
+L12:
+; Fin SI
+L10:
+; Fin SI
+L8:
+; Fin SI
+; Fin de primer_dia_mes
+    CSF
+; Comienzo del programa calendario
+L0:
+; Escribir
+; Cadena "CALENDARIO"
+    STC 67
+    WRT 0
+    STC 65
+    WRT 0
+    STC 76
+    WRT 0
+    STC 69
+    WRT 0
+    STC 78
+    WRT 0
+    STC 68
+    WRT 0
+    STC 65
+    WRT 0
+    STC 82
+    WRT 0
+    STC 73
+    WRT 0
+    STC 79
+    WRT 0
+; Escribir
+; Cadena "Introduce un mes en cifras:"
+    STC 73
+    WRT 0
+    STC 110
+    WRT 0
+    STC 116
+    WRT 0
+    STC 114
+    WRT 0
+    STC 111
+    WRT 0
+    STC 100
+    WRT 0
+    STC 117
+    WRT 0
+    STC 99
+    WRT 0
+    STC 101
+    WRT 0
+    STC 32
+    WRT 0
+    STC 117
+    WRT 0
+    STC 110
+    WRT 0
+    STC 32
+    WRT 0
+    STC 109
+    WRT 0
+    STC 101
+    WRT 0
+    STC 115
+    WRT 0
+    STC 32
+    WRT 0
+    STC 101
+    WRT 0
+    STC 110
+    WRT 0
+    STC 32
+    WRT 0
+    STC 99
+    WRT 0
+    STC 105
+    WRT 0
+    STC 102
+    WRT 0
+    STC 114
+    WRT 0
+    STC 97
+    WRT 0
+    STC 115
+    WRT 0
+    STC 58
+    WRT 0
+; Leer
+; Direccion de variable mes
+    SRF 0 3
+    RD 1
+; Leer
+; Direccion de variable ln
+    SRF 0 13
+    RD 0
+; Escribir
+; Cadena "Introduce un anio en cifras:"
+    STC 73
+    WRT 0
+    STC 110
+    WRT 0
+    STC 116
+    WRT 0
+    STC 114
+    WRT 0
+    STC 111
+    WRT 0
+    STC 100
+    WRT 0
+    STC 117
+    WRT 0
+    STC 99
+    WRT 0
+    STC 101
+    WRT 0
+    STC 32
+    WRT 0
+    STC 117
+    WRT 0
+    STC 110
+    WRT 0
+    STC 32
+    WRT 0
+    STC 97
+    WRT 0
+    STC 110
+    WRT 0
+    STC 105
+    WRT 0
+    STC 111
+    WRT 0
+    STC 32
+    WRT 0
+    STC 101
+    WRT 0
+    STC 110
+    WRT 0
+    STC 32
+    WRT 0
+    STC 99
+    WRT 0
+    STC 105
+    WRT 0
+    STC 102
+    WRT 0
+    STC 114
+    WRT 0
+    STC 97
+    WRT 0
+    STC 115
+    WRT 0
+    STC 58
+    WRT 0
+; Leer
+; Direccion de variable anho
+    SRF 0 5
+    RD 1
+; Leer
+; Direccion de variable ln
+    SRF 0 13
+    RD 0
+; Invocar accion primer_dia_anho
+    OSF 6 0 L1
+; Invocar accion primer_dia_mes
+    OSF 6 0 L4
+; Escribir
+; Acceso a variable dia1mes
+    SRF 0 9
+    DRF
+    WRT 1
+; Fin de calendario
+    LVP
