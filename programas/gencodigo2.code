@@ -13,7 +13,11 @@ L1:
     DRF
     DRF
     WRT 1
+; Asignacion de m
+    SRF 0 3
+    DRF
     STC 0
+    ASG
 ; Fin de q
     CSF
 ; Accion r
@@ -35,27 +39,31 @@ L2:
     DRF
     DRF
     WRT 1
+; Asignacion de l
+    SRF 0 5
+    DRF
     STC 0
+    ASG
+; Invocar accion q
 ; Acceso a variable l
     SRF 0 5
     DRF
-; Invocar accion q
     OSF 6 1 1
+; Invocar accion q
 ; Acceso a variable l
     SRF 0 5
     DRF
-; Invocar accion q
     OSF 6 1 1
 ; Fin de r
     CSF
 ; Comienzo del programa gencodigo2
 L0:
+; Invocar accion r
 ; Acceso a variable i
     SRF 0 3
     DRF
 ; Acceso a variable j
     SRF 0 5
-; Invocar accion r
-    OSF 6 0 10
+    OSF 6 0 13
 ; Fin de gencodigo2
     LVP

@@ -1004,7 +1004,7 @@ void identificacion() :
             }
         }
         (
-            tipo = asignacion() {
+            tipo = asignacion(s) {
                 if (t != null) { 
 	                if (!(s.es_variable() || (s.es_parametro() && s.es_referencia()))) {
 	                    ErrorSemantico.error_semantico(new SimboloNoAsignableException(), t);
@@ -1019,11 +1019,6 @@ void identificacion() :
                 if (!s.es_desconocido() && !s.es_accion()) {
                     ErrorSemantico.error_semantico(new SimboloNoAccionException(), t);
                 }
-                else {
-                    // Generación de código
-		            genCod.escribir("; Invocar accion " + s.getNombre());
-		            genCod.instruccion("OSF " + dir + " " + nivel + " " + s.strDir());
-		        }
             }
         )
     }
@@ -1032,16 +1027,26 @@ void identificacion() :
     }
 }
 
-Tipo_variable asignacion() :
+Tipo_variable asignacion(Simbolo s) :
 {
     Tipo_variable tipo = null;
     RegistroExpr reg;
+
+    // Generación de código
+    genCod.escribir("; Asignacion de " + s.getNombre());
+    genCod.instruccion("SRF 0 " + s.strDir()); // Almacena en stack la @
+    if (s.es_parametro() && s.es_referencia()) {
+        genCod.instruccion("DRF"); // Almacena en stack la @ original
+    }
 }
 {
     try { 
         <tOPAS>
         reg = expresion(Clase_parametro.VAL) {
             tipo = reg.getVariable();
+
+            // Generación de código
+            genCod.instruccion("ASG");
         }
         punto_y_coma()
     }
@@ -1055,11 +1060,17 @@ Tipo_variable asignacion() :
 }
 
 void invocacion_accion(Simbolo s) :
-{}
+{
+    // Generación de código
+    genCod.escribir("; Invocar accion " + s.getNombre());
+}
 {
     try { 
         (
-          argumentos(s)
+          argumentos(s) {
+              // Generación de código
+              genCod.instruccion("OSF " + dir + " " + nivel + " " + s.strDir());
+          }
         )?
         punto_y_coma()
     }
