@@ -418,13 +418,13 @@ Token identificador() :
 		        genCod.escribir("; Programa " + t.image);
 		    }
 		    etiq = genCod.nueva_etiqueta();
-            genCod.escribir("    ENP " + etiq);
+            genCod.instruccion("ENP " + etiq);
 	    }
 	    punto_y_coma()
 	    declaracion_variables()
 	    declaracion_acciones() {
             // Generación de código
-            genCod.escribir("; Comienzo de " + t.image);
+            genCod.escribir("; Comienzo del programa " + t.image);
             genCod.escribir(etiq + ":");
         }
 	    bloque_sentencias()
@@ -436,7 +436,7 @@ Token identificador() :
 	            if (t != null) {
 	                genCod.escribir("; Fin de " + t.image);
 	            }
-	            genCod.escribir("    LVP");
+	            genCod.instruccion("LVP");
 	            
                 try {
                     genCod.finalizar(correcto);
@@ -838,6 +838,18 @@ void lista_asignables() :
 		                if (!(s.es_asignable() &&
 		                      (s.es_entero() || s.es_caracter() || s.es_desconocido()))) {
 		                    ErrorSemantico.error_semantico(new SimboloNoAsignableException(), t);
+		                }
+		                else {
+		                    // Generación de código
+		                    genCod.escribir("; Leer");
+                            genCod.escribir("; Direccion de variable " + s.getNombre());
+		                    genCod.instruccion("SRF 0 " + s.strDir());
+		                    if (s.es_caracter()) {
+		                        genCod.instruccion("RD 0");
+		                    }
+		                    else {
+                                genCod.instruccion("RD 1");
+                            }
 		                }
 	                }
 	                catch (SimboloNoEncontradoException e) {

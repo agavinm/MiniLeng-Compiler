@@ -42,6 +42,10 @@ public class GeneracionCodigo {
         buffer += linea + "\n";
     }
     
+    public void instruccion(String instr) {
+        buffer += "    " + instr + "\n";
+    }
+    
     public void finalizar(boolean guardar) throws FicheroEscribirException {
         if (guardar) {
             try {

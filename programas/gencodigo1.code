@@ -1,4 +1,14 @@
 ; Programa gencodigo1
-ENP L0
+    ENP L0
+; Comienzo del programa gencodigo1
+L0:
+; Leer
+; Direccion de variable i
+    SRF 0 3
+    RD 1
+; Leer
+; Direccion de variable j
+    SRF 0 5
+    RD 1
 ; Fin de gencodigo1
-LVP
+    LVP
