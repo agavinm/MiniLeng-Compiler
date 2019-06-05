@@ -1111,6 +1111,9 @@ RegistroExpr expresion() :
                     !exp1.es_desconocido() && !exp2.es_desconocido()) {
                   ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
               }
+              else {
+                  exp1 = new RegistroExpr(exp1, exp2, op);
+              }
           }
         )?
     }
@@ -1119,7 +1122,7 @@ RegistroExpr expresion() :
     }
 
     {
-        return new RegistroExpr(exp1, exp2, op);
+        return exp1;
     }
 }
 
