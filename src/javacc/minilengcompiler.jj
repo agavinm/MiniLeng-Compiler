@@ -1061,20 +1061,36 @@ void mientras_que() :
     Tipo_variable tipo = null;
     Token t = null;
     RegistroExpr reg;
+    String etiqMQ, etiqFIN;
 }
 {
     try { 
         <tMQ> {
             t = token;
+
+            // Generación de código
+            genCod.escribir("; MQ");
+            etiqMQ = genCod.nueva_etiqueta();
+            genCod.escribir(etiqMQ + ":");
         }
         reg = expresion(Clase_parametro.VAL) {
             tipo = reg.getVariable();
             if (tipo != Tipo_variable.BOOLEANO) {
                 ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
             }
+
+            // Generación de código
+            etiqFIN = genCod.nueva_etiqueta();
+            genCod.instruccion("JMF " + etiqFIN);
+            genCod.escribir("; ENT");
         }
         lista_sentencias()
-        fmq()
+        fmq() {
+            // Generación de código
+            genCod.instruccion("JMP " + etiqMQ);
+            genCod.escribir("; Fin MQ");
+            genCod.escribir(etiqFIN + ":");
+        }
     }
     catch (ParseException e) { // Error sintáctico
         error_sintactico(e, "Se esperaba un bloque MQ");
@@ -1140,6 +1156,7 @@ void seleccion() :
           lista_sentencias()
         )?
         fsi() {
+            // Generación de código
             genCod.escribir("; Fin SI");
             genCod.escribir(etiqFIN + ":");
         }

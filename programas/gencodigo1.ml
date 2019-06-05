@@ -9,4 +9,8 @@ principio
   si_no
     escribir(j);
   fsi
+  
+  mq i > 5
+    escribir("A");
+  fmq
 fin

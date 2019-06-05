@@ -35,5 +35,20 @@ L1:
     WRT 1
 ; Fin SI
 L2:
+; MQ
+L3:
+; Acceso a variable i
+    SRF 0 3
+    DRF
+    STC 5
+    GT
+    JMF L4
+; ENT
+; Escribir
+    STC 65
+    WRT 0
+    JMP L3
+; Fin MQ
+L4:
 ; Fin de gencodigo1
     LVP
