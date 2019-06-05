@@ -10,5 +10,22 @@ L0:
 ; Direccion de variable j
     SRF 0 5
     RD 1
+; Acceso a variable i
+    SRF 0 3
+    DRF
+; Acceso a variable j
+    SRF 0 5
+    DRF
+    GT
+; Escribir
+; Acceso a variable i
+    SRF 0 3
+    DRF
+    WRT 1
+; Escribir
+; Acceso a variable j
+    SRF 0 5
+    DRF
+    WRT 1
 ; Fin de gencodigo1
     LVP

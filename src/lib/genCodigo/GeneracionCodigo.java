@@ -11,6 +11,8 @@ package lib.genCodigo;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 
+import lib.semantico.RegistroExpr.TipoOperador;
+
 public class GeneracionCodigo {
     private String fout_name;
     private String buffer;
@@ -44,6 +46,67 @@ public class GeneracionCodigo {
     
     public void instruccion(String instr) {
         buffer += "    " + instr + "\n";
+    }
+    
+    public void operacion(TipoOperador op) {
+        if (op != null) {
+            switch (op) {
+            case SUM :
+                buffer += "    PLUS\n";
+                break;
+
+            case RES :
+                buffer += "    SBT\n";
+                break;
+
+            case OR :
+                buffer += "    OR\n";
+                break;
+
+            case MOD :
+                buffer += "    MOD\n";
+                break;
+
+            case DIV :
+                buffer += "    DIV\n";
+                break;
+
+            case MUL :
+                buffer += "    TMS\n";
+                break;
+
+            case AND :
+                buffer += "    AND\n";
+                break;
+
+            case MAY :
+                buffer += "    GT\n";
+                break;
+
+            case MEN :
+                buffer += "    LT\n";
+                break;
+
+            case IGU :
+                buffer += "    EQ\n";
+                break;
+
+            case MAI :
+                buffer += "    GTE\n";
+                break;
+
+            case MEI :
+                buffer += "    LTE\n";
+                break;
+
+            case NI :
+                buffer += "    NEQ\n";
+                break;
+
+            default :
+                break;
+            }
+        }
     }
     
     public void finalizar(boolean guardar) throws FicheroEscribirException {

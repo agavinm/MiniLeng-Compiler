@@ -874,7 +874,9 @@ void escribir() :
 {
     try { 
         <tESCRIBIR>
-        ap()
+        ap() {
+            genCod.escribir("; Escribir");
+        }
         lista_escribibles()
         cp()
     }
@@ -883,30 +885,72 @@ void escribir() :
     }
 }
 
-void constcad() :
-{}
+String constcad() :
+{
+    Token t;
+    String s = "";
+}
 {
     try { 
-        <tCONSTCAD>
+        t = <tCONSTCAD> {
+            s = t.image;
+        }
     }
     catch (ParseException e) { // Error sintáctico
         error_sintactico(e, "Se esperaba una cadena de texto");
     }
+
+    {
+        return s;
+    }
 }
 
 void lista_escribibles() :
-{}
+{
+    RegistroExpr reg;
+    String s;
+}
 {
     try { 
         (
-            constcad()
-          | expresion() // To string cualquier valor menos desconocido
+            s = constcad() {
+                for (int i=0; i<s.length(); i++) {
+                    genCod.instruccion("STC " + (int) s.charAt(i));
+                    genCod.instruccion("WRT 0");
+                }
+            }
+          | reg = expresion(Clase_parametro.VAL) { // En stack está el resultado de la expresión
+                if (reg.es_entero()) {
+                    genCod.instruccion("WRT 1");
+                }
+                else if (reg.es_caracter()) {
+                    genCod.instruccion("WRT 0");
+                }
+                else if (reg.es_booleano()) {
+                    genCod.instruccion("WRT 1"); // TODO: Escribir Verdadero o Falso
+                }
+            }
         )
         (
           <tC>
           (
-              constcad()
-            | expresion()
+              s = constcad() {
+                  for (int i=0; i<s.length(); i++) {
+                      genCod.instruccion("STC " + (int) s.charAt(i));
+                      genCod.instruccion("WRT 0");
+                  }
+              }
+            | reg = expresion(Clase_parametro.VAL) { // En stack está el resultado de la expresión
+                  if (reg.es_entero()) {
+                      genCod.instruccion("WRT 1");
+                  }
+                  else if (reg.es_caracter()) {
+                      genCod.instruccion("WRT 0");
+                  }
+                  else if (reg.es_booleano()) {
+                      genCod.instruccion("WRT 1"); // TODO: Escribir Verdadero o Falso
+                  }
+              }
           )
         )*
     }
@@ -973,7 +1017,7 @@ Tipo_variable asignacion() :
 {
     try { 
         <tOPAS>
-        reg = expresion() {
+        reg = expresion(Clase_parametro.VAL) {
             tipo = reg.getVariable();
         }
         punto_y_coma()
@@ -1023,7 +1067,7 @@ void mientras_que() :
         <tMQ> {
             t = token;
         }
-        reg = expresion() {
+        reg = expresion(Clase_parametro.VAL) {
             tipo = reg.getVariable();
             if (tipo != Tipo_variable.BOOLEANO) {
                 ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
@@ -1070,7 +1114,7 @@ void seleccion() :
         <tSI> {
             t = token;
         }
-        reg = expresion() {
+        reg = expresion(Clase_parametro.VAL) {
             tipo = reg.getVariable();
             if (tipo != Tipo_variable.BOOLEANO) {
                 ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
@@ -1107,65 +1151,72 @@ void argumentos(Simbolo s) :
 void lista_expresiones(Simbolo simb) :
 {
     LinkedList<Simbolo> parametros = null;
-    ListIterator<Simbolo> it = null;
+    Integer i = 0;
     Simbolo param = null;
+    Clase_parametro clase = Clase_parametro.VAL;
     RegistroExpr exp;
     Token t = token;
     boolean exceso = false;
 
     if (!simb.es_desconocido() && simb.es_accion()) {
         parametros = simb.getLista_parametros();
-        it = parametros.listIterator();
+        if (i < parametros.size()) {
+            clase = parametros.get(i).getParametro();
+        }
     }
 }
 {
     try { 
-        exp = expresion() {
-            if (it != null) {
-	            if (it.hasNext()) {
-	                param = it.next();
-	                
-	                if (!exp.es_desconocido()) {
-	                    if (exp.getVariable() != param.getVariable()) {
-	                        ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
-	                    }
+        exp = expresion(clase) {
+            if (i < parametros.size()) {
+                param = parametros.get(i);
+                i++;
+                if (i < parametros.size()) {
+                    clase = parametros.get(i).getParametro();
+                }
+                    
+                if (!exp.es_desconocido()) {
+                    if (exp.getVariable() != param.getVariable()) {
+                        ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
+                    }
 
-	                    if (param.es_referencia() && exp.es_valor()) {
-                            ErrorSemantico.error_semantico(new SimboloNoAsignableException(), t.next);
-                        }
-	                }
-	            }
-	            else {
-	                ErrorSemantico.error_semantico(new ExcesoParametrosException(), t.next);
-                    exceso = true;
-	            }
-	        }
+                    if (param.es_referencia() && exp.es_valor()) {
+                        ErrorSemantico.error_semantico(new SimboloNoAsignableException(), t.next);
+                    }
+                }
+            }
+            else {
+                ErrorSemantico.error_semantico(new ExcesoParametrosException(), t.next);
+                exceso = true;
+            }
         }
         (
           <tC> {
               t = token;
           }
-          exp = expresion() {
-              if (it != null) {
-                  if (it.hasNext()) {
-                      param = it.next();
+          exp = expresion(clase) {
+              if (i < parametros.size()) {
+                  param = parametros.get(i);
+                  i++;
+                  if (i < parametros.size()) {
+                      clase = parametros.get(i).getParametro();
+                  }
                     
-                      if (!exp.es_desconocido()) {
-                          if (exp.getVariable() != param.getVariable()) {
-                              ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
-                          }
+                  if (!exp.es_desconocido()) {
+                      if (exp.getVariable() != param.getVariable()) {
+                          ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
+                      }
 
-                          if (param.es_referencia() && exp.es_valor()) {
-                              ErrorSemantico.error_semantico(new SimboloNoAsignableException(), t.next);
-                          }
+                      if (param.es_referencia() && exp.es_valor()) {
+                          ErrorSemantico.error_semantico(new SimboloNoAsignableException(), t.next);
                       }
                   }
-                  else {
-                      if (!exceso) { 
-                          ErrorSemantico.error_semantico(new ExcesoParametrosException(), t.next);
-                      }
-                      exceso = true;
+              }
+              else {
+                  if (!exceso) { 
+                      ErrorSemantico.error_semantico(new ExcesoParametrosException(), t.next);
                   }
+                  exceso = true;
               }
           }
         )*
@@ -1175,7 +1226,7 @@ void lista_expresiones(Simbolo simb) :
     }
 }
 
-RegistroExpr expresion() :
+RegistroExpr expresion(Clase_parametro clase) :
 {
     TipoOperador op = null;
     Token t = null;
@@ -1183,18 +1234,21 @@ RegistroExpr expresion() :
 }
 {
     try { 
-        exp1 = expresion_simple() {
+        exp1 = expresion_simple(clase) {
             t = token;
         }
         (
           op = operador_relacional()
-          exp2 = expresion_simple() {
+          exp2 = expresion_simple(clase) {
               if (exp1.getVariable() != exp2.getVariable() &&
                     !exp1.es_desconocido() && !exp2.es_desconocido()) {
                   ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
               }
               else {
                   exp1 = new RegistroExpr(exp1, exp2, op);
+
+                  // Generación de código
+                  genCod.operacion(op);
               }
           }
         )?
@@ -1209,26 +1263,40 @@ RegistroExpr expresion() :
 }
 
 TipoOperador operador_relacional() :
-{}
+{
+    TipoOperador tipo = null;
+}
 {
     try { 
-          <tMAYOR>
-        | <tMENOR>
-        | <tIGUAL>
-        | <tMAI>
-        | <tMEI>
-        | <tNI>
+          <tMAYOR> {
+              tipo = TipoOperador.MAY;
+          }
+        | <tMENOR> {
+              tipo = TipoOperador.MEN;
+          }
+        | <tIGUAL> {
+              tipo = TipoOperador.IGU;
+          }
+        | <tMAI> {
+              tipo = TipoOperador.MAI;
+          }
+        | <tMEI> {
+              tipo = TipoOperador.MEI;
+          }
+        | <tNI> {
+              tipo = TipoOperador.NI;
+          }
     }
     catch (ParseException e) { // Error sintáctico
         error_sintactico(e, "Se esperaba un operador relacional");
     }
 
     {
-        return TipoOperador.REL;
+        return tipo;
     }
 }
 
-RegistroExpr expresion_simple() :
+RegistroExpr expresion_simple(Clase_parametro clase) :
 {
     TipoOperador op = null;
     Token t = null;
@@ -1236,7 +1304,7 @@ RegistroExpr expresion_simple() :
 }
 {
     try { 
-        exp1 = termino() {
+        exp1 = termino(clase) {
             t = token;
         }
         (
@@ -1249,13 +1317,16 @@ RegistroExpr expresion_simple() :
               }
               t = token;
           }
-          exp2 = termino() {
+          exp2 = termino(clase) {
               if (exp1.getVariable() != exp2.getVariable() && !exp1.es_desconocido() &&
                     !exp2.es_desconocido()) {
                   ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
               }
               else {
                   exp1 = new RegistroExpr(exp1, exp2, op);
+
+                  // Generación de código
+                  genCod.operacion(op);
               }
           }
         )*
@@ -1294,7 +1365,7 @@ TipoOperador operador_aditivo() :
     }
 }
 
-RegistroExpr termino() :
+RegistroExpr termino(Clase_parametro clase) :
 {
     TipoOperador op = null;
     Token t = null;
@@ -1302,7 +1373,7 @@ RegistroExpr termino() :
 }
 {
     try { 
-        exp1 = factor() {
+        exp1 = factor(clase) {
             t = token;
         }
         (
@@ -1315,7 +1386,7 @@ RegistroExpr termino() :
               }
               t = token;
           }
-          exp2 = factor() {
+          exp2 = factor(clase) {
               if (exp1.getVariable() != exp2.getVariable() && !exp1.es_desconocido() &&
                     !exp2.es_desconocido()) {
                   ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
@@ -1326,6 +1397,9 @@ RegistroExpr termino() :
                       ErrorSemantico.error_semantico(new DivisionPorCeroException(), t);
                   }
                   exp1 = new RegistroExpr(exp1, exp2, op);
+
+                  // Generación de código
+                  genCod.operacion(op);
               }
           }
         )*
@@ -1367,7 +1441,7 @@ TipoOperador operador_multiplicativo() :
     }
 }
 
-RegistroExpr factor() :
+RegistroExpr factor(Clase_parametro clase) :
 {
     Token t = null;
     RegistroExpr exp = new RegistroExpr();
@@ -1375,7 +1449,7 @@ RegistroExpr factor() :
 {
     try { 
           t = <tRESTA>
-          exp = factor() {
+          exp = factor(clase) {
               if (!exp.es_entero() && !exp.es_desconocido()) {
                   ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
               }
@@ -1384,9 +1458,12 @@ RegistroExpr factor() :
                   exp.set_valor();
                   exp.setValorEnt(-1 * exp.getValorEnt());
               }
+
+              // Generación de código
+              genCod.instruccion("NGI");
           }
 	    | t = <tNOT>
-	      exp = factor() {
+	      exp = factor(clase) {
               if (!exp.es_booleano() && !exp.es_desconocido()) {
                   ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
               }
@@ -1395,15 +1472,18 @@ RegistroExpr factor() :
                   exp.set_valor();
                   exp.setValorBool(!exp.getValorBool());
               }
+
+              // Generación de código
+              genCod.instruccion("NGB");
           }
 	    | ap()
-	      exp = expresion()
+	      exp = expresion(clase)
 	      cp()
 	    | <tENTACAR> // Entero a caracter
 	      ap() {
               t = token;
           }
-	      exp = expresion() {
+	      exp = expresion(clase) {
 	          Character c = null;
 	          
 	          if (!exp.es_entero()) {
@@ -1430,13 +1510,13 @@ RegistroExpr factor() :
 	      ap() {
               t = token;
           }
-	      exp = expresion() {
+	      exp = expresion(clase) {
               Integer i = null;
               
               if (!exp.es_caracter()) {
                   ErrorSemantico.error_semantico(new SimboloNoConcuerdaException(), t);
               }
-              else if (exp.getValorEnt() != null) { 
+              else if (exp.getValorChar() != null) { 
                   i = (int) exp.getValorChar().charValue();
               }
 
@@ -1452,6 +1532,15 @@ RegistroExpr factor() :
 	          try { 
                   Simbolo aux = tabla_simbolos.buscar_simbolo(t.image);
                   exp = new RegistroExpr(aux);
+
+                  if (!aux.es_desconocido()) {
+                      // Generación de código
+                      genCod.escribir("; Acceso a variable " + aux.getNombre());
+                      genCod.instruccion("SRF 0 " + aux.strDir()); // Almacena en stack la @
+                      if (clase == Clase_parametro.VAL) {
+                          genCod.instruccion("DRF"); // Almacena en stack el valor
+                      }
+                  }
               }
               catch (SimboloNoEncontradoException e) {
                   ErrorSemantico.error_semantico(e, t);
@@ -1469,24 +1558,36 @@ RegistroExpr factor() :
 	          exp.set_entero();
               exp.set_valor();
               exp.setValorEnt(Integer.parseInt(token.image));
+
+              // Generación de código
+              genCod.instruccion("STC " + exp.getValorEnt());
 	      }
 	    | <tCONSTCHAR> {
               exp = new RegistroExpr();
               exp.set_caracter();
               exp.set_valor();
               exp.setValorChar(token.image.charAt(1));
+
+              // Generación de código
+              genCod.instruccion("STC " + (int) exp.getValorChar());
           }
 	    | <tTRUE> {
               exp = new RegistroExpr();
               exp.set_booleano();
               exp.set_valor();
               exp.setValorBool(true);
+
+              // Generación de código
+              genCod.instruccion("STC 1");
           }
 	    | <tFALSE> {
               exp = new RegistroExpr();
               exp.set_booleano();
               exp.set_valor();
               exp.setValorBool(false);
+
+              // Generación de código
+              genCod.instruccion("STC 0");
           }
     }
     catch (ParseException e) { // Error sintáctico

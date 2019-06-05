@@ -1,8 +1,8 @@
 //*****************************************************************
 // File:   RegistroExpr.java
 // Author: Andrés Gavín Murillo 716358
-// Date:   4/6/2019
-// Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V3.1
+// Date:   5/6/2019
+// Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V4.0
 //         JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
 //*****************************************************************
 
@@ -12,7 +12,7 @@ import lib.semantico.Simbolo.Clase_parametro;
 import lib.semantico.Simbolo.Tipo_variable;
 
 public class RegistroExpr {
-    public enum TipoOperador {SUM, RES, OR, MOD, DIV, MUL, AND, REL};
+    public enum TipoOperador {SUM, RES, OR, MOD, DIV, MUL, AND, MAY, MEN, IGU, MAI, MEI, NI};
     
     private Tipo_variable variable;
     private Clase_parametro parametro;
@@ -138,11 +138,8 @@ public class RegistroExpr {
                         }
                         break;
                         
-                    case REL :
-                        this.variable = Tipo_variable.BOOLEANO;
-                        break;
-                        
                     default :
+                        this.variable = Tipo_variable.BOOLEANO;
                         break;
                 }
             }
