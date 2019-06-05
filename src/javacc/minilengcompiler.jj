@@ -39,7 +39,7 @@ public class MiniLengCompiler {
     static boolean panic_mode = false;
     
     static TablaSimbolos tabla_simbolos = new TablaSimbolos();
-    static Long dir = new Long(0);
+    static Long dir = new Long(3);
     static int nivel = 0;
     static boolean tabla_simbolos_print = false;
 
@@ -412,7 +412,7 @@ Token identificador() :
 	    <tPROGRAMA>
 	    t = identificador() {
 	        if (t != null) {
-	            tabla_simbolos.introducir_programa(t.image, dir);
+	            tabla_simbolos.introducir_programa(t.image, null);
 
 	            // Generación de código
 		        genCod.escribir("; Programa " + t.image);
@@ -493,6 +493,12 @@ void declaracion() :
                 t = ids.get(i);
                 try { 
                     tabla_simbolos.introducir_variable(t.image, tipo, nivel, dir);
+                    if (tipo == Tipo_variable.ENTERO) {
+                        dir += 2;
+                    }
+                    else {
+                        dir++;
+                    }
                 }
 			    catch (SimboloYaExistenteException e) { // Error semántico
 			        ErrorSemantico.error_semantico(e, t);
@@ -613,7 +619,7 @@ Token cabecera_accion() :
         t = identificador() {
             if (t != null) { 
 	            try { 
-	                tabla_simbolos.introducir_accion(t.image, nivel, dir);
+	                tabla_simbolos.introducir_accion(t.image, nivel, null);
 	            }
 			    catch (SimboloYaExistenteException e) { // Error semántico
 			        ErrorSemantico.error_semantico(e, t);
@@ -701,6 +707,12 @@ void parametros() :
                 t = ids.get(i);
                 try { 
                     tabla_simbolos.introducir_parametro(t.image, tipo, clase, nivel, dir);
+                    if (clase == Clase_parametro.VAL && tipo == Tipo_variable.ENTERO) {
+                        dir += 2;
+                    }
+                    else {
+                        dir++; // Las referencias también ocupan 1
+                    }
                 }
 			    catch (SimboloYaExistenteException e) { // Error semántico
 			        ErrorSemantico.error_semantico(e, t);
@@ -832,6 +844,7 @@ void lista_asignables() :
 	                    ErrorSemantico.error_semantico(e, t);
 	                    try { 
 	                        s = tabla_simbolos.introducir_variable(t.image, Tipo_variable.DESCONOCIDO, nivel, dir);
+	                        dir++; // Si la compilación es correcta no se utiliza
 	                    }
 	                    catch (SimboloYaExistenteException ignored) { } // Imposible
 	                }
@@ -908,6 +921,7 @@ void identificacion() :
                     ErrorSemantico.error_semantico(e, t);
                     try { 
                         s = tabla_simbolos.introducir_variable(t.image, Tipo_variable.DESCONOCIDO, nivel, dir);
+                        dir++; // Si la compilación es correcta no se utiliza
                     }
                     catch (SimboloYaExistenteException ignored) { } // Imposible
                 }
@@ -1432,6 +1446,7 @@ RegistroExpr factor() :
                   try { 
                       Simbolo aux = tabla_simbolos.introducir_variable(t.image,
                             Tipo_variable.DESCONOCIDO, nivel, dir);
+                      dir++; // Si la compilación es correcta no se utiliza
                       exp = new RegistroExpr(aux);
                   }
                   catch (SimboloYaExistenteException ignored) { } // Imposible

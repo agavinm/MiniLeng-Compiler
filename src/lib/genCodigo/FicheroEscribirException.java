@@ -1,8 +1,8 @@
 //*****************************************************************
-// File:   SimboloNoAccionException.java
+// File:   FicheroEscribirException.java
 // Author: Andrés Gavín Murillo 716358
-// Date:   3/6/2019
-// Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V3.0
+// Date:   5/6/2019
+// Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V4.0
 //         JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
 //*****************************************************************
 
