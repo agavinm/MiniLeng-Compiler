@@ -3,30 +3,30 @@
 ; Comienzo del programa noventa_y_nueve
 L0:
 ; Direccion de n
-    SRF 0 7
+    SRF 0 5
     STC 0
 ; Asignacion de n
     ASG
 L1:
 ; MQ
 ; Acceso a variable n
-    SRF 0 7
+    SRF 0 5
     DRF
     STC 0
     LTE
 ; Acceso a variable n
-    SRF 0 7
+    SRF 0 5
     DRF
     STC 100
     GTE
     OR
 ; Acceso a variable n
-    SRF 0 7
+    SRF 0 5
     DRF
     STC 10
     DIV
 ; Acceso a variable n
-    SRF 0 7
+    SRF 0 5
     DRF
     STC 10
     MOD
@@ -44,7 +44,7 @@ L1:
     WRT 0
 ; Leer
 ; Direccion de variable n
-    SRF 0 7
+    SRF 0 5
     RD 1
 ; Fin de la iteracion. Saltar a la cabecera del bucle
     JMP L1
@@ -52,7 +52,7 @@ L2:
 ; Fin MQ
 ; Escribir
 ; Acceso a variable n
-    SRF 0 7
+    SRF 0 5
     DRF
     WRT 1
 ; Cadena " se convierte en "
@@ -93,26 +93,26 @@ L2:
 ; Direccion de x
     SRF 0 3
 ; Acceso a variable n
-    SRF 0 7
+    SRF 0 5
     DRF
     STC 10
     DIV
 ; Asignacion de x
     ASG
 ; Direccion de y
-    SRF 0 5
+    SRF 0 4
 ; Acceso a variable n
-    SRF 0 7
+    SRF 0 5
     DRF
     STC 10
     MOD
 ; Asignacion de y
     ASG
 ; Direccion de m
-    SRF 0 9
+    SRF 0 6
     STC 10
 ; Acceso a variable y
-    SRF 0 5
+    SRF 0 4
     DRF
     TMS
 ; Acceso a variable x
@@ -123,21 +123,21 @@ L2:
     ASG
 ; SI
 ; Acceso a variable n
-    SRF 0 7
+    SRF 0 5
     DRF
 ; Acceso a variable m
-    SRF 0 9
+    SRF 0 6
     DRF
     GT
     JMF L3
 ; ENT
 ; Direccion de n
-    SRF 0 7
+    SRF 0 5
 ; Acceso a variable n
-    SRF 0 7
+    SRF 0 5
     DRF
 ; Acceso a variable m
-    SRF 0 9
+    SRF 0 6
     DRF
     SBT
 ; Asignacion de n
@@ -146,12 +146,12 @@ L2:
 L3:
 ; SI_NO
 ; Direccion de n
-    SRF 0 7
+    SRF 0 5
 ; Acceso a variable m
-    SRF 0 9
+    SRF 0 6
     DRF
 ; Acceso a variable n
-    SRF 0 7
+    SRF 0 5
     DRF
     SBT
 ; Asignacion de n
@@ -161,26 +161,26 @@ L4:
 ; Direccion de x
     SRF 0 3
 ; Acceso a variable n
-    SRF 0 7
+    SRF 0 5
     DRF
     STC 10
     DIV
 ; Asignacion de x
     ASG
 ; Direccion de y
-    SRF 0 5
+    SRF 0 4
 ; Acceso a variable n
-    SRF 0 7
+    SRF 0 5
     DRF
     STC 10
     MOD
 ; Asignacion de y
     ASG
 ; Direccion de m
-    SRF 0 9
+    SRF 0 6
     STC 10
 ; Acceso a variable y
-    SRF 0 5
+    SRF 0 4
     DRF
     TMS
 ; Acceso a variable x
@@ -190,19 +190,19 @@ L4:
 ; Asignacion de m
     ASG
 ; Direccion de n
-    SRF 0 7
+    SRF 0 5
 ; Acceso a variable m
-    SRF 0 9
+    SRF 0 6
     DRF
 ; Acceso a variable n
-    SRF 0 7
+    SRF 0 5
     DRF
     PLUS
 ; Asignacion de n
     ASG
 ; Escribir
 ; Acceso a variable n
-    SRF 0 7
+    SRF 0 5
     DRF
     WRT 1
     STC 13

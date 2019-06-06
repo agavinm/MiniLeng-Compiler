@@ -492,12 +492,7 @@ void declaracion() :
                 t = ids.get(i);
                 try { 
                     tabla_simbolos.introducir_variable(t.image, tipo, nivel, dir);
-                    if (tipo == Tipo_variable.ENTERO) {
-                        dir += 2;
-                    }
-                    else {
-                        dir++;
-                    }
+                    dir++;
                 }
 			    catch (SimboloYaExistenteException e) { // Error semántico
 			        ErrorSemantico.error_semantico(e, t);
@@ -580,6 +575,8 @@ void declaracion_accion() :
 {
     Token t = null;
     String etiq = genCod.nueva_etiqueta();
+    Long dir_antes = dir;
+    dir = DIR_INICIAL;
 }
 {
     try { 
@@ -610,6 +607,10 @@ void declaracion_accion() :
     catch (ParseException e) { // Error sintáctico
         error_sintactico(e);
     }
+
+    {
+        dir = dir_antes;
+    }
 }
 
 Token cabecera_accion() :
@@ -629,7 +630,6 @@ Token cabecera_accion() :
 			        ErrorSemantico.error_semantico(e, t);
 			    }
 	            nivel++;
-	            dir = DIR_INICIAL;
 	        }
         }
         parametros_formales() {
@@ -729,12 +729,7 @@ void parametros() :
                 t = ids.get(i);
                 try { 
                     tabla_simbolos.introducir_parametro(t.image, tipo, clase, nivel, dir);
-                    if (clase == Clase_parametro.VAL && tipo == Tipo_variable.ENTERO) {
-                        dir += 2;
-                    }
-                    else {
-                        dir++; // Las referencias también ocupan 1
-                    }
+                    dir++;
                 }
 			    catch (SimboloYaExistenteException e) { // Error semántico
 			        ErrorSemantico.error_semantico(e, t);
@@ -1090,7 +1085,7 @@ void invocacion_accion(Simbolo s) :
     {
         // Generación de código
         if (s != null)
-            genCod.instruccion("OSF " + dir + " " + (nivel - s.getNivel()) + " L" + s.strDir());
+            genCod.instruccion("OSF " + (dir - 1) + " " + (nivel - s.getNivel()) + " L" + s.strDir());
     }
 }
 

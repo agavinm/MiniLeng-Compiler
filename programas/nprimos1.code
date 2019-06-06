@@ -10,7 +10,7 @@ L1:
 ; Asignacion de j
     ASG
 ; Direccion de divisible
-    SRF 0 5
+    SRF 0 4
 ; Constante Falso
     STC 0
 ; Asignacion de divisible
@@ -21,22 +21,22 @@ L2:
     SRF 0 3
     DRF
 ; Acceso a variable i
-    SRF 1 5
+    SRF 1 4
     DRF
     STC 2
     DIV
     LT
 ; Acceso a variable divisible
-    SRF 0 5
+    SRF 0 4
     DRF
     NGB
     AND
 ; Salir del bucle si la guarda se evalua a falso
     JMF L3
 ; Direccion de divisible
-    SRF 0 5
+    SRF 0 4
 ; Acceso a variable i
-    SRF 1 5
+    SRF 1 4
     DRF
 ; Acceso a variable j
     SRF 0 3
@@ -61,14 +61,14 @@ L3:
 ; Fin MQ
 ; SI
 ; Acceso a variable divisible
-    SRF 0 5
+    SRF 0 4
     DRF
     NGB
     JMF L4
 ; ENT
 ; Escribir
 ; Acceso a variable i
-    SRF 1 5
+    SRF 1 4
     DRF
     WRT 1
 ; Cadena "es primo."
@@ -109,14 +109,14 @@ L0:
 ; Asignacion de n
     ASG
 ; Direccion de i
-    SRF 0 5
+    SRF 0 4
     STC 2
 ; Asignacion de i
     ASG
 L6:
 ; MQ
 ; Acceso a variable i
-    SRF 0 5
+    SRF 0 4
     DRF
 ; Acceso a variable n
     SRF 0 3
@@ -125,11 +125,11 @@ L6:
 ; Salir del bucle si la guarda se evalua a falso
     JMF L7
 ; Invocar accion es_primo
-    OSF 6 0 L1
+    OSF 4 0 L1
 ; Direccion de i
-    SRF 0 5
+    SRF 0 4
 ; Acceso a variable i
-    SRF 0 5
+    SRF 0 4
     DRF
     STC 1
     PLUS

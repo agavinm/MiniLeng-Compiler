@@ -22,7 +22,7 @@ Características:
  Opciones disponibles:
   Panic mode: Modo de recuperación que permite la compilación cuando falta algún ';' o fin de bloque (Fin).
               En estos casos el compilador deja de comprobar nuevos tokens hasta que encuentra el token que
-              faltaba (';' o Fin) o un fin de línea. Puede generar nuevos errores o situaciones no deseadas,
+              faltaba (';' o Fin) o el final del fichero. Puede generar nuevos errores o situaciones no deseadas,
               por ejemplo si en la misma línea hay dos sentencias, y falta un ';' para separar ambas. En este
               caso la segunda sentencia será ignorada (Ej: 'a := 5  a := a - 1;', esto será interpretado como
               'a := 5;').
@@ -130,6 +130,7 @@ Características:
   Dado un fichero de entrada con formato '.ml', genera un fichero de código intermedio con 
   extensión '.code'.
   Si ha habido algún error en el proceso de compilación, no se genera el fichero de salida.
+  Todos los tipos de datos ocupan 16 bits, es decir, 2 Bytes (incluidas las referencias).
   
  Errores:
   Errores léxicos: Si ha habido un error léxico, se muestra la línea y columna, junto con el error 

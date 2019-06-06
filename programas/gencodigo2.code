@@ -13,17 +13,17 @@ L1:
     DRF
     DRF
     WRT 1
-; Asignacion de m
+; Direccion de m
     SRF 0 3
     DRF
-; Constante 0
     STC 0
+; Asignacion de m
     ASG
 ; Fin de q
     CSF
 ; Accion r
 ; Recuperar args r
-    SRF 0 5
+    SRF 0 4
     ASGI
     SRF 0 3
     ASGI
@@ -36,26 +36,26 @@ L2:
     DRF
     WRT 1
 ; Acceso a variable l
-    SRF 0 5
+    SRF 0 4
     DRF
     DRF
     WRT 1
-; Asignacion de l
-    SRF 0 5
+; Direccion de l
+    SRF 0 4
     DRF
-; Constante 0
     STC 0
+; Asignacion de l
     ASG
 ; Invocar accion q
 ; Acceso a variable l
-    SRF 0 5
+    SRF 0 4
     DRF
-    OSF 6 1 1
+    OSF 4 1 L1
 ; Invocar accion q
 ; Acceso a variable l
-    SRF 0 5
+    SRF 0 4
     DRF
-    OSF 6 1 1
+    OSF 4 1 L1
 ; Fin de r
     CSF
 ; Comienzo del programa gencodigo2
@@ -65,7 +65,7 @@ L0:
     SRF 0 3
     DRF
 ; Acceso a variable j
-    SRF 0 5
-    OSF 6 0 13
+    SRF 0 4
+    OSF 4 0 L2
 ; Fin de gencodigo2
     LVP

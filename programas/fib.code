@@ -86,7 +86,7 @@ L4:
 ; Salir del bucle si la guarda se evalua a falso
     JMF L5
 ; Invocar accion pedir_dato
-    OSF 3 0 L3
+    OSF 4 0 L3
 ; Direccion de correcto
     SRF 0 4
 ; Acceso a variable dato
@@ -161,7 +161,7 @@ L4:
     STC 46
     WRT 0
 ; Invocar accion cambiar_de_linea
-    OSF 3 1 L1
+    OSF 4 1 L1
     JMP L7
 L6:
 ; SI_NO
@@ -175,7 +175,7 @@ L5:
     CSF
 ; Accion fib
 ; Recuperar args fib
-    SRF 0 5
+    SRF 0 4
     ASGI
     SRF 0 3
     ASGI
@@ -197,8 +197,8 @@ L8:
     STC 1
     SBT
 ; Acceso a variable r1
-    SRF 0 6
-    OSF 10 1 L8
+    SRF 0 5
+    OSF 6 1 L8
 ; Invocar accion fib
 ; Acceso a variable n
     SRF 0 3
@@ -206,16 +206,16 @@ L8:
     STC 2
     SBT
 ; Acceso a variable r2
-    SRF 0 8
-    OSF 10 1 L8
+    SRF 0 6
+    OSF 6 1 L8
 ; Direccion de r
-    SRF 0 5
+    SRF 0 4
     DRF
 ; Acceso a variable r1
-    SRF 0 6
+    SRF 0 5
     DRF
 ; Acceso a variable r2
-    SRF 0 8
+    SRF 0 6
     DRF
     PLUS
 ; Asignacion de r
@@ -224,7 +224,7 @@ L8:
 L9:
 ; SI_NO
 ; Direccion de r
-    SRF 0 5
+    SRF 0 4
     DRF
 ; Acceso a variable n
     SRF 0 3
@@ -240,14 +240,14 @@ L0:
 ; Invocar accion dato
 ; Acceso a variable n
     SRF 0 3
-    OSF 10 0 L2
+    OSF 4 0 L2
 ; Invocar accion fib
 ; Acceso a variable n
     SRF 0 3
     DRF
 ; Acceso a variable r
-    SRF 0 5
-    OSF 10 0 L8
+    SRF 0 4
+    OSF 4 0 L8
 ; Escribir
 ; Cadena "Fibbonaci("
     STC 70
@@ -288,10 +288,10 @@ L0:
     STC 32
     WRT 0
 ; Acceso a variable r
-    SRF 0 5
+    SRF 0 4
     DRF
     WRT 1
 ; Invocar accion cambiar_de_linea
-    OSF 10 0 L1
+    OSF 4 0 L1
 ; Fin de fibbonaci
     LVP

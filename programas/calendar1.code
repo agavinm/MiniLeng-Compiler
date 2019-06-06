@@ -5,25 +5,25 @@
 L1:
 ; Codigo de primer_dia_anho
 ; Direccion de anho
-    SRF 1 5
+    SRF 1 4
 ; Acceso a variable anho
-    SRF 1 5
+    SRF 1 4
     DRF
     STC 1900
     SBT
 ; Asignacion de anho
     ASG
 ; Direccion de cuatro
-    SRF 0 7
+    SRF 0 6
 ; Acceso a variable anho
-    SRF 1 5
+    SRF 1 4
     DRF
     STC 4
     MOD
     STC 0
     EQ
 ; Acceso a variable anho
-    SRF 1 5
+    SRF 1 4
     DRF
     STC 100
     MOD
@@ -33,9 +33,9 @@ L1:
 ; Asignacion de cuatro
     ASG
 ; Direccion de cien
-    SRF 0 6
+    SRF 0 5
 ; Acceso a variable anho
-    SRF 1 5
+    SRF 1 4
     DRF
     STC 400
     MOD
@@ -44,12 +44,12 @@ L1:
 ; Asignacion de cien
     ASG
 ; Direccion de bisiestos_validos
-    SRF 0 5
+    SRF 0 4
 ; Acceso a variable cuatro
-    SRF 0 7
+    SRF 0 6
     DRF
 ; Acceso a variable cien
-    SRF 0 6
+    SRF 0 5
     DRF
     OR
 ; Asignacion de bisiestos_validos
@@ -57,7 +57,7 @@ L1:
 ; Direccion de bisiestos
     SRF 0 3
 ; Acceso a variable anho
-    SRF 1 5
+    SRF 1 4
     DRF
     STC 4
     DIV
@@ -65,14 +65,14 @@ L1:
     ASG
 ; SI
 ; Acceso a variable bisiestos_validos
-    SRF 0 5
+    SRF 0 4
     DRF
     JMF L2
 ; ENT
 ; Direccion de dia1anho
-    SRF 1 7
-; Acceso a variable anho
     SRF 1 5
+; Acceso a variable anho
+    SRF 1 4
     DRF
     STC 1
     SBT
@@ -88,9 +88,9 @@ L1:
 L2:
 ; SI_NO
 ; Direccion de dia1anho
-    SRF 1 7
-; Acceso a variable anho
     SRF 1 5
+; Acceso a variable anho
+    SRF 1 4
     DRF
 ; Acceso a variable bisiestos
     SRF 0 3
@@ -109,9 +109,9 @@ L3:
 L4:
 ; Codigo de primer_dia_mes
 ; Direccion de anho
-    SRF 1 5
+    SRF 1 4
 ; Acceso a variable anho
-    SRF 1 5
+    SRF 1 4
     DRF
     STC 1900
     SBT
@@ -120,14 +120,14 @@ L4:
 ; Direccion de cien
     SRF 0 4
 ; Acceso a variable anho
-    SRF 1 5
+    SRF 1 4
     DRF
     STC 4
     MOD
     STC 0
     EQ
 ; Acceso a variable anho
-    SRF 1 5
+    SRF 1 4
     DRF
     STC 100
     MOD
@@ -139,7 +139,7 @@ L4:
 ; Direccion de cuatro
     SRF 0 5
 ; Acceso a variable anho
-    SRF 1 5
+    SRF 1 4
     DRF
     STC 400
     MOD
@@ -165,7 +165,7 @@ L4:
     JMF L5
 ; ENT
 ; Direccion de anhade
-    SRF 1 11
+    SRF 1 7
     STC 1
 ; Asignacion de anhade
     ASG
@@ -173,7 +173,7 @@ L4:
 L5:
 ; SI_NO
 ; Direccion de anhade
-    SRF 1 11
+    SRF 1 7
     STC 0
 ; Asignacion de anhade
     ASG
@@ -188,9 +188,9 @@ L6:
     JMF L7
 ; ENT
 ; Direccion de dia1mes
-    SRF 1 9
+    SRF 1 6
 ; Acceso a variable dia1anho
-    SRF 1 7
+    SRF 1 5
     DRF
 ; Asignacion de dia1mes
     ASG
@@ -206,9 +206,9 @@ L7:
     JMF L9
 ; ENT
 ; Direccion de dia1mes
-    SRF 1 9
+    SRF 1 6
 ; Acceso a variable dia1anho
-    SRF 1 7
+    SRF 1 5
     DRF
     STC 31
     PLUS
@@ -228,14 +228,14 @@ L9:
     JMF L11
 ; ENT
 ; Direccion de dia1mes
-    SRF 1 9
+    SRF 1 6
 ; Acceso a variable dia1anho
-    SRF 1 7
+    SRF 1 5
     DRF
     STC 59
     PLUS
 ; Acceso a variable anhade
-    SRF 1 11
+    SRF 1 7
     DRF
     PLUS
     STC 7
@@ -254,14 +254,14 @@ L11:
     JMF L13
 ; ENT
 ; Direccion de dia1mes
-    SRF 1 9
+    SRF 1 6
 ; Acceso a variable dia1anho
-    SRF 1 7
+    SRF 1 5
     DRF
     STC 90
     PLUS
 ; Acceso a variable anhade
-    SRF 1 11
+    SRF 1 7
     DRF
     PLUS
     STC 7
@@ -280,14 +280,14 @@ L13:
     JMF L15
 ; ENT
 ; Direccion de dia1mes
-    SRF 1 9
+    SRF 1 6
 ; Acceso a variable dia1anho
-    SRF 1 7
+    SRF 1 5
     DRF
     STC 120
     PLUS
 ; Acceso a variable anhade
-    SRF 1 11
+    SRF 1 7
     DRF
     PLUS
     STC 7
@@ -306,14 +306,14 @@ L15:
     JMF L17
 ; ENT
 ; Direccion de dia1mes
-    SRF 1 9
+    SRF 1 6
 ; Acceso a variable dia1anho
-    SRF 1 7
+    SRF 1 5
     DRF
     STC 151
     PLUS
 ; Acceso a variable anhade
-    SRF 1 11
+    SRF 1 7
     DRF
     PLUS
     STC 7
@@ -332,14 +332,14 @@ L17:
     JMF L19
 ; ENT
 ; Direccion de dia1mes
-    SRF 1 9
+    SRF 1 6
 ; Acceso a variable dia1anho
-    SRF 1 7
+    SRF 1 5
     DRF
     STC 181
     PLUS
 ; Acceso a variable anhade
-    SRF 1 11
+    SRF 1 7
     DRF
     PLUS
     STC 7
@@ -358,14 +358,14 @@ L19:
     JMF L21
 ; ENT
 ; Direccion de dia1mes
-    SRF 1 9
+    SRF 1 6
 ; Acceso a variable dia1anho
-    SRF 1 7
+    SRF 1 5
     DRF
     STC 212
     PLUS
 ; Acceso a variable anhade
-    SRF 1 11
+    SRF 1 7
     DRF
     PLUS
     STC 7
@@ -384,14 +384,14 @@ L21:
     JMF L23
 ; ENT
 ; Direccion de dia1mes
-    SRF 1 9
+    SRF 1 6
 ; Acceso a variable dia1anho
-    SRF 1 7
+    SRF 1 5
     DRF
     STC 243
     PLUS
 ; Acceso a variable anhade
-    SRF 1 11
+    SRF 1 7
     DRF
     PLUS
     STC 7
@@ -410,14 +410,14 @@ L23:
     JMF L25
 ; ENT
 ; Direccion de dia1mes
-    SRF 1 9
+    SRF 1 6
 ; Acceso a variable dia1anho
-    SRF 1 7
+    SRF 1 5
     DRF
     STC 273
     PLUS
 ; Acceso a variable anhade
-    SRF 1 11
+    SRF 1 7
     DRF
     PLUS
     STC 7
@@ -436,14 +436,14 @@ L25:
     JMF L27
 ; ENT
 ; Direccion de dia1mes
-    SRF 1 9
+    SRF 1 6
 ; Acceso a variable dia1anho
-    SRF 1 7
+    SRF 1 5
     DRF
     STC 304
     PLUS
 ; Acceso a variable anhade
-    SRF 1 11
+    SRF 1 7
     DRF
     PLUS
     STC 7
@@ -462,14 +462,14 @@ L27:
     JMF L29
 ; ENT
 ; Direccion de dia1mes
-    SRF 1 9
+    SRF 1 6
 ; Acceso a variable dia1anho
-    SRF 1 7
+    SRF 1 5
     DRF
     STC 334
     PLUS
 ; Acceso a variable anhade
-    SRF 1 11
+    SRF 1 7
     DRF
     PLUS
     STC 7
@@ -645,7 +645,7 @@ L0:
     RD 1
 ; Leer
 ; Direccion de variable ln
-    SRF 0 13
+    SRF 0 8
     RD 0
 ; Escribir
 ; Cadena "Introduce un anio en cifras:"
@@ -707,19 +707,19 @@ L0:
     WRT 0
 ; Leer
 ; Direccion de variable anho
-    SRF 0 5
+    SRF 0 4
     RD 1
 ; Leer
 ; Direccion de variable ln
-    SRF 0 13
+    SRF 0 8
     RD 0
 ; Invocar accion primer_dia_anho
-    OSF 6 0 L1
+    OSF 8 0 L1
 ; Invocar accion primer_dia_mes
-    OSF 6 0 L4
+    OSF 8 0 L4
 ; Escribir
 ; Acceso a variable dia1mes
-    SRF 0 9
+    SRF 0 6
     DRF
     WRT 1
 ; Fin de calendario

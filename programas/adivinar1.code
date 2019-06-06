@@ -233,7 +233,7 @@ L0:
     STC 63
     WRT 0
 ; Invocar accion siono
-    OSF 5 0 L1
+    OSF 9 0 L1
 ; Direccion de min
     SRF 0 5
 ; Constante A
@@ -360,7 +360,7 @@ L7:
     STC 63
     WRT 0
 ; Invocar accion siono
-    OSF 5 0 L1
+    OSF 9 0 L1
 ; SI
 ; Acceso a variable respuesta
     SRF 0 3
@@ -441,7 +441,7 @@ L7:
     STC 63
     WRT 0
 ; Invocar accion siono
-    OSF 5 0 L1
+    OSF 9 0 L1
 ; SI
 ; Acceso a variable respuesta
     SRF 0 3

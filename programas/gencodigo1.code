@@ -8,14 +8,14 @@ L0:
     RD 1
 ; Leer
 ; Direccion de variable j
-    SRF 0 5
+    SRF 0 4
     RD 1
 ; SI
 ; Acceso a variable i
     SRF 0 3
     DRF
 ; Acceso a variable j
-    SRF 0 5
+    SRF 0 4
     DRF
     GT
     JMF L1
@@ -26,29 +26,31 @@ L0:
     DRF
     WRT 1
     JMP L2
-; SI_NO
 L1:
+; SI_NO
 ; Escribir
 ; Acceso a variable j
-    SRF 0 5
+    SRF 0 4
     DRF
     WRT 1
-; Fin SI
 L2:
-; MQ
+; Fin SI
 L3:
+; MQ
 ; Acceso a variable i
     SRF 0 3
     DRF
     STC 5
     GT
+; Salir del bucle si la guarda se evalua a falso
     JMF L4
-; ENT
 ; Escribir
+; Constante A
     STC 65
     WRT 0
+; Fin de la iteracion. Saltar a la cabecera del bucle
     JMP L3
-; Fin MQ
 L4:
+; Fin MQ
 ; Fin de gencodigo1
     LVP
