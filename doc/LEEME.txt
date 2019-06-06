@@ -1,5 +1,5 @@
 Autor: Andrés Gavín Murillo 716358
-Información sobre el compilador del lenguaje MiniLeng (análisis sintáctico).
+Información sobre el compilador del lenguaje MiniLeng.
 
 Modo de empleo:
  ./compilador [argumentos] [archivo]
@@ -8,19 +8,21 @@ Modo de empleo:
      -h : Muestra el mensaje de ayuda.
      -p : Uso del Panic mode (explicado en características).
      -v : Muestra información adicional (explicado en características).
+     -s : Muestra la tabla de símbolos cada vez que se cierre un bloque.
     Ejemplos de uso:
      ./compilador -h
      ./compilador programa.ml
      ./compilador -p programa.ml
      ./compilador -v -p programa.ml
+     ./compilador -s programa.ml
 
 Características:
- El compilador está preparado para el lenguaje MiniLeng (extensión de ficheros común .ml).
+ El compilador está preparado para el lenguaje MiniLeng (extensión de ficheros .ml).
  
  Opciones disponibles:
   Panic mode: Modo de recuperación que permite la compilación cuando falta algún ';' o fin de bloque (Fin).
               En estos casos el compilador deja de comprobar nuevos tokens hasta que encuentra el token que
-              faltaba (';' o Fin) o un fin de línea. Puede generar nuevos errores o situaciones no deseadas,
+              faltaba (';' o Fin) o el final del fichero. Puede generar nuevos errores o situaciones no deseadas,
               por ejemplo si en la misma línea hay dos sentencias, y falta un ';' para separar ambas. En este
               caso la segunda sentencia será ignorada (Ej: 'a := 5  a := a - 1;', esto será interpretado como
               'a := 5;').
@@ -53,13 +55,26 @@ Características:
                                 Identificadores:                  21
                                 ---------------------------------------
  
+  Tabla de símbolos: Muestra la tabla de símbolos cada vez que se cierra un bloque.
+                     Si algún símbolo carece de alguno de los atributos, se muestra en blanco.
+                     La @ de los parámetros y las variables sigue el mismo formato, pero la @ de las acciones
+                     representa el número asociado a su etiqueta Lx (siendo x el número que se muestra en la tabla).
+                     La tabla presenta el siguiente formato:
+        ---------------------------------------------------------------------------------------------------------------
+        |                                              TABLA DE SÍMBOLOS                                              |
+        ---------------------------------------------------------------------------------------------------------------
+        | Hash | Simbolo              | Nivel | Tipo      | Visible  | Variable    | Clase | Parametros         | @   |
+        ---------------------------------------------------------------------------------------------------------------
+        .....
+ 
  Léxico:
   No hay distinción entre mayúsculas y minúsculas (no es case-sensitive).
   
   Se permiten comentarios de una línea comenzados por el carácter '%'.
+  Se permiten comentarios de varias líneas comenzados y terminados por '%%'.
  
  Sintáctico:
-  La gramática admitida está definida en el fichero 'gramatica-BNF-miniLeng.html'.
+  La gramática admitida es del tipo LL(1) (por defecto) y está definida en el fichero 'gramatica-BNF-miniLeng.html'.
   
   Se permiten funciones anidadas (acciones) definiéndolas entre el bloque de variables y el bloque de sentencias.
         accion abuelo;
@@ -101,6 +116,22 @@ Características:
         
   Todo bloque de sentencias debe tener al menos una sentencia.
   
+ Semántico:
+  El lenguaje es fuertemente tipado, es decir, sólo se permiten asignaciones que sean del mismo tipo
+  y operaciones donde los dos operadores sean del mismo tipo (la operación puede devolver un tipo 
+  diferente).
+  Los parámetros por referencia y las variables pueden ser asignables y evaluados, a diferencia de los
+  parámetros por valor que solo pueden ser evaluados.
+  Se permite la escritura de cualquier expresión y cadenas constantes.
+  Sólo se permite la lectura de tipos asignables que sean caracteres o enteros.
+  
+ Generación de código:
+  Se genera un código intermedio ejecutable por la Máquina P.
+  Dado un fichero de entrada con formato '.ml', genera un fichero de código intermedio con 
+  extensión '.code'.
+  Si ha habido algún error en el proceso de compilación, no se genera el fichero de salida.
+  Todos los tipos de datos ocupan 16 bits, es decir, 2 Bytes (incluidas las referencias).
+  
  Errores:
   Errores léxicos: Si ha habido un error léxico, se muestra la línea y columna, junto con el error 
   léxico localizado, y el compilador termina su ejecución.
@@ -109,3 +140,7 @@ Características:
   Errores sintácticos: Si ha habido un error sintáctico, se muestra la línea y columna, junto con 
   un mensaje de error, y el compilador sigue su ejecución.
         "ERROR SINTÁCTICO(<línea, columna>): <mensaje de error>"
+
+  Errores semánticos: Si ha habido un error semántico, se muestra la línea y columna, junto con 
+  un mensaje de error, y el compilador sigue su ejecución.
+        "ERROR SEMÁNTICO(<línea, columna>): <mensaje de error>"

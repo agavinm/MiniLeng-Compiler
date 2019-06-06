@@ -1,15 +1,14 @@
 //*****************************************************************
 // File:   TablaDispersion.java
 // Author: Andrés Gavín Murillo 716358
-// Date:   5/5/2019
-// Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V3.0
+// Date:   6/6/2019
+// Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V4.0
 //         JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
 //*****************************************************************
 
 package lib.semantico;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -163,15 +162,14 @@ public class TablaDispersion {
     }
     
     public String toString() {
-        String linea = new String(new char[107]).replace("\0", "-") + "\n";
-        String resul = "";
+        String linea = new String(new char[111]).replace("\0", "-") + "\n";
+        String resul = linea;
         if (primer_toString) {
-            resul += linea;
-            resul += String.format("| %-41s  %-17s  %-41s |", "", "TABLA DE SÍMBOLOS", 
+            resul += String.format("| %-43s  %-17s  %-43s |", "", "TABLA DE SÍMBOLOS", 
                     "") + "\n";
             resul += linea;
-            resul += String.format("| %-4s | %-20s | %-5s | %-9s | %-8s | %-11s | %-5s | %-20s |", 
-                    "Hash", "Simbolo", "Nivel", "Tipo", "Visible", "Variable", "Clase", "Parametros") + "\n";
+            resul += String.format("| %-4s | %-20s | %-5s | %-9s | %-8s | %-11s | %-5s | %-18s | %-3s |", 
+                    "Hash", "Simbolo", "Nivel", "Tipo", "Visible", "Variable", "Clase", "Parametros", "@") + "\n";
             resul += linea;
             primer_toString = false;
         }
@@ -183,9 +181,9 @@ public class TablaDispersion {
             fila = tabla[i];
             for (int j=0; j<fila.size(); j++) {
                 s = fila.get(j);
-                resul += String.format("| %-4s | %-20s | %-5s | %-9s | %-8s | %-11s | %-5s | %-20s |", i, 
+                resul += String.format("| %-4s | %-20s | %-5s | %-9s | %-8s | %-11s | %-5s | %-18s | %-3s |", i, 
                         s.getNombre(), s.getNivel(), s.getTipo(), s.strVisible(), s.strVariable(),
-                        s.strClase(), s.strParametros()) + "\n";
+                        s.strClase(), s.strParametros(), s.strDir()) + "\n";
             }
         }
         

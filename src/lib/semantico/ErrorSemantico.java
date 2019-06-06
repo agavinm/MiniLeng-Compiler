@@ -1,8 +1,8 @@
 //*****************************************************************
 // File:   ErrorSemantico.java
 // Author: Andrés Gavín Murillo 716358
-// Date:   4/6/2019
-// Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V3.1
+// Date:   6/6/2019
+// Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V4.0
 //         JavaCC plugin 1.5.28+ wizard for JavaCC 1.5.0+
 //*****************************************************************
 
@@ -13,6 +13,7 @@ import javacc.Token;
 public abstract class ErrorSemantico {
     private static boolean correcto = true;
     
+    // Devuelve true si no se ha generado ningún error semántico, devuelve false en caso contrario
     public static boolean getCorrecto() {
         return correcto;
     }
@@ -60,7 +61,7 @@ public abstract class ErrorSemantico {
         correcto = false;
         
         System.out.println("ERROR SEMÁNTICO (<" + t.beginLine + ", " + 
-            t.beginColumn + ">) : <Exceso de parámetros>");
+            t.beginColumn + ">) : <Número incorrecto de parámetros>");
     }
 
     public static void error_semantico(DivisionPorCeroException e, Token t) {

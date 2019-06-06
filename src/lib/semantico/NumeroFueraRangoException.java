@@ -1,5 +1,5 @@
 //*****************************************************************
-// File:   SimboloNoAccionException.java
+// File:   NumeroFueraRangoException.java
 // Author: Andrés Gavín Murillo 716358
 // Date:   3/6/2019
 // Coms:   Procesadores de lenguajes - Compilador de MiniLengCompiler V3.0

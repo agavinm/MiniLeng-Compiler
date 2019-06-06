@@ -1,0 +1,213 @@
+; Programa noventa_y_nueve
+    ENP L0
+; Comienzo del programa noventa_y_nueve
+L0:
+; Direccion de n
+    SRF 0 5
+    STC 0
+; Asignacion de n
+    ASG
+L1:
+; MQ
+; Acceso a variable n
+    SRF 0 5
+    DRF
+    STC 0
+    LTE
+; Acceso a variable n
+    SRF 0 5
+    DRF
+    STC 100
+    GTE
+    OR
+; Acceso a variable n
+    SRF 0 5
+    DRF
+    STC 10
+    DIV
+; Acceso a variable n
+    SRF 0 5
+    DRF
+    STC 10
+    MOD
+    EQ
+    OR
+; Salir del bucle si la guarda se evalua a falso
+    JMF L2
+; Escribir
+; Cadena "n: "
+    STC 110
+    WRT 0
+    STC 58
+    WRT 0
+    STC 32
+    WRT 0
+; Leer
+; Direccion de variable n
+    SRF 0 5
+    RD 1
+; Fin de la iteracion. Saltar a la cabecera del bucle
+    JMP L1
+L2:
+; Fin MQ
+; Escribir
+; Acceso a variable n
+    SRF 0 5
+    DRF
+    WRT 1
+; Cadena " se convierte en "
+    STC 32
+    WRT 0
+    STC 115
+    WRT 0
+    STC 101
+    WRT 0
+    STC 32
+    WRT 0
+    STC 99
+    WRT 0
+    STC 111
+    WRT 0
+    STC 110
+    WRT 0
+    STC 118
+    WRT 0
+    STC 105
+    WRT 0
+    STC 101
+    WRT 0
+    STC 114
+    WRT 0
+    STC 116
+    WRT 0
+    STC 101
+    WRT 0
+    STC 32
+    WRT 0
+    STC 101
+    WRT 0
+    STC 110
+    WRT 0
+    STC 32
+    WRT 0
+; Direccion de x
+    SRF 0 3
+; Acceso a variable n
+    SRF 0 5
+    DRF
+    STC 10
+    DIV
+; Asignacion de x
+    ASG
+; Direccion de y
+    SRF 0 4
+; Acceso a variable n
+    SRF 0 5
+    DRF
+    STC 10
+    MOD
+; Asignacion de y
+    ASG
+; Direccion de m
+    SRF 0 6
+    STC 10
+; Acceso a variable y
+    SRF 0 4
+    DRF
+    TMS
+; Acceso a variable x
+    SRF 0 3
+    DRF
+    PLUS
+; Asignacion de m
+    ASG
+; SI
+; Acceso a variable n
+    SRF 0 5
+    DRF
+; Acceso a variable m
+    SRF 0 6
+    DRF
+    GT
+    JMF L3
+; ENT
+; Direccion de n
+    SRF 0 5
+; Acceso a variable n
+    SRF 0 5
+    DRF
+; Acceso a variable m
+    SRF 0 6
+    DRF
+    SBT
+; Asignacion de n
+    ASG
+    JMP L4
+L3:
+; SI_NO
+; Direccion de n
+    SRF 0 5
+; Acceso a variable m
+    SRF 0 6
+    DRF
+; Acceso a variable n
+    SRF 0 5
+    DRF
+    SBT
+; Asignacion de n
+    ASG
+L4:
+; Fin SI
+; Direccion de x
+    SRF 0 3
+; Acceso a variable n
+    SRF 0 5
+    DRF
+    STC 10
+    DIV
+; Asignacion de x
+    ASG
+; Direccion de y
+    SRF 0 4
+; Acceso a variable n
+    SRF 0 5
+    DRF
+    STC 10
+    MOD
+; Asignacion de y
+    ASG
+; Direccion de m
+    SRF 0 6
+    STC 10
+; Acceso a variable y
+    SRF 0 4
+    DRF
+    TMS
+; Acceso a variable x
+    SRF 0 3
+    DRF
+    PLUS
+; Asignacion de m
+    ASG
+; Direccion de n
+    SRF 0 5
+; Acceso a variable m
+    SRF 0 6
+    DRF
+; Acceso a variable n
+    SRF 0 5
+    DRF
+    PLUS
+; Asignacion de n
+    ASG
+; Escribir
+; Acceso a variable n
+    SRF 0 5
+    DRF
+    WRT 1
+    STC 13
+    WRT 0
+    STC 10
+    WRT 0
+; Fin de noventa_y_nueve
+    LVP

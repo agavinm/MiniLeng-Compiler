@@ -1,0 +1,56 @@
+; Programa gencodigo1
+    ENP L0
+; Comienzo del programa gencodigo1
+L0:
+; Leer
+; Direccion de variable i
+    SRF 0 3
+    RD 1
+; Leer
+; Direccion de variable j
+    SRF 0 4
+    RD 1
+; SI
+; Acceso a variable i
+    SRF 0 3
+    DRF
+; Acceso a variable j
+    SRF 0 4
+    DRF
+    GT
+    JMF L1
+; ENT
+; Escribir
+; Acceso a variable i
+    SRF 0 3
+    DRF
+    WRT 1
+    JMP L2
+L1:
+; SI_NO
+; Escribir
+; Acceso a variable j
+    SRF 0 4
+    DRF
+    WRT 1
+L2:
+; Fin SI
+L3:
+; MQ
+; Acceso a variable i
+    SRF 0 3
+    DRF
+    STC 5
+    GT
+; Salir del bucle si la guarda se evalua a falso
+    JMF L4
+; Escribir
+; Constante A
+    STC 65
+    WRT 0
+; Fin de la iteracion. Saltar a la cabecera del bucle
+    JMP L3
+L4:
+; Fin MQ
+; Fin de gencodigo1
+    LVP

@@ -1,0 +1,89 @@
+; Programa semantico
+    ENP L0
+; Accion accion1
+; Recuperar args accion1
+    SRF 0 3
+    ASGI
+    JMP L1
+; Accion accion2
+; Recuperar args accion2
+    SRF 0 3
+    ASGI
+    JMP L2
+; Accion accion3
+; Recuperar args accion3
+    SRF 0 3
+    ASGI
+    JMP L3
+; Accion accion4
+; Recuperar args accion4
+    SRF 0 5
+    ASGI
+    SRF 0 4
+    ASGI
+    SRF 0 3
+    ASGI
+    JMP L4
+; Accion accion5
+; Recuperar args accion5
+    SRF 0 5
+    ASGI
+    SRF 0 4
+    ASGI
+    SRF 0 3
+    ASGI
+    JMP L5
+L5:
+; Codigo de accion5
+; Escribir
+    STC 13
+    WRT 0
+    STC 10
+    WRT 0
+; Fin de accion5
+    CSF
+L4:
+; Codigo de accion4
+; Escribir
+    STC 13
+    WRT 0
+    STC 10
+    WRT 0
+; Fin de accion4
+    CSF
+L3:
+; Codigo de accion3
+; Escribir
+    STC 13
+    WRT 0
+    STC 10
+    WRT 0
+; Fin de accion3
+    CSF
+L2:
+; Codigo de accion2
+; Escribir
+    STC 13
+    WRT 0
+    STC 10
+    WRT 0
+; Fin de accion2
+    CSF
+L1:
+; Codigo de accion1
+; Escribir
+    STC 13
+    WRT 0
+    STC 10
+    WRT 0
+; Fin de accion1
+    CSF
+; Comienzo del programa semantico
+L0:
+; Escribir
+    STC 13
+    WRT 0
+    STC 10
+    WRT 0
+; Fin de semantico
+    LVP

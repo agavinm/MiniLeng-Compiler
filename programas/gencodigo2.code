@@ -1,0 +1,73 @@
+; Programa gencodigo2
+    ENP L0
+; Accion q
+L1:
+; Recuperar args q
+    SRF 0 3
+    ASGI
+    JMP L2
+L2:
+; Codigo de q
+; Escribir
+; Acceso a variable m
+    SRF 0 3
+    DRF
+    DRF
+    WRT 1
+; Direccion de m
+    SRF 0 3
+    DRF
+    STC 0
+; Asignacion de m
+    ASG
+; Fin de q
+    CSF
+; Accion r
+L3:
+; Recuperar args r
+    SRF 0 4
+    ASGI
+    SRF 0 3
+    ASGI
+    JMP L4
+L4:
+; Codigo de r
+; Escribir
+; Acceso a variable k
+    SRF 0 3
+    DRF
+    WRT 1
+; Acceso a variable l
+    SRF 0 4
+    DRF
+    DRF
+    WRT 1
+; Direccion de l
+    SRF 0 4
+    DRF
+    STC 0
+; Asignacion de l
+    ASG
+; Invocar accion q
+; Acceso a variable l
+    SRF 0 4
+    DRF
+    OSF 4 1 L1
+; Invocar accion q
+; Acceso a variable l
+    SRF 0 4
+    DRF
+    OSF 4 1 L1
+; Fin de r
+    CSF
+; Comienzo del programa gencodigo2
+L0:
+; Invocar accion r
+; Acceso a variable i
+    SRF 0 3
+    DRF
+; Acceso a variable j
+    SRF 0 4
+    OSF 4 0 L3
+; Fin de gencodigo2
+    LVP
