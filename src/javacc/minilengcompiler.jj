@@ -861,6 +861,9 @@ void lista_asignables() :
 		                    genCod.escribir("; Leer");
                             genCod.escribir("; Direccion de variable " + s.getNombre());
 		                    genCod.instruccion("SRF " + (nivel - s.getNivel()) + " " + s.strDir());
+		                    if (s.es_parametro() && s.es_referencia()) {
+	                            genCod.instruccion("DRF"); // Almacena en stack la @ original
+	                        }
 		                    if (s.es_caracter()) {
 		                        genCod.instruccion("RD 0");
 		                    }

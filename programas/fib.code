@@ -60,6 +60,7 @@ L3:
 ; Leer
 ; Direccion de variable dato
     SRF 1 3
+    DRF
     RD 1
 ; Fin de pedir_dato
     CSF
