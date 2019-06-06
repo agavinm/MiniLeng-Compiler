@@ -1,15 +1,16 @@
 ; Programa maximo_comun_divisor
     ENP L0
 ; Accion dato
-    JMP L1
 L1:
+    JMP L2
+L2:
 ; Codigo de dato
 ; Direccion de d
     SRF 1 4
     STC 0
 ; Asignacion de d
     ASG
-L2:
+L3:
 ; MQ
 ; Acceso a variable d
     SRF 1 4
@@ -17,7 +18,7 @@ L2:
     STC 0
     LTE
 ; Salir del bucle si la guarda se evalua a falso
-    JMF L3
+    JMF L4
 ; Escribir
 ; Cadena "Escribe un numero: "
     STC 69
@@ -68,7 +69,7 @@ L2:
     DRF
     STC 0
     LTE
-    JMF L4
+    JMF L5
 ; ENT
 ; Escribir
 ; Cadena "El numero debe ser postivo."
@@ -131,20 +132,21 @@ L2:
     WRT 0
     STC 10
     WRT 0
-    JMP L5
-L4:
-; SI_NO
+    JMP L6
 L5:
+; SI_NO
+L6:
 ; Fin SI
 ; Fin de la iteracion. Saltar a la cabecera del bucle
-    JMP L2
-L3:
+    JMP L3
+L4:
 ; Fin MQ
 ; Fin de dato
     CSF
 ; Accion mcd
-    JMP L6
-L6:
+L7:
+    JMP L8
+L8:
 ; Codigo de mcd
 ; Direccion de r
     SRF 0 3
@@ -157,7 +159,7 @@ L6:
     MOD
 ; Asignacion de r
     ASG
-L7:
+L9:
 ; MQ
 ; Acceso a variable r
     SRF 0 3
@@ -165,7 +167,7 @@ L7:
     STC 0
     NEQ
 ; Salir del bucle si la guarda se evalua a falso
-    JMF L8
+    JMF L10
 ; Direccion de a
     SRF 1 5
 ; Acceso a variable b
@@ -192,8 +194,8 @@ L7:
 ; Asignacion de r
     ASG
 ; Fin de la iteracion. Saltar a la cabecera del bucle
-    JMP L7
-L8:
+    JMP L9
+L10:
 ; Fin MQ
 ; Direccion de m
     SRF 1 3
@@ -225,7 +227,7 @@ L0:
 ; Asignacion de b
     ASG
 ; Invocar accion mcd
-    OSF 6 0 L6
+    OSF 6 0 L7
 ; Escribir
 ; Cadena "El MCD es: "
     STC 69

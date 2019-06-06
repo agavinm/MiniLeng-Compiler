@@ -1,8 +1,9 @@
 ; Programa calendario
     ENP L0
 ; Accion primer_dia_anho
-    JMP L1
 L1:
+    JMP L2
+L2:
 ; Codigo de primer_dia_anho
 ; Direccion de anho
     SRF 1 4
@@ -67,7 +68,7 @@ L1:
 ; Acceso a variable bisiestos_validos
     SRF 0 4
     DRF
-    JMF L2
+    JMF L3
 ; ENT
 ; Direccion de dia1anho
     SRF 1 5
@@ -84,8 +85,8 @@ L1:
     MOD
 ; Asignacion de dia1anho
     ASG
-    JMP L3
-L2:
+    JMP L4
+L3:
 ; SI_NO
 ; Direccion de dia1anho
     SRF 1 5
@@ -100,13 +101,14 @@ L2:
     MOD
 ; Asignacion de dia1anho
     ASG
-L3:
+L4:
 ; Fin SI
 ; Fin de primer_dia_anho
     CSF
 ; Accion primer_dia_mes
-    JMP L4
-L4:
+L5:
+    JMP L6
+L6:
 ; Codigo de primer_dia_mes
 ; Direccion de anho
     SRF 1 4
@@ -162,22 +164,22 @@ L4:
 ; Acceso a variable bisiestos_validos
     SRF 0 3
     DRF
-    JMF L5
+    JMF L7
 ; ENT
 ; Direccion de anhade
     SRF 1 7
     STC 1
 ; Asignacion de anhade
     ASG
-    JMP L6
-L5:
+    JMP L8
+L7:
 ; SI_NO
 ; Direccion de anhade
     SRF 1 7
     STC 0
 ; Asignacion de anhade
     ASG
-L6:
+L8:
 ; Fin SI
 ; SI
 ; Acceso a variable mes
@@ -185,7 +187,7 @@ L6:
     DRF
     STC 1
     EQ
-    JMF L7
+    JMF L9
 ; ENT
 ; Direccion de dia1mes
     SRF 1 6
@@ -194,8 +196,8 @@ L6:
     DRF
 ; Asignacion de dia1mes
     ASG
-    JMP L8
-L7:
+    JMP L10
+L9:
 ; SI_NO
 ; SI
 ; Acceso a variable mes
@@ -203,7 +205,7 @@ L7:
     DRF
     STC 2
     EQ
-    JMF L9
+    JMF L11
 ; ENT
 ; Direccion de dia1mes
     SRF 1 6
@@ -216,8 +218,8 @@ L7:
     MOD
 ; Asignacion de dia1mes
     ASG
-    JMP L10
-L9:
+    JMP L12
+L11:
 ; SI_NO
 ; SI
 ; Acceso a variable mes
@@ -225,7 +227,7 @@ L9:
     DRF
     STC 3
     EQ
-    JMF L11
+    JMF L13
 ; ENT
 ; Direccion de dia1mes
     SRF 1 6
@@ -242,8 +244,8 @@ L9:
     MOD
 ; Asignacion de dia1mes
     ASG
-    JMP L12
-L11:
+    JMP L14
+L13:
 ; SI_NO
 ; SI
 ; Acceso a variable mes
@@ -251,7 +253,7 @@ L11:
     DRF
     STC 4
     EQ
-    JMF L13
+    JMF L15
 ; ENT
 ; Direccion de dia1mes
     SRF 1 6
@@ -268,8 +270,8 @@ L11:
     MOD
 ; Asignacion de dia1mes
     ASG
-    JMP L14
-L13:
+    JMP L16
+L15:
 ; SI_NO
 ; SI
 ; Acceso a variable mes
@@ -277,7 +279,7 @@ L13:
     DRF
     STC 5
     EQ
-    JMF L15
+    JMF L17
 ; ENT
 ; Direccion de dia1mes
     SRF 1 6
@@ -294,8 +296,8 @@ L13:
     MOD
 ; Asignacion de dia1mes
     ASG
-    JMP L16
-L15:
+    JMP L18
+L17:
 ; SI_NO
 ; SI
 ; Acceso a variable mes
@@ -303,7 +305,7 @@ L15:
     DRF
     STC 6
     EQ
-    JMF L17
+    JMF L19
 ; ENT
 ; Direccion de dia1mes
     SRF 1 6
@@ -320,8 +322,8 @@ L15:
     MOD
 ; Asignacion de dia1mes
     ASG
-    JMP L18
-L17:
+    JMP L20
+L19:
 ; SI_NO
 ; SI
 ; Acceso a variable mes
@@ -329,7 +331,7 @@ L17:
     DRF
     STC 7
     EQ
-    JMF L19
+    JMF L21
 ; ENT
 ; Direccion de dia1mes
     SRF 1 6
@@ -346,8 +348,8 @@ L17:
     MOD
 ; Asignacion de dia1mes
     ASG
-    JMP L20
-L19:
+    JMP L22
+L21:
 ; SI_NO
 ; SI
 ; Acceso a variable mes
@@ -355,7 +357,7 @@ L19:
     DRF
     STC 8
     EQ
-    JMF L21
+    JMF L23
 ; ENT
 ; Direccion de dia1mes
     SRF 1 6
@@ -372,8 +374,8 @@ L19:
     MOD
 ; Asignacion de dia1mes
     ASG
-    JMP L22
-L21:
+    JMP L24
+L23:
 ; SI_NO
 ; SI
 ; Acceso a variable mes
@@ -381,7 +383,7 @@ L21:
     DRF
     STC 9
     EQ
-    JMF L23
+    JMF L25
 ; ENT
 ; Direccion de dia1mes
     SRF 1 6
@@ -398,8 +400,8 @@ L21:
     MOD
 ; Asignacion de dia1mes
     ASG
-    JMP L24
-L23:
+    JMP L26
+L25:
 ; SI_NO
 ; SI
 ; Acceso a variable mes
@@ -407,7 +409,7 @@ L23:
     DRF
     STC 10
     EQ
-    JMF L25
+    JMF L27
 ; ENT
 ; Direccion de dia1mes
     SRF 1 6
@@ -424,8 +426,8 @@ L23:
     MOD
 ; Asignacion de dia1mes
     ASG
-    JMP L26
-L25:
+    JMP L28
+L27:
 ; SI_NO
 ; SI
 ; Acceso a variable mes
@@ -433,7 +435,7 @@ L25:
     DRF
     STC 11
     EQ
-    JMF L27
+    JMF L29
 ; ENT
 ; Direccion de dia1mes
     SRF 1 6
@@ -450,8 +452,8 @@ L25:
     MOD
 ; Asignacion de dia1mes
     ASG
-    JMP L28
-L27:
+    JMP L30
+L29:
 ; SI_NO
 ; SI
 ; Acceso a variable mes
@@ -459,7 +461,7 @@ L27:
     DRF
     STC 12
     EQ
-    JMF L29
+    JMF L31
 ; ENT
 ; Direccion de dia1mes
     SRF 1 6
@@ -476,8 +478,8 @@ L27:
     MOD
 ; Asignacion de dia1mes
     ASG
-    JMP L30
-L29:
+    JMP L32
+L31:
 ; SI_NO
 ; Escribir
 ; Cadena "Has introducido el mes mal"
@@ -533,6 +535,8 @@ L29:
     WRT 0
     STC 108
     WRT 0
+L32:
+; Fin SI
 L30:
 ; Fin SI
 L28:
@@ -554,8 +558,6 @@ L14:
 L12:
 ; Fin SI
 L10:
-; Fin SI
-L8:
 ; Fin SI
 ; Fin de primer_dia_mes
     CSF
@@ -716,7 +718,7 @@ L0:
 ; Invocar accion primer_dia_anho
     OSF 8 0 L1
 ; Invocar accion primer_dia_mes
-    OSF 8 0 L4
+    OSF 8 0 L5
 ; Escribir
 ; Acceso a variable dia1mes
     SRF 0 6

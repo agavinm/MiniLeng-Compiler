@@ -574,7 +574,7 @@ void declaracion_acciones() :
 void declaracion_accion() :
 {
     Token t = null;
-    String etiq = genCod.nueva_etiqueta();
+    String etiq;
     Long dir_antes = dir;
     dir = DIR_INICIAL;
 }
@@ -582,6 +582,7 @@ void declaracion_accion() :
     try { 
         t = cabecera_accion() {
             // Generación de código
+            etiq = genCod.nueva_etiqueta();
             genCod.instruccion("JMP " + etiq);
         }
         punto_y_coma()
@@ -616,15 +617,19 @@ void declaracion_accion() :
 Token cabecera_accion() :
 {
     Token t = null;
-    Simbolo s;
+    Simbolo s = null;
 }
 {
     try { 
         <tACCION>
         t = identificador() {
             if (t != null) { 
-	            try { 
-	                tabla_simbolos.introducir_accion(t.image, nivel, genCod.getDir());
+	            try {
+	                // Generación de código
+                    genCod.escribir("; Accion " + t.image);
+                    genCod.escribir(genCod.nueva_etiqueta() + ":");
+                    
+	                s = tabla_simbolos.introducir_accion(t.image, nivel, genCod.getDir());
 	            }
 			    catch (SimboloYaExistenteException e) { // Error semántico
 			        ErrorSemantico.error_semantico(e, t);
@@ -634,11 +639,9 @@ Token cabecera_accion() :
         }
         parametros_formales() {
             // Generación de código
-            if (t != null) { 
-	            genCod.escribir("; Accion " + t.image);
+            if (t != null && s != null) { 
 	            try {
-	                Iterator<Simbolo> it =
-	                    tabla_simbolos.buscar_simbolo(t.image).getLista_parametros().descendingIterator();
+	                Iterator<Simbolo> it = s.getLista_parametros().descendingIterator();
 	                if (it.hasNext()) {
 	                    genCod.escribir("; Recuperar args " + t.image);
 	                }

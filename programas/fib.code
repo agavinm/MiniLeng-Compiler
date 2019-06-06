@@ -1,8 +1,9 @@
 ; Programa fibbonaci
     ENP L0
 ; Accion cambiar_de_linea
-    JMP L1
 L1:
+    JMP L2
+L2:
 ; Codigo de cambiar_de_linea
 ; Escribir
     STC 13
@@ -12,10 +13,15 @@ L1:
 ; Fin de cambiar_de_linea
     CSF
 ; Accion dato
-    JMP L2
-; Accion pedir_dato
-    JMP L3
 L3:
+; Recuperar args dato
+    SRF 0 3
+    ASGI
+    JMP L4
+; Accion pedir_dato
+L5:
+    JMP L6
+L6:
 ; Codigo de pedir_dato
 ; Escribir
 ; Cadena "Escribe un numero: "
@@ -64,7 +70,7 @@ L3:
     RD 1
 ; Fin de pedir_dato
     CSF
-L2:
+L4:
 ; Codigo de dato
 ; Direccion de dato
     SRF 0 3
@@ -78,16 +84,16 @@ L2:
     STC 0
 ; Asignacion de correcto
     ASG
-L4:
+L7:
 ; MQ
 ; Acceso a variable correcto
     SRF 0 4
     DRF
     NGB
 ; Salir del bucle si la guarda se evalua a falso
-    JMF L5
+    JMF L8
 ; Invocar accion pedir_dato
-    OSF 4 0 L3
+    OSF 4 0 L5
 ; Direccion de correcto
     SRF 0 4
 ; Acceso a variable dato
@@ -103,7 +109,7 @@ L4:
     SRF 0 4
     DRF
     NGB
-    JMF L6
+    JMF L9
 ; ENT
 ; Escribir
 ; Cadena "El numero debe ser postivo."
@@ -163,25 +169,26 @@ L4:
     WRT 0
 ; Invocar accion cambiar_de_linea
     OSF 4 1 L1
-    JMP L7
-L6:
+    JMP L10
+L9:
 ; SI_NO
-L7:
+L10:
 ; Fin SI
 ; Fin de la iteracion. Saltar a la cabecera del bucle
-    JMP L4
-L5:
+    JMP L7
+L8:
 ; Fin MQ
 ; Fin de dato
     CSF
 ; Accion fib
+L11:
 ; Recuperar args fib
     SRF 0 4
     ASGI
     SRF 0 3
     ASGI
-    JMP L8
-L8:
+    JMP L12
+L12:
 ; Codigo de fib
 ; SI
 ; Acceso a variable n
@@ -189,7 +196,7 @@ L8:
     DRF
     STC 1
     GT
-    JMF L9
+    JMF L13
 ; ENT
 ; Invocar accion fib
 ; Acceso a variable n
@@ -199,7 +206,7 @@ L8:
     SBT
 ; Acceso a variable r1
     SRF 0 5
-    OSF 6 1 L8
+    OSF 6 1 L11
 ; Invocar accion fib
 ; Acceso a variable n
     SRF 0 3
@@ -208,7 +215,7 @@ L8:
     SBT
 ; Acceso a variable r2
     SRF 0 6
-    OSF 6 1 L8
+    OSF 6 1 L11
 ; Direccion de r
     SRF 0 4
     DRF
@@ -221,8 +228,8 @@ L8:
     PLUS
 ; Asignacion de r
     ASG
-    JMP L10
-L9:
+    JMP L14
+L13:
 ; SI_NO
 ; Direccion de r
     SRF 0 4
@@ -232,7 +239,7 @@ L9:
     DRF
 ; Asignacion de r
     ASG
-L10:
+L14:
 ; Fin SI
 ; Fin de fib
     CSF
@@ -241,14 +248,14 @@ L0:
 ; Invocar accion dato
 ; Acceso a variable n
     SRF 0 3
-    OSF 4 0 L2
+    OSF 4 0 L3
 ; Invocar accion fib
 ; Acceso a variable n
     SRF 0 3
     DRF
 ; Acceso a variable r
     SRF 0 4
-    OSF 4 0 L8
+    OSF 4 0 L11
 ; Escribir
 ; Cadena "Fibbonaci("
     STC 70
